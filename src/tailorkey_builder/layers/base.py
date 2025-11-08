@@ -72,9 +72,7 @@ def apply_patch(layer: Layer, patch: Dict[int, Dict[str, Any]]) -> None:
         layer[index] = deepcopy(replacement)
 
 
-def apply_patch_if(
-    layer: Layer, condition: bool, patch: Dict[int, Dict[str, Any]]
-) -> None:
+def apply_patch_if(layer: Layer, condition: bool, patch: Dict[int, Dict[str, Any]]) -> None:
     if condition:
         apply_patch(layer, patch)
 

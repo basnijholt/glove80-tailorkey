@@ -30,9 +30,7 @@ def build_layout(variant: str) -> Dict:
     ordered_layers = []
     for name in layout["layer_names"]:
         if name not in generated_layers:
-            raise KeyError(
-                f"No generated layer data for '{name}' in variant '{variant}'"
-            )
+            raise KeyError(f"No generated layer data for '{name}' in variant '{variant}'")
         ordered_layers.append(generated_layers[name])
 
     layout["layers"] = ordered_layers

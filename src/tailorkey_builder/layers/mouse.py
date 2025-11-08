@@ -73,10 +73,7 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             54: KeySpec("&mkp", (KeySpec("MB5"),)),
             55: KeySpec("&kp", (KeySpec("LC", (KeySpec("X"),)),)),
             56: KeySpec("&kp", (KeySpec("LC", (KeySpec("C"),)),)),
-            57: KeySpec(
-                "&kp",
-                (KeySpec("LC", (KeySpec("LC", (KeySpec("V"),)),)),),
-            ),
+            57: KeySpec("&kp", (KeySpec("LC", (KeySpec("LC", (KeySpec("V"),)),)),)),
             58: KeySpec("&msc", (KeySpec("SCRL_DOWN"),)),
             59: KeySpec("&msc", (KeySpec("SCRL_LEFT"),)),
             60: KeySpec("&mmv", (KeySpec("MOVE_UP"),)),
@@ -107,9 +104,7 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
 }
 
 
-_BASE_MOUSE_LAYERS = {
-    name: build_layer_from_spec(spec) for name, spec in MOUSE_LAYER_SPECS.items()
-}
+_BASE_MOUSE_LAYERS = {name: build_layer_from_spec(spec) for name, spec in MOUSE_LAYER_SPECS.items()}
 
 Patch = Dict[int, Dict[str, Any]]
 

@@ -26,9 +26,7 @@ def write_layout(data: dict, destination: Path) -> bool:
         current = json.loads(destination.read_text(encoding="utf-8"))
         if current == data:
             return False
-    destination.write_text(
-        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+    destination.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     return True
 
 
