@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Dict
 
-from ...base import KeySpec, Layer, LayerSpec, build_layer_from_spec
+from ...base import KeySpec, Layer, LayerSpec, build_layer_from_spec, copy_layer
+from ...layers.mouse_helpers import build_transparent_mouse_layer
 
 
 _MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
@@ -44,14 +45,16 @@ _MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             79: KeySpec("&mkp", (KeySpec("MB5"),)),
         }
     ),
-    "MouseSlow": LayerSpec(overrides={}),
-    "MouseFast": LayerSpec(overrides={}),
-    "MouseWarp": LayerSpec(overrides={}),
 }
 
 
+_BASE_MOUSE_LAYERS = {"Mouse": build_layer_from_spec(_MOUSE_LAYER_SPECS["Mouse"])}
+for transparent in ("MouseSlow", "MouseFast", "MouseWarp"):
+    _BASE_MOUSE_LAYERS[transparent] = build_transparent_mouse_layer(transparent)
+
+
 def _build(name: str) -> Layer:
-    return build_layer_from_spec(_MOUSE_LAYER_SPECS[name])
+    return copy_layer(_BASE_MOUSE_LAYERS[name])
 
 
 def build_mouse_layer(_variant: str) -> Layer:

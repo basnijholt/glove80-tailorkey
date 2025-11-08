@@ -13,6 +13,7 @@ from ...base import (
     build_layer_from_spec,
     copy_layers_map,
 )
+from ...layers.mouse_helpers import build_transparent_mouse_layer
 
 MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
     "Mouse": LayerSpec(
@@ -99,13 +100,12 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             79: KeySpec("&kp", (KeySpec("K_APP"),)),
         }
     ),
-    "MouseSlow": LayerSpec(overrides={}),
-    "MouseFast": LayerSpec(overrides={}),
-    "MouseWarp": LayerSpec(overrides={}),
 }
 
 
-_BASE_MOUSE_LAYERS = {name: build_layer_from_spec(spec) for name, spec in MOUSE_LAYER_SPECS.items()}
+_BASE_MOUSE_LAYERS = {"Mouse": build_layer_from_spec(MOUSE_LAYER_SPECS["Mouse"])}
+for transparent in ("MouseSlow", "MouseFast", "MouseWarp"):
+    _BASE_MOUSE_LAYERS[transparent] = build_transparent_mouse_layer(transparent)
 
 
 _MAC_MOUSE_PATCH: PatchSpec = {
