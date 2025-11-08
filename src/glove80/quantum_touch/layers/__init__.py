@@ -9,6 +9,7 @@ from .lower_layer import build_lower_layer
 from .mouse_fast_layer import build_mouse_fast_layer
 from .mouse_layer import build_mouse_layer
 from .mouse_slow_layer import build_mouse_slow_layer
+from .mouse_warp_layer import build_mouse_warp_layer
 from .original_layer import build_original_layer
 
 LayerBuilder = Callable[[str], Layer]
@@ -21,6 +22,7 @@ LAYER_BUILDERS: Dict[str, LayerBuilder] = {
     "Mouse": build_mouse_layer,
     "MouseFast": build_mouse_fast_layer,
     "MouseSlow": build_mouse_slow_layer,
+    "MouseWarp": build_mouse_warp_layer,
     "Original": build_original_layer,
 }
 
