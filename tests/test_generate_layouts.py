@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from tailorkey_builder.layouts import build_layout
 
 import scripts.generate_tailorkey_layouts as generator
 
@@ -18,13 +19,7 @@ def test_generated_files_match_canonical_source(tmp_path, variant):
     meta = metadata[variant]
 
     source_path = REPO_ROOT / meta["source"]
-    output_path = REPO_ROOT / meta["output"]
+    expected = json.loads(source_path.read_text())
 
-    # Ensure the generator rewrites the files before comparing.
-    generator.generate_variant(variant, meta)
-
-    with (
-        source_path.open(encoding="utf-8") as src,
-        output_path.open(encoding="utf-8") as dst,
-    ):
-        assert json.load(src) == json.load(dst)
+    built = build_layout(variant)
+    assert built == expected

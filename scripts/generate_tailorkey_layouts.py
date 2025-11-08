@@ -4,10 +4,15 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 METADATA_PATH = ROOT / "sources" / "variant_metadata.json"
+
+sys.path.insert(0, str(ROOT / "src"))
+
+from tailorkey_builder.layouts import build_layout  # noqa: E402
 
 
 def load_metadata() -> dict[str, dict]:
@@ -23,11 +28,8 @@ def write_layout(data: dict, destination: Path) -> None:
 
 
 def generate_variant(name: str, meta: dict) -> None:
-    source_path = ROOT / meta["source"]
     destination = ROOT / meta["output"]
-
-    with source_path.open(encoding="utf-8") as handle:
-        layout = json.load(handle)
+    layout = build_layout(name)
 
     for field in ("title", "uuid", "parent_uuid", "date", "notes", "tags"):
         if field in meta:
