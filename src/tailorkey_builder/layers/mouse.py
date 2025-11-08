@@ -2,29 +2,29 @@
 
 from __future__ import annotations
 
-import json
-from copy import deepcopy
-from importlib import resources
-from typing import Dict, List
+from typing import Dict
 
-Layer = List[Dict]
+from .base import Layer, apply_patch, copy_layers_map, load_layers_map
 
 
-def _load_base_layers() -> Dict[str, Layer]:
-    data_path = resources.files("tailorkey_builder.data").joinpath("mouse_layers.json")
-    with data_path.open(encoding="utf-8") as handle:
-        return json.load(handle)
-
-
-_BASE_MOUSE_LAYERS: Dict[str, Layer] = _load_base_layers()
+_BASE_MOUSE_LAYERS: Dict[str, Layer] = load_layers_map("mouse_layers.json")
 
 
 _MAC_MOUSE_PATCH = {
     30: {"value": "&sk", "params": [{"value": "RGUI", "params": []}]},
     32: {"value": "&sk", "params": [{"value": "RCTRL", "params": []}]},
-    55: {"value": "&kp", "params": [{"value": "LG", "params": [{"value": "X", "params": []}]}]},
-    56: {"value": "&kp", "params": [{"value": "LG", "params": [{"value": "C", "params": []}]}]},
-    57: {"value": "&kp", "params": [{"value": "LG", "params": [{"value": "V", "params": []}]}]},
+    55: {
+        "value": "&kp",
+        "params": [{"value": "LG", "params": [{"value": "X", "params": []}]}],
+    },
+    56: {
+        "value": "&kp",
+        "params": [{"value": "LG", "params": [{"value": "C", "params": []}]}],
+    },
+    57: {
+        "value": "&kp",
+        "params": [{"value": "LG", "params": [{"value": "V", "params": []}]}],
+    },
 }
 
 _DUAL_MOUSE_PATCH = {
@@ -43,28 +43,18 @@ _BILATERAL_MOUSE_PATCH = {
 }
 
 
-def _apply_patch(layer: Layer, patch: Dict[int, Dict]) -> None:
-    for index, replacement in patch.items():
-        layer[index] = deepcopy(replacement)
-
-
-def _copy_base_layers() -> Dict[str, Layer]:
-    return {name: deepcopy(layer) for name, layer in _BASE_MOUSE_LAYERS.items()}
-
-
 def build_mouse_layers(variant: str) -> Dict[str, Layer]:
     """Return the four mouse-related layers for the requested variant."""
-
-    layers = _copy_base_layers()
+    layers = copy_layers_map(_BASE_MOUSE_LAYERS)
     mouse = layers["Mouse"]
 
     if variant in {"mac", "bilateral_mac"}:
-        _apply_patch(mouse, _MAC_MOUSE_PATCH)
+        apply_patch(mouse, _MAC_MOUSE_PATCH)
 
     if variant == "dual":
-        _apply_patch(mouse, _DUAL_MOUSE_PATCH)
+        apply_patch(mouse, _DUAL_MOUSE_PATCH)
 
     if variant in {"bilateral_windows", "bilateral_mac"}:
-        _apply_patch(mouse, _BILATERAL_MOUSE_PATCH)
+        apply_patch(mouse, _BILATERAL_MOUSE_PATCH)
 
     return layers

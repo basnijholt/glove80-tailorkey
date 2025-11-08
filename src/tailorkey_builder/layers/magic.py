@@ -2,22 +2,10 @@
 
 from __future__ import annotations
 
-import json
-from copy import deepcopy
-from importlib import resources
-from typing import Dict, List
-
-Layer = List[Dict]
+from .base import Layer, apply_patch_if, copy_layer, load_layer_from_data
 
 
-def _load_base_layer() -> Layer:
-    data_path = resources.files("tailorkey_builder.data").joinpath("magic_layer.json")
-    with data_path.open(encoding="utf-8") as handle:
-        data = json.load(handle)
-    return data["Magic"]
-
-
-_BASE_MAGIC_LAYER: Layer = _load_base_layer()
+_BASE_MAGIC_LAYER: Layer = load_layer_from_data("Magic", filename="magic_layer.json")
 
 _DUAL_PATCH = {
     11: {"value": "&to", "params": [{"value": 1, "params": []}]},
@@ -26,13 +14,7 @@ _DUAL_PATCH = {
 }
 
 
-def _apply_patch(layer: Layer, patch: Dict[int, Dict]) -> None:
-    for index, replacement in patch.items():
-        layer[index] = deepcopy(replacement)
-
-
 def build_magic_layer(variant: str) -> Layer:
-    layer = deepcopy(_BASE_MAGIC_LAYER)
-    if variant == "dual":
-        _apply_patch(layer, _DUAL_PATCH)
+    layer = copy_layer(_BASE_MAGIC_LAYER)
+    apply_patch_if(layer, variant == "dual", _DUAL_PATCH)
     return layer
