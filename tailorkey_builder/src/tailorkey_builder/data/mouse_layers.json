@@ -1,0 +1,1525 @@
+{
+  "Mouse": [
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_LEFT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_UP",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_RIGHT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&sk",
+      "params": [
+        {
+          "value": "RSHFT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&sk",
+      "params": [
+        {
+          "value": "RCTRL",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&sk",
+      "params": [
+        {
+          "value": "RALT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&sk",
+      "params": [
+        {
+          "value": "RGUI",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_UP",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_LEFT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_DOWN",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_RIGHT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_UP",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_UP",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mo",
+      "params": [
+        {
+          "value": 9,
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mo",
+      "params": [
+        {
+          "value": 10,
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mo",
+      "params": [
+        {
+          "value": 8,
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "LCLK",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "MB4",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_DOWN",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mo",
+      "params": [
+        {
+          "value": 8,
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mo",
+      "params": [
+        {
+          "value": 10,
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mo",
+      "params": [
+        {
+          "value": 9,
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_DOWN",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "MCLK",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&kp",
+      "params": [
+        {
+          "value": "K_APP",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "MB5",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&kp",
+      "params": [
+        {
+          "value": "LC",
+          "params": [
+            {
+              "value": "X",
+              "params": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "value": "&kp",
+      "params": [
+        {
+          "value": "LC",
+          "params": [
+            {
+              "value": "C",
+              "params": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "value": "&kp",
+      "params": [
+        {
+          "value": "LC",
+          "params": [
+            {
+              "value": "LC",
+              "params": [
+                {
+                  "value": "V",
+                  "params": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_DOWN",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_LEFT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_UP",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&msc",
+      "params": [
+        {
+          "value": "SCRL_RIGHT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "RCLK",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "MB5",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "LCLK",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "RCLK",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "MB4",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&none",
+      "params": []
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_LEFT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_DOWN",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mmv",
+      "params": [
+        {
+          "value": "MOVE_RIGHT",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&mkp",
+      "params": [
+        {
+          "value": "MCLK",
+          "params": []
+        }
+      ]
+    },
+    {
+      "value": "&kp",
+      "params": [
+        {
+          "value": "K_APP",
+          "params": []
+        }
+      ]
+    }
+  ],
+  "MouseSlow": [
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    }
+  ],
+  "MouseFast": [
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    }
+  ],
+  "MouseWarp": [
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    },
+    {
+      "value": "&trans",
+      "params": []
+    }
+  ]
+}
