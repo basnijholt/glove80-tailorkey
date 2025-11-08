@@ -1,5 +1,5 @@
 [project]
-name = "tailorkey-builder"
+name = "glove80"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,7 +10,7 @@ requires-python = ">=3.14"
 dependencies = []
 
 [project.scripts]
-tailorkey-builder = "tailorkey_builder:main"
+glove80 = "glove80:main"
 
 [tool.pytest.ini_options]
 pythonpath = [

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from tailorkey_builder.metadata import get_variant_metadata
+from glove80.metadata import get_variant_metadata
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

@@ -1,6 +1,6 @@
 import pytest
 
-from tailorkey_builder.tailorkey.layers.mouse import build_mouse_layers
+from glove80.tailorkey.layers.mouse import build_mouse_layers
 from tests.utils import load_variant_json
 
 

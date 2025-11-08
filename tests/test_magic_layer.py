@@ -1,6 +1,6 @@
 import pytest
 
-from tailorkey_builder.tailorkey.layers.magic import build_magic_layer
+from glove80.tailorkey.layers.magic import build_magic_layer
 from tests.utils import load_variant_json
 
 

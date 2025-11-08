@@ -1,6 +1,6 @@
 import pytest
 
-from tailorkey_builder.tailorkey.layers.symbol import build_symbol_layer
+from glove80.tailorkey.layers.symbol import build_symbol_layer
 from tests.utils import load_variant_json
 
 

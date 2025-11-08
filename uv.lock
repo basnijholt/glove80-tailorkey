@@ -224,7 +224,7 @@ wheels = [
 ]
 
 [[package]]
-name = "tailorkey-builder"
+name = "glove80"
 version = "0.1.0"
 source = { editable = "." }
 

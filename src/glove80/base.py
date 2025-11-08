@@ -45,7 +45,7 @@ def load_layer_from_data(layer_name: str, *, filename: str | None = None) -> Lay
     """Load a single layer definition from the data bundle."""
 
     file = filename or f"{layer_name.lower()}_layer.json"
-    data_path = resources.files("tailorkey_builder.data").joinpath(file)
+    data_path = resources.files("glove80.data").joinpath(file)
     with data_path.open(encoding="utf-8") as handle:
         data = json.load(handle)
     return data[layer_name]
@@ -54,7 +54,7 @@ def load_layer_from_data(layer_name: str, *, filename: str | None = None) -> Lay
 def load_layers_map(filename: str) -> LayerMap:
     """Load a dict of layer_name -> layer data from the given JSON file."""
 
-    data_path = resources.files("tailorkey_builder.data").joinpath(filename)
+    data_path = resources.files("glove80.data").joinpath(filename)
     with data_path.open(encoding="utf-8") as handle:
         return json.load(handle)
 

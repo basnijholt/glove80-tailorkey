@@ -12,8 +12,8 @@ METADATA_PATH = ROOT / "sources" / "variant_metadata.json"
 
 sys.path.insert(0, str(ROOT / "src"))
 
-from tailorkey_builder.tailorkey.layouts import build_layout  # noqa: E402
-from tailorkey_builder.metadata import (  # noqa: E402
+from glove80.tailorkey.layouts import build_layout  # noqa: E402
+from glove80.metadata import (  # noqa: E402
     MetadataByVariant,
     VariantMetadata,
     load_metadata,
