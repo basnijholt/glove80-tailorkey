@@ -1,0 +1,17 @@
+[project]
+name = "tailorkey-builder"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Bas Nijholt", email = "bas@nijho.lt" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+tailorkey-builder = "tailorkey_builder:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
