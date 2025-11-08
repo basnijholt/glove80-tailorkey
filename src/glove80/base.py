@@ -13,6 +13,13 @@ LayerMap = Dict[str, Layer]
 
 
 @dataclass(frozen=True)
+class LayerRef:
+    """Reference to a layer by name (resolved at layout build time)."""
+
+    name: str
+
+
+@dataclass(frozen=True)
 class KeySpec:
     """Declarative spec for a single key in a layer."""
 
@@ -84,6 +91,8 @@ def build_layer_from_spec(spec: LayerSpec) -> Layer:
 def _coerce_param(param: Any) -> Dict[str, Any]:
     if isinstance(param, KeySpec):
         return param.to_dict()
+    if isinstance(param, LayerRef):
+        raise TypeError("LayerRef must be resolved before serializing")
     if isinstance(param, dict):
         return deepcopy(param)
     if isinstance(param, (str, int)):
@@ -92,3 +101,18 @@ def _coerce_param(param: Any) -> Dict[str, Any]:
 
 
 PatchSpec = Dict[int, KeySpec]
+
+
+def resolve_layer_refs(obj: Any, resolver: Dict[str, int]) -> Any:
+    """Replace LayerRef placeholders recursively using the provided mapping."""
+
+    if isinstance(obj, LayerRef):
+        try:
+            return resolver[obj.name]
+        except KeyError as exc:
+            raise KeyError(f"Unknown layer reference '{obj.name}'") from exc
+    if isinstance(obj, list):
+        return [resolve_layer_refs(item, resolver) for item in obj]
+    if isinstance(obj, dict):
+        return {key: resolve_layer_refs(value, resolver) for key, value in obj.items()}
+    return obj
