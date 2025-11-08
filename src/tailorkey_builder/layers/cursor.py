@@ -4,136 +4,139 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from .base import Layer, apply_patch_if, copy_layer, load_layer_from_data
+from .base import (
+    KeySpec,
+    Layer,
+    LayerSpec,
+    apply_patch_if,
+    build_layer_from_spec,
+    copy_layer,
+)
 
 
-_BASE_CURSOR_LAYER: Layer = load_layer_from_data("Cursor", filename="cursor_layer.json")
+CURSOR_SPEC = LayerSpec(
+    overrides={
+        0: KeySpec("&none"),
+        1: KeySpec("&none"),
+        2: KeySpec("&none"),
+        3: KeySpec("&none"),
+        4: KeySpec("&none"),
+        5: KeySpec("&none"),
+        6: KeySpec("&none"),
+        7: KeySpec("&none"),
+        8: KeySpec("&none"),
+        9: KeySpec("&none"),
+        10: KeySpec("&none"),
+        11: KeySpec("&kp", (KeySpec("ESC"),)),
+        12: KeySpec("&kp", (KeySpec("INS"),)),
+        13: KeySpec("&kp", (KeySpec("LS", (KeySpec("TAB"),)),)),
+        14: KeySpec("&kp", (KeySpec("DEL"),)),
+        15: KeySpec("&none"),
+        16: KeySpec("&none"),
+        17: KeySpec("&none"),
+        18: KeySpec("&none"),
+        19: KeySpec("&none"),
+        20: KeySpec("&none"),
+        21: KeySpec("&none"),
+        22: KeySpec("&none"),
+        23: KeySpec("&kp", (KeySpec("RET"),)),
+        24: KeySpec("&kp", (KeySpec("SPACE"),)),
+        25: KeySpec("&kp", (KeySpec("TAB"),)),
+        26: KeySpec("&kp", (KeySpec("BSPC"),)),
+        27: KeySpec("&kp", (KeySpec("LC", (KeySpec("X"),)),)),
+        28: KeySpec("&kp", (KeySpec("LC", (KeySpec("X"),)),)),
+        29: KeySpec("&kp", (KeySpec("LS", (KeySpec("TAB"),)),)),
+        30: KeySpec("&kp", (KeySpec("LC", (KeySpec("Z"),)),)),
+        31: KeySpec("&kp", (KeySpec("LC", (KeySpec("Y"),)),)),
+        32: KeySpec("&kp", (KeySpec("TAB"),)),
+        33: KeySpec("&none"),
+        34: KeySpec("&sk", (KeySpec("LSHFT"),)),
+        35: KeySpec("&kp", (KeySpec("LGUI"),)),
+        36: KeySpec("&kp", (KeySpec("LALT"),)),
+        37: KeySpec("&kp", (KeySpec("LCTRL"),)),
+        38: KeySpec("&kp", (KeySpec("LSHFT"),)),
+        39: KeySpec("&kp", (KeySpec("LC", (KeySpec("C"),)),)),
+        40: KeySpec("&kp", (KeySpec("LC", (KeySpec("C"),)),)),
+        41: KeySpec("&kp", (KeySpec("LEFT"),)),
+        42: KeySpec("&kp", (KeySpec("UP"),)),
+        43: KeySpec("&kp", (KeySpec("DOWN"),)),
+        44: KeySpec("&kp", (KeySpec("RIGHT"),)),
+        45: KeySpec("&sk", (KeySpec("RSHFT"),)),
+        46: KeySpec("&kp", (KeySpec("LC", (KeySpec("L"),)),)),
+        47: KeySpec("&kp", (KeySpec("LC", (KeySpec("A"),)),)),
+        48: KeySpec("&cur_SELECT_LINE_v1_TKZ"),
+        49: KeySpec("&cur_SELECT_WORD_v1_TKZ"),
+        50: KeySpec("&kp", (KeySpec("LC", (KeySpec("F"),)),)),
+        51: KeySpec("&kp", (KeySpec("LC", (KeySpec("V"),)),)),
+        52: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LALT"),)),
+        53: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LGUI"),)),
+        54: KeySpec("&kp", (KeySpec("PSCRN"),)),
+        55: KeySpec("&cur_SELECT_NONE_v1_TKZ"),
+        56: KeySpec("&cur_EXTEND_LINE_v1_TKZ"),
+        57: KeySpec("&cur_EXTEND_WORD_v1_TKZ"),
+        58: KeySpec("&kp", (KeySpec("LC", (KeySpec("V"),)),)),
+        59: KeySpec("&kp", (KeySpec("HOME"),)),
+        60: KeySpec("&kp", (KeySpec("PG_UP"),)),
+        61: KeySpec("&kp", (KeySpec("PG_DN"),)),
+        62: KeySpec("&kp", (KeySpec("END"),)),
+        63: KeySpec("&kp", (KeySpec("LC", (KeySpec("L"),)),)),
+        64: KeySpec("&kp", (KeySpec("LC", (KeySpec("K"),)),)),
+        65: KeySpec("&kp", (KeySpec("LC", (KeySpec("Z"),)),)),
+        66: KeySpec("&kp", (KeySpec("LC", (KeySpec("Y"),)),)),
+        67: KeySpec("&kp", (KeySpec("LC", (KeySpec("LS", (KeySpec("G"),)),)),)),
+        68: KeySpec("&kp", (KeySpec("LC", (KeySpec("G"),)),)),
+        69: KeySpec("&none"),
+        70: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LCTRL"),)),
+        71: KeySpec("&kp", (KeySpec("LG", (KeySpec("D"),)),)),
+        72: KeySpec("&kp", (KeySpec("LC", (KeySpec("A"),)),)),
+        73: KeySpec("&cur_SELECT_LINE_v1_TKZ"),
+        74: KeySpec("&cur_SELECT_WORD_v1_TKZ"),
+        75: KeySpec("&kp", (KeySpec("LC", (KeySpec("F"),)),)),
+        76: KeySpec("&kp", (KeySpec("LC", (KeySpec("LS", (KeySpec("G"),)),)),)),
+        77: KeySpec("&kp", (KeySpec("LC", (KeySpec("G"),)),)),
+        78: KeySpec("&kp", (KeySpec("LC", (KeySpec("H"),)),)),
+        79: KeySpec("&kp", (KeySpec("LC", (KeySpec("K"),)),)),
+    }
+)
+
+_BASE_CURSOR_LAYER: Layer = build_layer_from_spec(CURSOR_SPEC)
 
 Patch = Dict[int, Dict[str, Any]]
 
 _MAC_PATCH: Patch = {
-    27: {
-        "params": [{"params": [{"params": [], "value": "X"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    28: {
-        "params": [{"params": [{"params": [], "value": "X"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    30: {
-        "params": [{"params": [{"params": [], "value": "Z"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    31: {
-        "params": [
-            {
-                "params": [{"params": [{"params": [], "value": "Z"}], "value": "LS"}],
-                "value": "LG",
-            }
-        ],
-        "value": "&kp",
-    },
-    35: {"params": [{"params": [], "value": "LCTRL"}], "value": "&kp"},
-    37: {"params": [{"params": [], "value": "LGUI"}], "value": "&kp"},
-    39: {
-        "params": [{"params": [{"params": [], "value": "C"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    40: {
-        "params": [{"params": [{"params": [], "value": "C"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    46: {
-        "params": [{"params": [{"params": [], "value": "L"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    47: {
-        "params": [{"params": [{"params": [], "value": "A"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    48: {"params": [], "value": "&cur_SELECT_LINE_macos_v1_TKZ"},
-    49: {"params": [], "value": "&cur_SELECT_WORD_macos_v1_TKZ"},
-    50: {
-        "params": [{"params": [{"params": [], "value": "F"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    51: {
-        "params": [{"params": [{"params": [], "value": "V"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    52: {"params": [{"params": [], "value": "LGUI"}], "value": "&mod_tab_v2_TKZ"},
-    53: {"params": [{"params": [], "value": "LALT"}], "value": "&mod_tab_v2_TKZ"},
-    56: {"params": [], "value": "&cur_EXTEND_LINE_macos_v1_TKZ"},
-    57: {"params": [], "value": "&cur_EXTEND_WORD_macos_v1_TKZ"},
-    58: {
-        "params": [{"params": [{"params": [], "value": "V"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    63: {
-        "params": [{"params": [{"params": [], "value": "L"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    64: {
-        "params": [{"params": [{"params": [], "value": "K"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    65: {
-        "params": [{"params": [{"params": [], "value": "Z"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    66: {
-        "params": [
-            {
-                "params": [{"params": [{"params": [], "value": "Z"}], "value": "LS"}],
-                "value": "LG",
-            }
-        ],
-        "value": "&kp",
-    },
-    67: {
-        "params": [
-            {
-                "params": [{"params": [{"params": [], "value": "G"}], "value": "LS"}],
-                "value": "LG",
-            }
-        ],
-        "value": "&kp",
-    },
-    68: {
-        "params": [{"params": [{"params": [], "value": "G"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    71: {
-        "params": [{"params": [{"params": [], "value": "F3"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    72: {
-        "params": [{"params": [{"params": [], "value": "A"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    73: {"params": [], "value": "&cur_SELECT_LINE_macos_v1_TKZ"},
-    74: {"params": [], "value": "&cur_SELECT_WORD_macos_v1_TKZ"},
-    75: {
-        "params": [{"params": [{"params": [], "value": "F"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    76: {
-        "params": [
-            {
-                "params": [{"params": [{"params": [], "value": "G"}], "value": "LS"}],
-                "value": "LG",
-            }
-        ],
-        "value": "&kp",
-    },
-    77: {
-        "params": [{"params": [{"params": [], "value": "G"}], "value": "LG"}],
-        "value": "&kp",
-    },
-    79: {
-        "params": [{"params": [{"params": [], "value": "K"}], "value": "LG"}],
-        "value": "&kp",
-    },
+    27: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)).to_dict(),
+    28: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)).to_dict(),
+    30: KeySpec("&kp", (KeySpec("LG", (KeySpec("Z"),)),)).to_dict(),
+    31: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("Z"),)),)),)).to_dict(),
+    35: KeySpec("&kp", (KeySpec("LCTRL"),)).to_dict(),
+    37: KeySpec("&kp", (KeySpec("LGUI"),)).to_dict(),
+    39: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)).to_dict(),
+    40: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)).to_dict(),
+    46: KeySpec("&kp", (KeySpec("LG", (KeySpec("L"),)),)).to_dict(),
+    47: KeySpec("&kp", (KeySpec("LG", (KeySpec("A"),)),)).to_dict(),
+    48: KeySpec("&cur_SELECT_LINE_macos_v1_TKZ").to_dict(),
+    49: KeySpec("&cur_SELECT_WORD_macos_v1_TKZ").to_dict(),
+    50: KeySpec("&kp", (KeySpec("LG", (KeySpec("F"),)),)).to_dict(),
+    51: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)).to_dict(),
+    52: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LGUI"),)).to_dict(),
+    53: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LALT"),)).to_dict(),
+    56: KeySpec("&cur_EXTEND_LINE_macos_v1_TKZ").to_dict(),
+    57: KeySpec("&cur_EXTEND_WORD_macos_v1_TKZ").to_dict(),
+    58: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)).to_dict(),
+    63: KeySpec("&kp", (KeySpec("LG", (KeySpec("L"),)),)).to_dict(),
+    64: KeySpec("&kp", (KeySpec("LG", (KeySpec("K"),)),)).to_dict(),
+    65: KeySpec("&kp", (KeySpec("LG", (KeySpec("Z"),)),)).to_dict(),
+    66: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("Z"),)),)),)).to_dict(),
+    67: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("G"),)),)),)).to_dict(),
+    68: KeySpec("&kp", (KeySpec("LG", (KeySpec("G"),)),)).to_dict(),
+    71: KeySpec("&kp", (KeySpec("LG", (KeySpec("F3"),)),)).to_dict(),
+    72: KeySpec("&kp", (KeySpec("LG", (KeySpec("A"),)),)).to_dict(),
+    73: KeySpec("&cur_SELECT_LINE_macos_v1_TKZ").to_dict(),
+    74: KeySpec("&cur_SELECT_WORD_macos_v1_TKZ").to_dict(),
+    75: KeySpec("&kp", (KeySpec("LG", (KeySpec("F"),)),)).to_dict(),
+    76: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("G"),)),)),)).to_dict(),
+    77: KeySpec("&kp", (KeySpec("LG", (KeySpec("G"),)),)).to_dict(),
+    79: KeySpec("&kp", (KeySpec("LG", (KeySpec("K"),)),)).to_dict(),
 }
 
 
