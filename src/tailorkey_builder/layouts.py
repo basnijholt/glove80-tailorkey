@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Dict
 
 from .layers import build_all_layers
+from .metadata import get_variant_metadata
 
 ROOT = Path(__file__).resolve().parents[2]
-VARIANT_METADATA = json.loads((ROOT / "sources" / "variant_metadata.json").read_text())
 
 
 def load_canonical_variant(variant: str) -> Dict:
-    meta = VARIANT_METADATA[variant]
+    meta = get_variant_metadata(variant)
     path = ROOT / meta["output"]
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)

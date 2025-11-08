@@ -13,11 +13,11 @@ METADATA_PATH = ROOT / "sources" / "variant_metadata.json"
 sys.path.insert(0, str(ROOT / "src"))
 
 from tailorkey_builder.layouts import build_layout  # noqa: E402
-
-
-def load_metadata() -> dict[str, dict]:
-    with METADATA_PATH.open(encoding="utf-8") as handle:
-        return json.load(handle)
+from tailorkey_builder.metadata import (  # noqa: E402
+    MetadataByVariant,
+    VariantMetadata,
+    load_metadata,
+)
 
 
 def write_layout(data: dict, destination: Path) -> bool:
@@ -30,7 +30,7 @@ def write_layout(data: dict, destination: Path) -> bool:
     return True
 
 
-def generate_variant(name: str, meta: dict) -> None:
+def generate_variant(name: str, meta: VariantMetadata) -> None:
     destination = ROOT / meta["output"]
     layout = build_layout(name)
 
@@ -45,7 +45,7 @@ def generate_variant(name: str, meta: dict) -> None:
 
 
 def main() -> None:
-    metadata = load_metadata()
+    metadata: MetadataByVariant = load_metadata(METADATA_PATH)
     for name, meta in metadata.items():
         generate_variant(name, meta)
 

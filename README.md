@@ -38,6 +38,8 @@ auditable history of every change.
 - **src/tailorkey_builder/layouts.py** composes all layers for a variant and
   merges them with the preserved metadata. This is the single entry point the
   generator and tests call.
+- **src/tailorkey_builder/metadata.py** loads the release metadata (UUIDs,
+  titles, etc.) once with type checking so scripts and tests share it safely.
 - **scripts/generate_tailorkey_layouts.py** simply runs `build_layout()` for
   each variant listed in `variant_metadata.json` and overwrites the file in
   `original/`.
@@ -67,6 +69,15 @@ auditable history of every change.
 
    The suite re-checks every layer module plus the full-layout comparison to
    ensure nothing regressed.
+
+## Extending the Layout
+
+- When adding a new layer, implement it in `src/tailorkey_builder/layers/…`
+  using `LayerSpec`/`KeySpec`, then register its builder in
+  `tailorkey_builder.layers.LAYER_PROVIDERS`.
+- To introduce a new release variant, add its entry to
+  `sources/variant_metadata.json`; the typed loader (`metadata.py`) keeps the
+  rest of the tooling in sync automatically.
 
 ## Continuous Integration
 
