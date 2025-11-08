@@ -14,53 +14,58 @@ auditable history of every change.
 
 ```
 .
-├─ original/                   # published layouts (generated artifacts)
+├─ original/                   # canonical TailorKey variants (JSON)
 ├─ sources/
-│  └─ variant_metadata.json    # mapping of variants → release metadata
+│  └─ variant_metadata.json    # release filenames + UUIDs + notes
 ├─ src/
-│  └─ tailorkey_builder/       # Python package for layered generation
+│  ├─ tailorkey_builder/layers # per-layer generators + shared helpers
+│  └─ tailorkey_builder/layouts.py
 ├─ scripts/
 │  └─ generate_tailorkey_layouts.py
-├─ tests/                      # pytest suites (release + layer builders)
+├─ tests/                      # pytest suites (layers + full layouts)
 └─ README.md
 ```
 
-- **sources/variant_metadata.json** lists each variant, the release filename,
-  and the metadata (uuid, parent_uuid, tags, notes, etc.) that should be
-  applied when regenerating the published JSON.
-- **scripts/generate_tailorkey_layouts.py** builds every layer from code and
-  rewrites the release file so it matches the committed canonical layout.
-- **original/** is where the generator writes the published JSON files that ship
-  with releases or get uploaded as CI artifacts.
-- **src/tailorkey_builder** is the growing Python package that will eventually
-  synthesize every layer from shared building blocks (starting with mouse
-  layers).
-- **tests/** contains pytest suites that validate both the published layouts and
-  individual generator modules.
+- **original/** contains the exact artifacts Moosy published. We treat them as
+  the source of truth; regeneration must leave them unchanged.
+- **sources/variant_metadata.json** stores the metadata we need to keep intact
+  (titles, UUIDs, notes, tags, release filenames).
+- **src/tailorkey_builder/layers/** defines every layer as code: each module
+  loads the Windows baseline, applies variant-specific patches, and returns the
+  final layer. `layers/base.py` houses shared helpers (data loading, cloning,
+  patching).
+- **src/tailorkey_builder/layouts.py** composes all layers for a variant and
+  merges them with the preserved metadata. This is the single entry point the
+  generator and tests call.
+- **scripts/generate_tailorkey_layouts.py** simply runs `build_layout()` for
+  each variant listed in `variant_metadata.json` and overwrites the file in
+  `original/`.
+- **tests/** contains per-layer tests (ensuring every module reproduces its
+  canonical layer) plus a top-level test that compares `build_layout()` against
+  the checked-in `original/*.json`. This guarantees we never drift from the
+  historical layouts.
 
-## Regeneration Workflow
+## Workflow
 
-1. Modify the generator code under `src/tailorkey_builder/` (or adjust the
-   metadata in `sources/variant_metadata.json`).
+1. Modify the generator code under `src/tailorkey_builder/` (or adjust metadata
+   in `sources/variant_metadata.json` if the release notes/UUIDs change).
 2. Run the generator:
 
    ```bash
    python3 scripts/generate_tailorkey_layouts.py
    ```
 
-   The script rewrites every release JSON under `original/`. Because the layout
-   is generated from code, the working tree will only show diffs for files you
-   intentionally changed.
+   The script rebuilds each JSON under `original/`. A clean `git diff` confirms
+   the new code still matches Moosy’s published layouts.
 
 3. Run the tests:
 
    ```bash
-   pytest
+   uv run pytest
    ```
 
-   The test suite compares the generated layouts with the committed files under
-   `original/`. This guards against accidental changes to the published
-   layouts.
+   The suite re-checks every layer module plus the full-layout comparison to
+   ensure nothing regressed.
 
 ## Continuous Integration
 

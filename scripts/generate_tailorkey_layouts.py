@@ -20,11 +20,16 @@ def load_metadata() -> dict[str, dict]:
         return json.load(handle)
 
 
-def write_layout(data: dict, destination: Path) -> None:
+def write_layout(data: dict, destination: Path) -> bool:
     destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        current = json.loads(destination.read_text(encoding="utf-8"))
+        if current == data:
+            return False
     destination.write_text(
         json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
     )
+    return True
 
 
 def generate_variant(name: str, meta: dict) -> None:
@@ -35,9 +40,10 @@ def generate_variant(name: str, meta: dict) -> None:
         if field in meta:
             layout[field] = meta[field]
 
-    write_layout(layout, destination)
+    changed = write_layout(layout, destination)
     rel = destination.relative_to(ROOT)
-    print(f"Wrote {name}: {rel}")
+    status = "updated" if changed else "unchanged"
+    print(f"{name}: {rel} ({status})")
 
 
 def main() -> None:
