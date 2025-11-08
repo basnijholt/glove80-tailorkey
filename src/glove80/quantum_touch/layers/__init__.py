@@ -7,6 +7,7 @@ from .base_layer import build_base_layer
 from .hrm import build_hrm_layer
 from .left_index_layer import build_left_index_layer
 from .left_middle_layer import build_left_middle_layer
+from .left_pinky_layer import build_left_pinky_layer
 from .left_ring_layer import build_left_ring_layer
 from .lower_layer import build_lower_layer
 from .magic_layer import build_magic_layer
@@ -31,6 +32,7 @@ LAYER_BUILDERS: Dict[str, LayerBuilder] = {
     "LeftIndex": build_left_index_layer,
     "LeftMiddle": build_left_middle_layer,
     "LeftRing": build_left_ring_layer,
+    "LeftPinky": build_left_pinky_layer,
     "Original": build_original_layer,
 }
 
