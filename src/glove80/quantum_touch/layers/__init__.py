@@ -5,10 +5,16 @@ from typing import Callable, Dict
 from ...base import Layer, LayerMap
 from .base_layer import build_base_layer
 from .hrm import build_hrm_layer
-from .left_index_layer import build_left_index_layer
-from .left_middle_layer import build_left_middle_layer
-from .left_pinky_layer import build_left_pinky_layer
-from .left_ring_layer import build_left_ring_layer
+from .finger_layers import (
+    build_left_index_layer,
+    build_left_middle_layer,
+    build_left_pinky_layer,
+    build_left_ring_layer,
+    build_right_index_layer,
+    build_right_middle_layer,
+    build_right_pinky_layer,
+    build_right_ring_layer,
+)
 from .lower_layer import build_lower_layer
 from .magic_layer import build_magic_layer
 from .mouse_layers import (
@@ -18,10 +24,6 @@ from .mouse_layers import (
     build_mouse_warp_layer,
 )
 from .original_layer import build_original_layer
-from .right_index_layer import build_right_index_layer
-from .right_middle_layer import build_right_middle_layer
-from .right_pinky_layer import build_right_pinky_layer
-from .right_ring_layer import build_right_ring_layer
 
 LayerBuilder = Callable[[str], Layer]
 

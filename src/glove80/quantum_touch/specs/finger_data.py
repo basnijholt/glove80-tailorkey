@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Dict, Tuple
 
 
 @dataclass(frozen=True)
@@ -478,4 +478,9 @@ FINGERS: Tuple[FingerMeta, ...] = (
 )
 
 
-__all__ = ["FingerMeta", "FINGERS"]
+FINGER_BY_LABEL: Dict[str, FingerMeta] = {
+    ("Left" if meta.hand == "L" else "Right") + meta.name: meta for meta in FINGERS
+}
+
+
+__all__ = ["FingerMeta", "FINGERS", "FINGER_BY_LABEL"]
