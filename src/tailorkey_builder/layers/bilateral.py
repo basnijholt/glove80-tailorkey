@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from typing import Dict
 
-from .base import KeySpec, LayerMap, LayerSpec, apply_patch, build_layer_from_spec
+from .base import (
+    KeySpec,
+    LayerMap,
+    LayerSpec,
+    PatchSpec,
+    apply_patch,
+    build_layer_from_spec,
+)
 
 
 _LEFT_TAP_KEYS: Dict[int, str] = {
@@ -177,79 +184,34 @@ def _build_bilateral_layers() -> LayerMap:
     return {name: build_layer_from_spec(spec) for name, spec in _BILATERAL_LAYER_SPECS.items()}
 
 
-_MAC_PATCHES = {
+_MAC_PATCHES: Dict[str, PatchSpec] = {
     "LeftIndex": {
-        35: {
-            "value": "&HRM_left_index_pinky_v1B_TKZ",
-            "params": [{"value": "LCTRL", "params": []}, {"value": "A", "params": []}],
-        },
-        37: {
-            "value": "&HRM_left_index_middy_v1B_TKZ",
-            "params": [{"value": "LGUI", "params": []}, {"value": "D", "params": []}],
-        },
+        35: KeySpec("&HRM_left_index_pinky_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
+        37: KeySpec("&HRM_left_index_middy_v1B_TKZ", (KeySpec("LGUI"), KeySpec("D"))),
     },
     "LeftMiddy": {
-        35: {
-            "value": "&HRM_left_middy_pinky_v1B_TKZ",
-            "params": [{"value": "LCTRL", "params": []}, {"value": "A", "params": []}],
-        },
+        35: KeySpec("&HRM_left_middy_pinky_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
     },
     "LeftRingy": {
-        35: {
-            "value": "&HRM_left_ring_pinky_v1B_TKZ",
-            "params": [{"value": "LCTRL", "params": []}, {"value": "A", "params": []}],
-        },
-        37: {
-            "value": "&HRM_left_ring_middy_v1B_TKZ",
-            "params": [{"value": "LGUI", "params": []}, {"value": "D", "params": []}],
-        },
+        35: KeySpec("&HRM_left_ring_pinky_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
+        37: KeySpec("&HRM_left_ring_middy_v1B_TKZ", (KeySpec("LGUI"), KeySpec("D"))),
     },
     "LeftPinky": {
-        37: {
-            "value": "&HRM_left_pinky_middy_v1B_TKZ",
-            "params": [{"value": "LGUI", "params": []}, {"value": "D", "params": []}],
-        },
+        37: KeySpec("&HRM_left_pinky_middy_v1B_TKZ", (KeySpec("LGUI"), KeySpec("D"))),
     },
     "RightIndex": {
-        42: {
-            "value": "&HRM_right_index_middy_v1B_TKZ",
-            "params": [{"value": "RGUI", "params": []}, {"value": "K", "params": []}],
-        },
-        44: {
-            "value": "&HRM_right_index_pinky_v1B_TKZ",
-            "params": [
-                {"value": "LCTRL", "params": []},
-                {"value": "SEMI", "params": []},
-            ],
-        },
+        42: KeySpec("&HRM_right_index_middy_v1B_TKZ", (KeySpec("RGUI"), KeySpec("K"))),
+        44: KeySpec("&HRM_right_index_pinky_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("SEMI"))),
     },
     "RightMiddy": {
-        44: {
-            "value": "&HRM_right_middy_pinky_v1B_TKZ",
-            "params": [
-                {"value": "RCTRL", "params": []},
-                {"value": "SEMI", "params": []},
-            ],
-        },
+        44: KeySpec("&HRM_right_middy_pinky_v1B_TKZ", (KeySpec("RCTRL"), KeySpec("SEMI"))),
     },
     "RightRingy": {
-        42: {
-            "value": "&HRM_right_ring_middy_v1B_TKZ",
-            "params": [{"value": "RGUI", "params": []}, {"value": "K", "params": []}],
-        },
-        44: {
-            "value": "&HRM_right_ring_pinky_v1B_TKZ",
-            "params": [
-                {"value": "RCTRL", "params": []},
-                {"value": "SEMI", "params": []},
-            ],
-        },
+        42: KeySpec("&HRM_right_ring_middy_v1B_TKZ", (KeySpec("RGUI"), KeySpec("K"))),
+        44: KeySpec("&HRM_right_ring_pinky_v1B_TKZ", (KeySpec("RCTRL"), KeySpec("SEMI"))),
     },
     "RightPinky": {
-        42: {
-            "value": "&HRM_right_pinky_middy_v1B_TKZ",
-            "params": [{"value": "RGUI", "params": []}, {"value": "K", "params": []}],
-        },
+        42: KeySpec("&HRM_right_pinky_middy_v1B_TKZ", (KeySpec("RGUI"), KeySpec("K"))),
     },
 }
 

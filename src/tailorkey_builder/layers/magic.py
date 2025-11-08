@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
-
 from .base import (
     KeySpec,
     Layer,
     LayerSpec,
+    PatchSpec,
     apply_patch_if,
     build_layer_from_spec,
     copy_layer,
@@ -101,12 +100,12 @@ MAGIC_SPEC = LayerSpec(
 
 _BASE_MAGIC_LAYER: Layer = build_layer_from_spec(MAGIC_SPEC)
 
-Patch = Dict[int, Dict[str, Any]]
+Patch = PatchSpec
 
 _DUAL_PATCH: Patch = {
-    11: KeySpec("&to", (KeySpec(1),)).to_dict(),
-    12: KeySpec("&to", (KeySpec(2),)).to_dict(),
-    15: KeySpec("&to", (KeySpec(3),)).to_dict(),
+    11: KeySpec("&to", (KeySpec(1),)),
+    12: KeySpec("&to", (KeySpec(2),)),
+    15: KeySpec("&to", (KeySpec(3),)),
 }
 
 

@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
-
 from .base import (
     KeySpec,
     Layer,
     LayerMap,
     LayerSpec,
+    PatchSpec,
     apply_patch,
     build_layer_from_spec,
     copy_layer,
@@ -103,128 +102,50 @@ _BASE_HRM_SPEC = LayerSpec(
 
 _BASE_HRM_LAYER: Layer = build_layer_from_spec(_BASE_HRM_SPEC)
 
-Patch = Dict[int, Dict[str, Any]]
+Patch = PatchSpec
 
 _MAC_PATCH: Patch = {
-    35: {
-        "value": "&HRM_left_pinky_v1_TKZ",
-        "params": [{"value": "LCTRL", "params": []}, {"value": "A", "params": []}],
-    },
-    37: {
-        "value": "&HRM_left_middy_v1_TKZ",
-        "params": [{"value": "LGUI", "params": []}, {"value": "D", "params": []}],
-    },
-    42: {
-        "value": "&HRM_right_middy_v1_TKZ",
-        "params": [{"value": "RGUI", "params": []}, {"value": "K", "params": []}],
-    },
-    44: {
-        "value": "&HRM_right_pinky_v1_TKZ",
-        "params": [{"value": "RCTRL", "params": []}, {"value": "SEMI", "params": []}],
-    },
-    53: {"value": "&kp", "params": [{"value": "LGUI", "params": []}]},
-    55: {"value": "&kp", "params": [{"value": "LCTRL", "params": []}]},
-    56: {"value": "&kp", "params": [{"value": "RGUI", "params": []}]},
+    35: KeySpec("&HRM_left_pinky_v1_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
+    37: KeySpec("&HRM_left_middy_v1_TKZ", (KeySpec("LGUI"), KeySpec("D"))),
+    42: KeySpec("&HRM_right_middy_v1_TKZ", (KeySpec("RGUI"), KeySpec("K"))),
+    44: KeySpec("&HRM_right_pinky_v1_TKZ", (KeySpec("RCTRL"), KeySpec("SEMI"))),
+    53: KeySpec("&kp", (KeySpec("LGUI"),)),
+    55: KeySpec("&kp", (KeySpec("LCTRL"),)),
+    56: KeySpec("&kp", (KeySpec("RGUI"),)),
 }
 
 _DUAL_PATCH: Patch = {
-    69: {
-        "value": "&thumb_v2_TKZ",
-        "params": [{"value": 5, "params": []}, {"value": "BSPC", "params": []}],
-    },
-    74: {
-        "value": "&space_v3_TKZ",
-        "params": [{"value": 6, "params": []}, {"value": "SPACE", "params": []}],
-    },
+    69: KeySpec("&thumb_v2_TKZ", (KeySpec(5), KeySpec("BSPC"))),
+    74: KeySpec("&space_v3_TKZ", (KeySpec(6), KeySpec("SPACE"))),
 }
 
 _DUAL_MAC_PATCH: Patch = {
-    69: {
-        "value": "&thumb_v2_TKZ",
-        "params": [{"value": 4, "params": []}, {"value": "BSPC", "params": []}],
-    },
-    74: {
-        "value": "&space_v3_TKZ",
-        "params": [{"value": 6, "params": []}, {"value": "SPACE", "params": []}],
-    },
+    69: KeySpec("&thumb_v2_TKZ", (KeySpec(4), KeySpec("BSPC"))),
+    74: KeySpec("&space_v3_TKZ", (KeySpec(6), KeySpec("SPACE"))),
 }
 
 _BILATERAL_WIN_PATCH: Patch = {
-    35: {
-        "value": "&HRM_left_pinky_v1B_TKZ",
-        "params": [{"value": "LGUI", "params": []}, {"value": "A", "params": []}],
-    },
-    36: {
-        "value": "&HRM_left_ring_v1B_TKZ",
-        "params": [{"value": "LALT", "params": []}, {"value": "S", "params": []}],
-    },
-    37: {
-        "value": "&HRM_left_middy_v1B_TKZ",
-        "params": [{"value": "LCTRL", "params": []}, {"value": "D", "params": []}],
-    },
-    38: {
-        "value": "&HRM_left_index_v1B_TKZ",
-        "params": [{"value": "LSHFT", "params": []}, {"value": "F", "params": []}],
-    },
-    41: {
-        "value": "&HRM_right_index_v1B_TKZ",
-        "params": [{"value": "RSHFT", "params": []}, {"value": "J", "params": []}],
-    },
-    42: {
-        "value": "&HRM_right_middy_v1B_TKZ",
-        "params": [{"value": "RCTRL", "params": []}, {"value": "K", "params": []}],
-    },
-    43: {
-        "value": "&HRM_right_ring_v1B_TKZ",
-        "params": [{"value": "LALT", "params": []}, {"value": "L", "params": []}],
-    },
-    44: {
-        "value": "&HRM_right_pinky_v1B_TKZ",
-        "params": [{"value": "RGUI", "params": []}, {"value": "SEMI", "params": []}],
-    },
-    73: {
-        "value": "&thumb_v2_TKZ",
-        "params": [{"value": 15, "params": []}, {"value": "RET", "params": []}],
-    },
+    35: KeySpec("&HRM_left_pinky_v1B_TKZ", (KeySpec("LGUI"), KeySpec("A"))),
+    36: KeySpec("&HRM_left_ring_v1B_TKZ", (KeySpec("LALT"), KeySpec("S"))),
+    37: KeySpec("&HRM_left_middy_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("D"))),
+    38: KeySpec("&HRM_left_index_v1B_TKZ", (KeySpec("LSHFT"), KeySpec("F"))),
+    41: KeySpec("&HRM_right_index_v1B_TKZ", (KeySpec("RSHFT"), KeySpec("J"))),
+    42: KeySpec("&HRM_right_middy_v1B_TKZ", (KeySpec("RCTRL"), KeySpec("K"))),
+    43: KeySpec("&HRM_right_ring_v1B_TKZ", (KeySpec("LALT"), KeySpec("L"))),
+    44: KeySpec("&HRM_right_pinky_v1B_TKZ", (KeySpec("RGUI"), KeySpec("SEMI"))),
+    73: KeySpec("&thumb_v2_TKZ", (KeySpec(15), KeySpec("RET"))),
 }
 
 _BILATERAL_MAC_PATCH: Patch = {
-    35: {
-        "value": "&HRM_left_pinky_v1B_TKZ",
-        "params": [{"value": "LCTRL", "params": []}, {"value": "A", "params": []}],
-    },
-    36: {
-        "value": "&HRM_left_ring_v1B_TKZ",
-        "params": [{"value": "LALT", "params": []}, {"value": "S", "params": []}],
-    },
-    37: {
-        "value": "&HRM_left_middy_v1B_TKZ",
-        "params": [{"value": "LGUI", "params": []}, {"value": "D", "params": []}],
-    },
-    38: {
-        "value": "&HRM_left_index_v1B_TKZ",
-        "params": [{"value": "LSHFT", "params": []}, {"value": "F", "params": []}],
-    },
-    41: {
-        "value": "&HRM_right_index_v1B_TKZ",
-        "params": [{"value": "RSHFT", "params": []}, {"value": "J", "params": []}],
-    },
-    42: {
-        "value": "&HRM_right_middy_v1B_TKZ",
-        "params": [{"value": "RGUI", "params": []}, {"value": "K", "params": []}],
-    },
-    43: {
-        "value": "&HRM_right_ring_v1B_TKZ",
-        "params": [{"value": "LALT", "params": []}, {"value": "L", "params": []}],
-    },
-    44: {
-        "value": "&HRM_right_pinky_v1B_TKZ",
-        "params": [{"value": "RCTRL", "params": []}, {"value": "SEMI", "params": []}],
-    },
-    73: {
-        "value": "&thumb_v2_TKZ",
-        "params": [{"value": 15, "params": []}, {"value": "RET", "params": []}],
-    },
+    35: KeySpec("&HRM_left_pinky_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
+    36: KeySpec("&HRM_left_ring_v1B_TKZ", (KeySpec("LALT"), KeySpec("S"))),
+    37: KeySpec("&HRM_left_middy_v1B_TKZ", (KeySpec("LGUI"), KeySpec("D"))),
+    38: KeySpec("&HRM_left_index_v1B_TKZ", (KeySpec("LSHFT"), KeySpec("F"))),
+    41: KeySpec("&HRM_right_index_v1B_TKZ", (KeySpec("RSHFT"), KeySpec("J"))),
+    42: KeySpec("&HRM_right_middy_v1B_TKZ", (KeySpec("RGUI"), KeySpec("K"))),
+    43: KeySpec("&HRM_right_ring_v1B_TKZ", (KeySpec("LALT"), KeySpec("L"))),
+    44: KeySpec("&HRM_right_pinky_v1B_TKZ", (KeySpec("RCTRL"), KeySpec("SEMI"))),
+    73: KeySpec("&thumb_v2_TKZ", (KeySpec(15), KeySpec("RET"))),
 }
 
 

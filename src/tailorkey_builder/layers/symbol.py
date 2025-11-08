@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
-
 from .base import (
     KeySpec,
     Layer,
     LayerSpec,
+    PatchSpec,
     apply_patch_if,
     build_layer_from_spec,
     copy_layer,
@@ -101,11 +100,11 @@ SYMBOL_SPEC = LayerSpec(
 
 _BASE_SYMBOL_LAYER: Layer = build_layer_from_spec(SYMBOL_SPEC)
 
-Patch = Dict[int, Dict[str, Any]]
+Patch = PatchSpec
 
 _MAC_PATCH: Patch = {
-    30: KeySpec("&sk", (KeySpec("RGUI"),)).to_dict(),
-    32: KeySpec("&sk", (KeySpec("RCTRL"),)).to_dict(),
+    30: KeySpec("&sk", (KeySpec("RGUI"),)),
+    32: KeySpec("&sk", (KeySpec("RCTRL"),)),
 }
 
 

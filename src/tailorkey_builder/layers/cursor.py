@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
-
 from .base import (
     KeySpec,
     Layer,
     LayerSpec,
+    PatchSpec,
     apply_patch_if,
     build_layer_from_spec,
     copy_layer,
@@ -101,42 +100,42 @@ CURSOR_SPEC = LayerSpec(
 
 _BASE_CURSOR_LAYER: Layer = build_layer_from_spec(CURSOR_SPEC)
 
-Patch = Dict[int, Dict[str, Any]]
+Patch = PatchSpec
 
 _MAC_PATCH: Patch = {
-    27: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)).to_dict(),
-    28: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)).to_dict(),
-    30: KeySpec("&kp", (KeySpec("LG", (KeySpec("Z"),)),)).to_dict(),
-    31: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("Z"),)),)),)).to_dict(),
-    35: KeySpec("&kp", (KeySpec("LCTRL"),)).to_dict(),
-    37: KeySpec("&kp", (KeySpec("LGUI"),)).to_dict(),
-    39: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)).to_dict(),
-    40: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)).to_dict(),
-    46: KeySpec("&kp", (KeySpec("LG", (KeySpec("L"),)),)).to_dict(),
-    47: KeySpec("&kp", (KeySpec("LG", (KeySpec("A"),)),)).to_dict(),
-    48: KeySpec("&cur_SELECT_LINE_macos_v1_TKZ").to_dict(),
-    49: KeySpec("&cur_SELECT_WORD_macos_v1_TKZ").to_dict(),
-    50: KeySpec("&kp", (KeySpec("LG", (KeySpec("F"),)),)).to_dict(),
-    51: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)).to_dict(),
-    52: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LGUI"),)).to_dict(),
-    53: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LALT"),)).to_dict(),
-    56: KeySpec("&cur_EXTEND_LINE_macos_v1_TKZ").to_dict(),
-    57: KeySpec("&cur_EXTEND_WORD_macos_v1_TKZ").to_dict(),
-    58: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)).to_dict(),
-    63: KeySpec("&kp", (KeySpec("LG", (KeySpec("L"),)),)).to_dict(),
-    64: KeySpec("&kp", (KeySpec("LG", (KeySpec("K"),)),)).to_dict(),
-    65: KeySpec("&kp", (KeySpec("LG", (KeySpec("Z"),)),)).to_dict(),
-    66: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("Z"),)),)),)).to_dict(),
-    67: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("G"),)),)),)).to_dict(),
-    68: KeySpec("&kp", (KeySpec("LG", (KeySpec("G"),)),)).to_dict(),
-    71: KeySpec("&kp", (KeySpec("LG", (KeySpec("F3"),)),)).to_dict(),
-    72: KeySpec("&kp", (KeySpec("LG", (KeySpec("A"),)),)).to_dict(),
-    73: KeySpec("&cur_SELECT_LINE_macos_v1_TKZ").to_dict(),
-    74: KeySpec("&cur_SELECT_WORD_macos_v1_TKZ").to_dict(),
-    75: KeySpec("&kp", (KeySpec("LG", (KeySpec("F"),)),)).to_dict(),
-    76: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("G"),)),)),)).to_dict(),
-    77: KeySpec("&kp", (KeySpec("LG", (KeySpec("G"),)),)).to_dict(),
-    79: KeySpec("&kp", (KeySpec("LG", (KeySpec("K"),)),)).to_dict(),
+    27: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)),
+    28: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)),
+    30: KeySpec("&kp", (KeySpec("LG", (KeySpec("Z"),)),)),
+    31: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("Z"),)),)),)),
+    35: KeySpec("&kp", (KeySpec("LCTRL"),)),
+    37: KeySpec("&kp", (KeySpec("LGUI"),)),
+    39: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)),
+    40: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)),
+    46: KeySpec("&kp", (KeySpec("LG", (KeySpec("L"),)),)),
+    47: KeySpec("&kp", (KeySpec("LG", (KeySpec("A"),)),)),
+    48: KeySpec("&cur_SELECT_LINE_macos_v1_TKZ"),
+    49: KeySpec("&cur_SELECT_WORD_macos_v1_TKZ"),
+    50: KeySpec("&kp", (KeySpec("LG", (KeySpec("F"),)),)),
+    51: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)),
+    52: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LGUI"),)),
+    53: KeySpec("&mod_tab_v2_TKZ", (KeySpec("LALT"),)),
+    56: KeySpec("&cur_EXTEND_LINE_macos_v1_TKZ"),
+    57: KeySpec("&cur_EXTEND_WORD_macos_v1_TKZ"),
+    58: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)),
+    63: KeySpec("&kp", (KeySpec("LG", (KeySpec("L"),)),)),
+    64: KeySpec("&kp", (KeySpec("LG", (KeySpec("K"),)),)),
+    65: KeySpec("&kp", (KeySpec("LG", (KeySpec("Z"),)),)),
+    66: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("Z"),)),)),)),
+    67: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("G"),)),)),)),
+    68: KeySpec("&kp", (KeySpec("LG", (KeySpec("G"),)),)),
+    71: KeySpec("&kp", (KeySpec("LG", (KeySpec("F3"),)),)),
+    72: KeySpec("&kp", (KeySpec("LG", (KeySpec("A"),)),)),
+    73: KeySpec("&cur_SELECT_LINE_macos_v1_TKZ"),
+    74: KeySpec("&cur_SELECT_WORD_macos_v1_TKZ"),
+    75: KeySpec("&kp", (KeySpec("LG", (KeySpec("F"),)),)),
+    76: KeySpec("&kp", (KeySpec("LG", (KeySpec("LS", (KeySpec("G"),)),)),)),
+    77: KeySpec("&kp", (KeySpec("LG", (KeySpec("G"),)),)),
+    79: KeySpec("&kp", (KeySpec("LG", (KeySpec("K"),)),)),
 }
 
 

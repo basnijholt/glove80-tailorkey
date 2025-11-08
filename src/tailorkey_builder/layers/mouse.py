@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Dict
 
 from .base import (
     KeySpec,
     Layer,
     LayerSpec,
+    PatchSpec,
     apply_patch,
     build_layer_from_spec,
     copy_layers_map,
@@ -106,30 +107,30 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
 
 _BASE_MOUSE_LAYERS = {name: build_layer_from_spec(spec) for name, spec in MOUSE_LAYER_SPECS.items()}
 
-Patch = Dict[int, Dict[str, Any]]
+Patch = PatchSpec
 
 
 _MAC_MOUSE_PATCH: Patch = {
-    30: KeySpec("&sk", (KeySpec("RGUI"),)).to_dict(),
-    32: KeySpec("&sk", (KeySpec("RCTRL"),)).to_dict(),
-    55: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)).to_dict(),
-    56: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)).to_dict(),
-    57: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)).to_dict(),
+    30: KeySpec("&sk", (KeySpec("RGUI"),)),
+    32: KeySpec("&sk", (KeySpec("RCTRL"),)),
+    55: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)),
+    56: KeySpec("&kp", (KeySpec("LG", (KeySpec("C"),)),)),
+    57: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)),
 }
 
 _DUAL_MOUSE_PATCH: Patch = {
-    55: KeySpec("&none").to_dict(),
-    56: KeySpec("&none").to_dict(),
-    57: KeySpec("&none").to_dict(),
+    55: KeySpec("&none"),
+    56: KeySpec("&none"),
+    57: KeySpec("&none"),
 }
 
 _BILATERAL_MOUSE_PATCH: Patch = {
-    41: KeySpec("&mo", (KeySpec(17),)).to_dict(),
-    42: KeySpec("&mo", (KeySpec(18),)).to_dict(),
-    43: KeySpec("&mo", (KeySpec(16),)).to_dict(),
-    48: KeySpec("&mo", (KeySpec(16),)).to_dict(),
-    49: KeySpec("&mo", (KeySpec(18),)).to_dict(),
-    50: KeySpec("&mo", (KeySpec(17),)).to_dict(),
+    41: KeySpec("&mo", (KeySpec(17),)),
+    42: KeySpec("&mo", (KeySpec(18),)),
+    43: KeySpec("&mo", (KeySpec(16),)),
+    48: KeySpec("&mo", (KeySpec(16),)),
+    49: KeySpec("&mo", (KeySpec(18),)),
+    50: KeySpec("&mo", (KeySpec(17),)),
 }
 
 
