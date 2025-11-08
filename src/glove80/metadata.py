@@ -9,15 +9,14 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
+from importlib import resources
 from pathlib import Path
 from typing import Dict, List, TypedDict
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-
 DEFAULT_LAYOUT = "tailorkey"
-LAYOUT_METADATA_PATHS: Dict[str, Path] = {
-    "tailorkey": REPO_ROOT / "layouts" / "tailorkey" / "metadata" / "metadata.json",
-    "quantum_touch": REPO_ROOT / "layouts" / "quantum_touch" / "metadata" / "metadata.json",
+LAYOUT_METADATA_PACKAGES: Dict[str, str] = {
+    "tailorkey": "glove80.layouts.tailorkey",
+    "quantum_touch": "glove80.layouts.quantum_touch",
 }
 
 
@@ -34,26 +33,32 @@ class VariantMetadata(TypedDict):
 MetadataByVariant = Dict[str, VariantMetadata]
 
 
-def _metadata_path_for(layout: str, override: Path | None) -> Path:
-    if override is not None:
-        return override
+def _metadata_package(layout: str) -> str:
     try:
-        return LAYOUT_METADATA_PATHS[layout]
+        return LAYOUT_METADATA_PACKAGES[layout]
     except KeyError as exc:
-        raise KeyError(f"Unknown layout '{layout}'. Available: {sorted(LAYOUT_METADATA_PATHS)}") from exc
+        raise KeyError(f"Unknown layout '{layout}'. Available: {sorted(LAYOUT_METADATA_PACKAGES)}") from exc
+
+
+def _load_metadata_from_path(metadata_path: Path) -> MetadataByVariant:
+    with metadata_path.open(encoding="utf-8") as handle:
+        return json.load(handle)
 
 
 @lru_cache()
-def _load_metadata_cached(layout: str, metadata_path: str) -> MetadataByVariant:
-    with Path(metadata_path).open(encoding="utf-8") as handle:
+def _load_packaged_metadata(layout: str) -> MetadataByVariant:
+    package = _metadata_package(layout)
+    resource = resources.files(package).joinpath("metadata.json")
+    with resource.open(encoding="utf-8") as handle:
         return json.load(handle)
 
 
 def load_metadata(layout: str = DEFAULT_LAYOUT, path: Path | None = None) -> MetadataByVariant:
     """Load (and cache) the metadata file as typed objects."""
 
-    metadata_path = _metadata_path_for(layout, path)
-    return _load_metadata_cached(layout, str(metadata_path))
+    if path is not None:
+        return _load_metadata_from_path(path)
+    return _load_packaged_metadata(layout)
 
 
 def get_variant_metadata(

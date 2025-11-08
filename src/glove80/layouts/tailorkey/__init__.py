@@ -1,0 +1,1 @@
+"""TailorKey metadata resources."""

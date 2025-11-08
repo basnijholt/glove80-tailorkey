@@ -1,0 +1,1 @@
+"""QuantumTouch metadata resources."""
