@@ -1,9 +1,7 @@
-import json
-from pathlib import Path
-
 import pytest
 
 from tailorkey_builder.layers.cursor import build_cursor_layer
+from tests.utils import load_variant_json
 
 
 VARIANTS = [
@@ -16,8 +14,7 @@ VARIANTS = [
 
 
 def _load_canonical_layer(variant: str):
-    path = Path("sources/variants") / f"{variant}.json"
-    data = json.loads(path.read_text())
+    data = load_variant_json(variant)
     name = "Cursor"
     idx = data["layer_names"].index(name)
     return data["layers"][idx]

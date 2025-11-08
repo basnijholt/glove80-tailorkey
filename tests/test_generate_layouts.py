@@ -18,7 +18,7 @@ def test_generated_files_match_canonical_source(tmp_path, variant):
     metadata = generator.load_metadata()
     meta = metadata[variant]
 
-    source_path = REPO_ROOT / meta["source"]
+    source_path = REPO_ROOT / meta["output"]
     expected = json.loads(source_path.read_text())
 
     built = build_layout(variant)

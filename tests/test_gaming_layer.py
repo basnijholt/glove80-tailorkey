@@ -1,9 +1,7 @@
-import json
-from pathlib import Path
-
 import pytest
 
 from tailorkey_builder.layers.gaming import build_gaming_layer
+from tests.utils import load_variant_json
 
 
 VARIANTS = [
@@ -16,7 +14,7 @@ VARIANTS = [
 
 
 def _canonical_layer(variant: str):
-    data = json.loads((Path("sources/variants") / f"{variant}.json").read_text())
+    data = load_variant_json(variant)
     idx = data["layer_names"].index("Gaming")
     return data["layers"][idx]
 

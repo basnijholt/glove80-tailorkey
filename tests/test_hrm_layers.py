@@ -1,9 +1,7 @@
-import json
-from pathlib import Path
-
 import pytest
 
 from tailorkey_builder.layers.hrm import build_hrm_layers
+from tests.utils import load_variant_json
 
 
 VARIANTS = [
@@ -16,7 +14,7 @@ VARIANTS = [
 
 
 def _canonical_layers(variant: str):
-    data = json.loads((Path("sources/variants") / f"{variant}.json").read_text())
+    data = load_variant_json(variant)
     layer_map = {}
     for idx, name in enumerate(data["layer_names"]):
         if name.startswith("HRM"):

@@ -1,9 +1,7 @@
-import json
-from pathlib import Path
-
 import pytest
 
 from tailorkey_builder.layers.mouse import build_mouse_layers
+from tests.utils import load_variant_json
 
 
 VARIANTS = [
@@ -18,8 +16,7 @@ LAYER_NAMES = ["Mouse", "MouseSlow", "MouseFast", "MouseWarp"]
 
 
 def _load_canonical_layers(variant: str):
-    path = Path("sources/variants") / f"{variant}.json"
-    data = json.loads(path.read_text())
+    data = load_variant_json(variant)
     layers = {}
     for layer_name in LAYER_NAMES:
         idx = data["layer_names"].index(layer_name)

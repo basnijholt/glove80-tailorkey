@@ -1,9 +1,7 @@
-import json
-from pathlib import Path
-
 import pytest
 
 from tailorkey_builder.layers.typing import build_typing_layer
+from tests.utils import load_variant_json
 
 
 VARIANTS = [
@@ -16,7 +14,7 @@ VARIANTS = [
 
 
 def _load_layer(variant: str):
-    data = json.loads((Path("sources/variants") / f"{variant}.json").read_text())
+    data = load_variant_json(variant)
     idx = data["layer_names"].index("Typing")
     return data["layers"][idx]
 

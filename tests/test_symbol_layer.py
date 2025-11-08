@@ -1,1 +1,24 @@
-"import json\nfrom pathlib import Path\n\nimport pytest\n\nfrom tailorkey_builder.layers.symbol import build_symbol_layer\n\n\nVARIANTS = [\n    'windows',\n    'mac',\n    'dual',\n    'bilateral_windows',\n    'bilateral_mac',\n]\n\n\ndef _load_canonical_layer(variant: str):\n    path = Path('sources/variants') / f'{variant}.json'\n    data = json.loads(path.read_text())\n    idx = data['layer_names'].index('Symbol')\n    return data['layers'][idx]\n\n\n@pytest.mark.parametrize('variant', VARIANTS)\ndef test_symbol_layer_matches_canonical(variant):\n    assert build_symbol_layer(variant) == _load_canonical_layer(variant)\n*** End Patch***"
+import pytest
+
+from tailorkey_builder.layers.symbol import build_symbol_layer
+from tests.utils import load_variant_json
+
+
+VARIANTS = [
+    "windows",
+    "mac",
+    "dual",
+    "bilateral_windows",
+    "bilateral_mac",
+]
+
+
+def _load_canonical_layer(variant: str):
+    data = load_variant_json(variant)
+    idx = data["layer_names"].index("Symbol")
+    return data["layers"][idx]
+
+
+@pytest.mark.parametrize("variant", VARIANTS)
+def test_symbol_layer_matches_canonical(variant):
+    assert build_symbol_layer(variant) == _load_canonical_layer(variant)

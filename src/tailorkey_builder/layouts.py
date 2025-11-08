@@ -10,16 +10,12 @@ from typing import Dict
 from .layers import build_all_layers
 
 ROOT = Path(__file__).resolve().parents[2]
-VARIANT_SOURCES = ROOT / "sources" / "variants"
 VARIANT_METADATA = json.loads((ROOT / "sources" / "variant_metadata.json").read_text())
-VARIANT_ALIASES = {
-    "bilateral_win": "bilateral_windows",
-}
 
 
 def load_canonical_variant(variant: str) -> Dict:
     meta = VARIANT_METADATA[variant]
-    path = ROOT / meta["source"]
+    path = ROOT / meta["output"]
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
 
@@ -30,8 +26,7 @@ def build_layout(variant: str) -> Dict:
     canonical = load_canonical_variant(variant)
     layout = deepcopy(canonical)
 
-    layer_variant = VARIANT_ALIASES.get(variant, variant)
-    generated_layers = build_all_layers(layer_variant)
+    generated_layers = build_all_layers(variant)
     ordered_layers = []
     for name in layout["layer_names"]:
         if name not in generated_layers:

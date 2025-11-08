@@ -18,8 +18,7 @@ auditable history of every change.
 .
 ├─ original/                   # published layouts (generated artifacts)
 ├─ sources/
-│  ├─ variant_metadata.json    # mapping of variants → release metadata
-│  └─ variants/                # canonical source JSON per layout variant
+│  └─ variant_metadata.json    # mapping of variants → release metadata
 ├─ src/
 │  └─ tailorkey_builder/       # Python package for layered generation
 ├─ scripts/
@@ -28,16 +27,11 @@ auditable history of every change.
 └─ README.md
 ```
 
-- **sources/variants** contains the original layouts, one file per variant.
-  These are treated as the authoritative copies that should be edited when
-  making changes.
-- **sources/variant_metadata.json** lists each variant, the path to its
-  canonical source, the release filename, and the metadata (uuid, parent_uuid,
-  tags, notes, etc.) that should be applied when regenerating the published
-  JSON.
-- **scripts/generate_tailorkey_layouts.py** copies the canonical source JSON to
-  the release file path and overwrites its headline metadata so it matches the
-  upstream release exactly.
+- **sources/variant_metadata.json** lists each variant, the release filename,
+  and the metadata (uuid, parent_uuid, tags, notes, etc.) that should be
+  applied when regenerating the published JSON.
+- **scripts/generate_tailorkey_layouts.py** builds every layer from code and
+  rewrites the release file so it matches the committed canonical layout.
 - **original/** is where the generator writes the published JSON files that ship
   with releases or get uploaded as CI artifacts.
 - **src/tailorkey_builder** is the growing Python package that will eventually
@@ -48,17 +42,17 @@ auditable history of every change.
 
 ## Regeneration Workflow
 
-1. Modify the canonical source in `sources/variants/*.json` or adjust the
-   metadata in `sources/variant_metadata.json`.
+1. Modify the generator code under `src/tailorkey_builder/` (or adjust the
+   metadata in `sources/variant_metadata.json`).
 2. Run the generator:
 
    ```bash
    python3 scripts/generate_tailorkey_layouts.py
    ```
 
-   The script rewrites every release JSON under `original/`. Because it pulls
-   from the canonical source, the working tree will only show diffs for files
-   you intentionally edited.
+   The script rewrites every release JSON under `original/`. Because the layout
+   is generated from code, the working tree will only show diffs for files you
+   intentionally changed.
 
 3. Run the tests:
 
@@ -66,9 +60,9 @@ auditable history of every change.
    pytest
    ```
 
-   The test suite reruns the generator for each variant and asserts that the
-   release file exactly matches the canonical source. This guards against
-   accidental edits to the public layouts.
+   The test suite compares the generated layouts with the committed files under
+   `original/`. This guards against accidental changes to the published
+   layouts.
 
 ## Continuous Integration
 
