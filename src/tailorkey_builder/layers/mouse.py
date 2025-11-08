@@ -107,10 +107,8 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
 
 _BASE_MOUSE_LAYERS = {name: build_layer_from_spec(spec) for name, spec in MOUSE_LAYER_SPECS.items()}
 
-Patch = PatchSpec
 
-
-_MAC_MOUSE_PATCH: Patch = {
+_MAC_MOUSE_PATCH: PatchSpec = {
     30: KeySpec("&sk", (KeySpec("RGUI"),)),
     32: KeySpec("&sk", (KeySpec("RCTRL"),)),
     55: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)),
@@ -118,13 +116,13 @@ _MAC_MOUSE_PATCH: Patch = {
     57: KeySpec("&kp", (KeySpec("LG", (KeySpec("V"),)),)),
 }
 
-_DUAL_MOUSE_PATCH: Patch = {
+_DUAL_MOUSE_PATCH: PatchSpec = {
     55: KeySpec("&none"),
     56: KeySpec("&none"),
     57: KeySpec("&none"),
 }
 
-_BILATERAL_MOUSE_PATCH: Patch = {
+_BILATERAL_MOUSE_PATCH: PatchSpec = {
     41: KeySpec("&mo", (KeySpec(17),)),
     42: KeySpec("&mo", (KeySpec(18),)),
     43: KeySpec("&mo", (KeySpec(16),)),

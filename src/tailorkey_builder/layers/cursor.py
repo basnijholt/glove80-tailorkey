@@ -100,9 +100,8 @@ CURSOR_SPEC = LayerSpec(
 
 _BASE_CURSOR_LAYER: Layer = build_layer_from_spec(CURSOR_SPEC)
 
-Patch = PatchSpec
 
-_MAC_PATCH: Patch = {
+_MAC_PATCH: PatchSpec = {
     27: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)),
     28: KeySpec("&kp", (KeySpec("LG", (KeySpec("X"),)),)),
     30: KeySpec("&kp", (KeySpec("LG", (KeySpec("Z"),)),)),

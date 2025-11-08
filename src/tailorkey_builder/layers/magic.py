@@ -100,9 +100,8 @@ MAGIC_SPEC = LayerSpec(
 
 _BASE_MAGIC_LAYER: Layer = build_layer_from_spec(MAGIC_SPEC)
 
-Patch = PatchSpec
 
-_DUAL_PATCH: Patch = {
+_DUAL_PATCH: PatchSpec = {
     11: KeySpec("&to", (KeySpec(1),)),
     12: KeySpec("&to", (KeySpec(2),)),
     15: KeySpec("&to", (KeySpec(3),)),

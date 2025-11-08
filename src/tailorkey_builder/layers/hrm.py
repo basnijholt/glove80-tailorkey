@@ -102,9 +102,8 @@ _BASE_HRM_SPEC = LayerSpec(
 
 _BASE_HRM_LAYER: Layer = build_layer_from_spec(_BASE_HRM_SPEC)
 
-Patch = PatchSpec
 
-_MAC_PATCH: Patch = {
+_MAC_PATCH: PatchSpec = {
     35: KeySpec("&HRM_left_pinky_v1_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
     37: KeySpec("&HRM_left_middy_v1_TKZ", (KeySpec("LGUI"), KeySpec("D"))),
     42: KeySpec("&HRM_right_middy_v1_TKZ", (KeySpec("RGUI"), KeySpec("K"))),
@@ -114,17 +113,17 @@ _MAC_PATCH: Patch = {
     56: KeySpec("&kp", (KeySpec("RGUI"),)),
 }
 
-_DUAL_PATCH: Patch = {
+_DUAL_PATCH: PatchSpec = {
     69: KeySpec("&thumb_v2_TKZ", (KeySpec(5), KeySpec("BSPC"))),
     74: KeySpec("&space_v3_TKZ", (KeySpec(6), KeySpec("SPACE"))),
 }
 
-_DUAL_MAC_PATCH: Patch = {
+_DUAL_MAC_PATCH: PatchSpec = {
     69: KeySpec("&thumb_v2_TKZ", (KeySpec(4), KeySpec("BSPC"))),
     74: KeySpec("&space_v3_TKZ", (KeySpec(6), KeySpec("SPACE"))),
 }
 
-_BILATERAL_WIN_PATCH: Patch = {
+_BILATERAL_WIN_PATCH: PatchSpec = {
     35: KeySpec("&HRM_left_pinky_v1B_TKZ", (KeySpec("LGUI"), KeySpec("A"))),
     36: KeySpec("&HRM_left_ring_v1B_TKZ", (KeySpec("LALT"), KeySpec("S"))),
     37: KeySpec("&HRM_left_middy_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("D"))),
@@ -136,7 +135,7 @@ _BILATERAL_WIN_PATCH: Patch = {
     73: KeySpec("&thumb_v2_TKZ", (KeySpec(15), KeySpec("RET"))),
 }
 
-_BILATERAL_MAC_PATCH: Patch = {
+_BILATERAL_MAC_PATCH: PatchSpec = {
     35: KeySpec("&HRM_left_pinky_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
     36: KeySpec("&HRM_left_ring_v1B_TKZ", (KeySpec("LALT"), KeySpec("S"))),
     37: KeySpec("&HRM_left_middy_v1B_TKZ", (KeySpec("LGUI"), KeySpec("D"))),

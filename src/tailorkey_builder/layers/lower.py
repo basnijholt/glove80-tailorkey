@@ -83,9 +83,8 @@ LOWER_LAYER_SPEC = LayerSpec(
 
 _BASE_LOWER_LAYER: Layer = build_layer_from_spec(LOWER_LAYER_SPEC)
 
-Patch = PatchSpec
 
-_DUAL_PATCH: Patch = {
+_DUAL_PATCH: PatchSpec = {
     54: KeySpec("&to", (KeySpec(1),)),
 }
 

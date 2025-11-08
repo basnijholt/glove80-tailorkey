@@ -100,9 +100,8 @@ SYMBOL_SPEC = LayerSpec(
 
 _BASE_SYMBOL_LAYER: Layer = build_layer_from_spec(SYMBOL_SPEC)
 
-Patch = PatchSpec
 
-_MAC_PATCH: Patch = {
+_MAC_PATCH: PatchSpec = {
     30: KeySpec("&sk", (KeySpec("RGUI"),)),
     32: KeySpec("&sk", (KeySpec("RCTRL"),)),
 }
