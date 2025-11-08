@@ -1,6 +1,6 @@
 {
   "windows": {
-    "output": "12312d23-b371-445a-9183-83552767bd76_TailorKey v4.2h.json",
+    "output": "original/12312d23-b371-445a-9183-83552767bd76_TailorKey v4.2h.json",
     "title": "TailorKey v4.2h",
     "uuid": "12312d23-b371-445a-9183-83552767bd76",
     "parent_uuid": "b979fc63-bdcf-44ba-9c0a-f7ef645494d1",
@@ -14,7 +14,7 @@
     "source": "sources/variants/windows.json"
   },
   "mac": {
-    "output": "eee91968-ac8e-4d6f-95a3-4a5e2f3b4b44_TailorKey v4.2h - macOS.json",
+    "output": "original/eee91968-ac8e-4d6f-95a3-4a5e2f3b4b44_TailorKey v4.2h - macOS.json",
     "title": "TailorKey v4.2h - macOS",
     "uuid": "eee91968-ac8e-4d6f-95a3-4a5e2f3b4b44",
     "parent_uuid": "62b2711c-8ecc-43de-8ca8-d0e730926fcd",
@@ -30,7 +30,7 @@
     "source": "sources/variants/mac.json"
   },
   "dual": {
-    "output": "179300bf-aec6-456c-84d2-5c33d5be91b0_TailorKey v4.2h - Dual OS version.json",
+    "output": "original/179300bf-aec6-456c-84d2-5c33d5be91b0_TailorKey v4.2h - Dual OS version.json",
     "title": "TailorKey v4.2h - Dual OS version",
     "uuid": "179300bf-aec6-456c-84d2-5c33d5be91b0",
     "parent_uuid": "9e138e97-4ef5-4850-a79e-b99989c613b8",
@@ -50,7 +50,7 @@
     "source": "sources/variants/dual.json"
   },
   "bilateral_win": {
-    "output": "85f92852-413b-4931-ac7d-cf42e6b129eb_TailorKey v4.2h Bilateral.json",
+    "output": "original/85f92852-413b-4931-ac7d-cf42e6b129eb_TailorKey v4.2h Bilateral.json",
     "title": "TailorKey v4.2h Bilateral ",
     "uuid": "85f92852-413b-4931-ac7d-cf42e6b129eb",
     "parent_uuid": "51e8f67f-92b3-4641-a695-0f0452795c22",
@@ -64,7 +64,7 @@
     "source": "sources/variants/bilateral_windows.json"
   },
   "bilateral_mac": {
-    "output": "906466c2-8029-4831-9571-2bf250ca4505_TailorKey v4.2h - macOS Bilateral.json",
+    "output": "original/906466c2-8029-4831-9571-2bf250ca4505_TailorKey v4.2h - macOS Bilateral.json",
     "title": "TailorKey v4.2h - macOS Bilateral",
     "uuid": "906466c2-8029-4831-9571-2bf250ca4505",
     "parent_uuid": "45a4eda0-3a04-4d89-99c2-ee7280d4478c",

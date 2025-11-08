@@ -16,14 +16,15 @@ auditable history of every change.
 
 ```
 .
+├─ original/                   # published layouts (generated artifacts)
 ├─ sources/
 │  ├─ variant_metadata.json    # mapping of variants → release metadata
 │  └─ variants/                # canonical source JSON per layout variant
+├─ src/
+│  └─ tailorkey_builder/       # Python package for layered generation
 ├─ scripts/
 │  └─ generate_tailorkey_layouts.py
-├─ tests/
-│  └─ test_generate_layouts.py
-├─ *.json                      # release files produced by the generator
+├─ tests/                      # pytest suites (release + layer builders)
 └─ README.md
 ```
 
@@ -37,8 +38,13 @@ auditable history of every change.
 - **scripts/generate_tailorkey_layouts.py** copies the canonical source JSON to
   the release file path and overwrites its headline metadata so it matches the
   upstream release exactly.
-- **tests/** contains a pytest suite that asserts every release file matches the
-  canonical source after the generator runs.
+- **original/** is where the generator writes the published JSON files that ship
+  with releases or get uploaded as CI artifacts.
+- **src/tailorkey_builder** is the growing Python package that will eventually
+  synthesize every layer from shared building blocks (starting with mouse
+  layers).
+- **tests/** contains pytest suites that validate both the published layouts and
+  individual generator modules.
 
 ## Regeneration Workflow
 
@@ -50,7 +56,7 @@ auditable history of every change.
    python3 scripts/generate_tailorkey_layouts.py
    ```
 
-   The script rewrites every release JSON in the repository. Because it pulls
+   The script rewrites every release JSON under `original/`. Because it pulls
    from the canonical source, the working tree will only show diffs for files
    you intentionally edited.
 
