@@ -37,6 +37,7 @@ checked into `src/glove80`.
 ```
 .
 ├─ layouts/                     # checked-in release JSON
+│  ├─ default/                  # MoErgo factory/examples
 │  ├─ tailorkey/releases/
 │  └─ quantum_touch/releases/
 ├─ docs/                        # architecture + per-layout guides
@@ -49,8 +50,8 @@ checked into `src/glove80`.
 ```
 
 - Read `docs/architecture.md` for a walkthrough of the data flow and regeneration pipeline.
-- `docs/tailorkey.md` and `docs/quantum_touch.md` explain how each layout family is structured, the available layers,
-  and the steps for adding new variants.
+- `docs/default.md`, `docs/tailorkey.md`, and `docs/quantum_touch.md` explain how each layout family is structured, the
+  available layers, and the steps for adding new variants.
 
 ## CI Contract
 `.github/workflows/ci.yml` runs the same steps you do locally:
