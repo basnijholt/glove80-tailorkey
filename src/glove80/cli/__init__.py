@@ -16,7 +16,16 @@ def _print_results(results: list[GenerationResult]) -> None:
         typer.echo(f"{result.layout}:{result.variant}: {result.destination} ({status})")
 
 
-@app.command()
+@app.callback(invoke_without_command=True)
+def main(ctx: typer.Context) -> None:
+    """Show the top-level help when no sub-command is provided."""
+
+    if ctx.invoked_subcommand is None:
+        typer.echo(ctx.get_help())
+        raise typer.Exit()
+
+
+@app.command("generate")
 def generate(
     layout: Optional[str] = typer.Option(None, help="Limit regeneration to a single layout family."),
     variant: Optional[str] = typer.Option(None, help="Limit regeneration to a single variant."),
