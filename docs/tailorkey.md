@@ -3,6 +3,13 @@
 TailorKey is the zero-code Glove80 layout curated by @moosy.  The code in `src/glove80/tailorkey` captures the entire
 layout in declarative specs so every variant (Windows, macOS, Dual, Bilateral) is reproducible.
 
+## Canonical Layouts
+- [TailorKey v4.2h](https://my.glove80.com/#/layout/user/12312d23-b371-445a-9183-83552767bd76) (accessed 8 Nov 2025)
+- [TailorKey v4.2h - macOS](https://my.glove80.com/#/layout/user/eee91968-ac8e-4d6f-95a3-4a5e2f3b4b44) (accessed 8 Nov 2025)
+- [TailorKey v4.2h - Dual OS version](https://my.glove80.com/#/layout/user/179300bf-aec6-456c-84d2-5c33d5be91b0) (accessed 8 Nov 2025)
+- [TailorKey v4.2h Bilateral](https://my.glove80.com/#/layout/user/85f92852-413b-4931-ac7d-cf42e6b129eb) (accessed 8 Nov 2025)
+- [TailorKey v4.2h - macOS Bilateral](https://my.glove80.com/#/layout/user/906466c2-8029-4831-9571-2bf250ca4505) (accessed 8 Nov 2025)
+
 ## Structure
 - `specs/common.py` lists the canonical layer order and shared layout metadata fields.
 - `specs/macros.py`, `specs/hold_taps.py`, `specs/combos.py`, and `specs/input_listeners.py` use the spec primitives to

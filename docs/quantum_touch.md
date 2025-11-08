@@ -3,6 +3,9 @@
 QuantumTouch expands on TailorKey concepts with bilateral HRM training layers and bespoke mouse behavior.  Its code
 lives in `src/glove80/quantum_touch` and mirrors the TailorKey structure so new features remain declarative.
 
+## Canonical Layout
+- [QuantumTouch80BHRM](https://my.glove80.com/#/layout/user/bdd76424-25f0-4a53-a250-c9fdde247bd6) (accessed 8 Nov 2025)
+
 ## Structure
 - `specs/` contains macros, hold-taps, combos, and listener definitions tailored for the QuantumTouch training flow.
 - `layers/` builds the base layer, HRM, finger-training layers, mouse variants, and the remaining supporting layers needed for the training workflow.
