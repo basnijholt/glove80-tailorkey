@@ -29,3 +29,6 @@ dev = [
     "pytest>=9.0.0",
     "ruff>=0.14.4",
 ]
+
+[tool.ruff]
+line-length = 120
