@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from glove80.layouts.common import build_common_fields
-from glove80.specs.primitives import InputListenerNodeSpec, InputListenerSpec, InputProcessorSpec
+from glove80.layouts.schema import InputListener, InputProcessor, ListenerNode
 
 from .layer_data import BASE_LAYERS, FACTORY_LAYERS, LOWER_LAYERS, MAGIC_LAYERS, MOUSE_EXTRAS
 
@@ -19,55 +19,55 @@ class VariantSpec:
     common_fields: dict[str, Any]
     layer_names: Sequence[str]
     layer_specs: Mapping[str, LayerSpec]
-    input_listeners: Sequence[InputListenerSpec] = ()
+    input_listeners: Sequence[InputListener] = ()
 
 
-MOUSE_INPUT_LISTENERS: Sequence[InputListenerSpec] = (
-    InputListenerSpec(
+MOUSE_INPUT_LISTENERS: Sequence[InputListener] = (
+    InputListener(
         code="&mmv_input_listener",
-        nodes=(
-            InputListenerNodeSpec(
+        nodes=[
+            ListenerNode(
                 code="LAYER_MouseSlow",
                 description="LAYER_MouseSlow",
-                layers=(3,),
-                input_processors=(InputProcessorSpec(code="&zip_xy_scaler", params=(1, 9)),),
+                layers=[3],
+                inputProcessors=[InputProcessor(code="&zip_xy_scaler", params=[1, 9])],
             ),
-            InputListenerNodeSpec(
+            ListenerNode(
                 code="LAYER_MouseFast",
                 description="LAYER_MouseFast",
-                layers=(4,),
-                input_processors=(InputProcessorSpec(code="&zip_xy_scaler", params=(3, 1)),),
+                layers=[4],
+                inputProcessors=[InputProcessor(code="&zip_xy_scaler", params=[3, 1])],
             ),
-            InputListenerNodeSpec(
+            ListenerNode(
                 code="LAYER_MouseWarp",
                 description="LAYER_MouseWarp",
-                layers=(5,),
-                input_processors=(InputProcessorSpec(code="&zip_xy_scaler", params=(12, 1)),),
+                layers=[5],
+                inputProcessors=[InputProcessor(code="&zip_xy_scaler", params=[12, 1])],
             ),
-        ),
+        ],
     ),
-    InputListenerSpec(
+    InputListener(
         code="&msc_input_listener",
-        nodes=(
-            InputListenerNodeSpec(
+        nodes=[
+            ListenerNode(
                 code="LAYER_MouseSlow",
                 description="LAYER_MouseSlow",
-                layers=(3,),
-                input_processors=(InputProcessorSpec(code="&zip_scroll_scaler", params=(1, 9)),),
+                layers=[3],
+                inputProcessors=[InputProcessor(code="&zip_scroll_scaler", params=[1, 9])],
             ),
-            InputListenerNodeSpec(
+            ListenerNode(
                 code="LAYER_MouseFast",
                 description="LAYER_MouseFast",
-                layers=(4,),
-                input_processors=(InputProcessorSpec(code="&zip_scroll_scaler", params=(3, 1)),),
+                layers=[4],
+                inputProcessors=[InputProcessor(code="&zip_scroll_scaler", params=[3, 1])],
             ),
-            InputListenerNodeSpec(
+            ListenerNode(
                 code="LAYER_MouseWarp",
                 description="LAYER_MouseWarp",
-                layers=(5,),
-                input_processors=(InputProcessorSpec(code="&zip_scroll_scaler", params=(12, 1)),),
+                layers=[5],
+                inputProcessors=[InputProcessor(code="&zip_scroll_scaler", params=[12, 1])],
             ),
-        ),
+        ],
     ),
 )
 
