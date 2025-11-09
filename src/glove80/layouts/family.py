@@ -47,4 +47,25 @@ class LayoutRegistry:
 
 REGISTRY = LayoutRegistry()
 
-__all__ = ["LayoutFamily", "LayoutRegistry", "REGISTRY", "RegisteredFamily"]
+
+def get_family(name: str) -> LayoutFamily:
+    return REGISTRY.get(name)
+
+
+def list_families() -> list[str]:
+    return [registered.name for registered in REGISTRY.families()]
+
+
+def build_layout(family: str, variant: str) -> dict:
+    return get_family(family).build(variant)
+
+
+__all__ = [
+    "LayoutFamily",
+    "LayoutRegistry",
+    "RegisteredFamily",
+    "REGISTRY",
+    "get_family",
+    "list_families",
+    "build_layout",
+]

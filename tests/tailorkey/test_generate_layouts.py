@@ -3,7 +3,7 @@ import json
 import pytest
 
 from glove80.metadata import load_metadata
-from glove80.families.tailorkey.layouts import build_layout
+from glove80 import build_layout as build_family_layout
 
 
 TAILORKEY_VARIANTS = sorted(load_metadata(layout="tailorkey").keys())
@@ -17,5 +17,5 @@ def test_generated_files_match_canonical_source(variant, tailorkey_metadata, rep
     source_path = repo_root / meta["output"]
     expected = json.loads(source_path.read_text())
 
-    built = build_layout(variant)
+    built = build_family_layout("tailorkey", variant)
     assert built == expected

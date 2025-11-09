@@ -49,13 +49,3 @@ class Family(LayoutFamily):
 REGISTRY.register(Family())
 
 __all__ = ["Family"]
-
-
-_family = Family()
-
-
-def build_layout(variant: str = "default") -> dict:
-    return _family.build(variant)
-
-
-__all__ = ["Family", "build_layout"]

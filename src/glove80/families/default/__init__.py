@@ -1,5 +1,5 @@
 """MoErgo default Glove80 layouts."""
 
-from .layouts import build_layout
+from . import layouts as _layouts  # noqa: F401
 
-__all__ = ["build_layout"]
+__all__ = []

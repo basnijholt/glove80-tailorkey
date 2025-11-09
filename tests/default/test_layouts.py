@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.families.default.layouts import build_layout
+from glove80 import build_layout as build_family_layout
 
 
 @pytest.mark.parametrize(
@@ -18,5 +18,5 @@ from glove80.families.default.layouts import build_layout
 )
 def test_default_layout_matches_release(variant, load_default_variant):
     expected = load_default_variant(variant)
-    built = build_layout(variant)
+    built = build_family_layout("default", variant)
     assert built == expected
