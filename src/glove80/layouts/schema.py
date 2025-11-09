@@ -95,3 +95,25 @@ class InputListener(BaseModel):
 
 
 __all__ += ["InputProcessor", "ListenerNode", "InputListener"]
+
+
+class CommonFields(BaseModel):
+    """Top-level, shared fields merged into every layout payload.
+
+    We validate known keys while allowing extras so families can inject
+    additional metadata (e.g., `creator`) without breaking validation.
+    """
+
+    model_config = ConfigDict(extra="allow", frozen=True)
+
+    keyboard: str
+    firmware_api_version: str
+    locale: str
+    unlisted: bool
+    custom_defined_behaviors: str
+    custom_devicetree: str
+    config_parameters: List[Dict]
+    layout_parameters: Dict
+
+
+__all__.append("CommonFields")

@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from glove80.base import Layer, LayerMap, resolve_layer_refs
+from glove80.layouts.schema import CommonFields as CommonFieldsModel
 from glove80.metadata import get_variant_metadata
 
 if TYPE_CHECKING:
@@ -36,8 +37,11 @@ def build_layout_payload(
     input_listeners: Sequence[Any] | None = None,
 ) -> dict[str, Any]:
     """Create a baseline layout payload from shared metadata and sections."""
-    # Make a concrete, mutable dict copy for mypy and runtime safety.
-    layout: dict[str, Any] = deepcopy(dict(common_fields))
+    # Validate/normalize common fields via Pydantic, then dump to a plain dict
+    # so downstream output remains identical.
+    layout: dict[str, Any] = deepcopy(
+        CommonFieldsModel(**dict(common_fields)).model_dump(by_alias=True)  # type: ignore[arg-type]
+    )
     layout["layer_names"] = list(layer_names)
     layout["macros"] = list(macros or [])
     layout["holdTaps"] = list(hold_taps or [])
