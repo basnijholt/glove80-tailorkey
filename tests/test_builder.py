@@ -3,6 +3,7 @@ from __future__ import annotations
 from glove80.layouts.builder import LayoutBuilder
 from glove80.layouts.common import BASE_COMMON_FIELDS, compose_layout
 from glove80.layouts.components import LayoutFeatureComponents
+from glove80.layouts.schema import Combo, Macro
 
 
 def _mock_layer(token: str) -> list[dict[str, object]]:
@@ -10,10 +11,12 @@ def _mock_layer(token: str) -> list[dict[str, object]]:
 
 
 def _mock_feature_components(name: str) -> LayoutFeatureComponents:
-    return LayoutFeatureComponents(
-        macros=[{"name": name, "bindings": []}],
-        layers={f"{name}_layer": _mock_layer(name)},
+    macro = Macro(
+        name=name,
+        description=None,
+        bindings=[{"value": "&kp", "params": [{"value": "A", "params": []}]}],
     )
+    return LayoutFeatureComponents(macros=[macro], layers={f"{name}_layer": _mock_layer(name)})
 
 
 def test_builder_matches_compose_layout() -> None:
@@ -21,8 +24,22 @@ def test_builder_matches_compose_layout() -> None:
         "Typing": _mock_layer("&kp_A"),
         "Symbol": _mock_layer("&kp_HASH"),
     }
-    macros = [{"name": "&macro_demo", "bindings": []}]
-    combos = [{"name": "combo_demo", "layers": [0, 1]}]
+    macros = [
+        Macro(
+            name="&macro_demo",
+            description=None,
+            bindings=[{"value": "&kp", "params": [{"value": "A", "params": []}]}],
+        )
+    ]
+    combos = [
+        Combo(
+            name="combo_demo",
+            description=None,
+            binding={"value": "&kp", "params": [{"value": "A", "params": []}]},
+            keyPositions=[0, 1],
+            layers=[0, 1],
+        )
+    ]
 
     builder = LayoutBuilder(
         metadata_key="default",

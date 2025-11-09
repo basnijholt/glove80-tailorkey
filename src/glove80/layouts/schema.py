@@ -221,10 +221,10 @@ class LayoutPayload(BaseModel):
 
     # Sections
     layer_names: List[str]
-    macros: List[Union[Macro, Dict[str, Any]]]
-    holdTaps: List[Union[HoldTap, Dict[str, Any]]]
-    combos: List[Union[Combo, Dict[str, Any]]]
-    inputListeners: List[Union[InputListener, Dict[str, Any]]]
+    macros: List[Macro]
+    holdTaps: List[HoldTap]
+    combos: List[Combo]
+    inputListeners: List[InputListener]
     layers: List[List[Dict[str, Any]]]
 
     # Attached metadata (optional)

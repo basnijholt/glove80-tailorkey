@@ -7,6 +7,7 @@ from rich.table import Table
 
 from glove80.layouts.family import REGISTRY
 from glove80.layouts.generator import GenerationResult, available_layouts, generate_layouts
+from glove80.layouts.parse import parse_typed_sections
 
 from pathlib import Path
 
@@ -81,3 +82,26 @@ def generate(
 
 
 __all__ = ["app"]
+
+
+@app.command("typed-parse")
+def typed_parse(
+    path: Path = typer.Argument(..., exists=True, file_okay=True, dir_okay=False, help="Path to a layout JSON file."),
+) -> None:
+    """Parse a layout JSON into typed Pydantic models and report a summary."""
+    import json
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    payload, macros, hold_taps, combos, listeners = parse_typed_sections(data)
+
+    table = Table(title=f"Typed Parse: {path.name}", show_header=True, header_style="bold green")
+    table.add_column("Field", style="cyan", no_wrap=True)
+    table.add_column("Count", justify="right")
+    table.add_row("layer_names", str(len(payload.layer_names)))
+    table.add_row("macros", str(len(macros)))
+    table.add_row("holdTaps", str(len(hold_taps)))
+    table.add_row("combos", str(len(combos)))
+    table.add_row("inputListeners", str(len(listeners)))
+    console.print(table)
+
+    console.print("[green]Validation OK[/] — sections parsed into typed models.")
