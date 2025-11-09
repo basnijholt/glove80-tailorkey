@@ -19,6 +19,13 @@ pythonpath = [
     "src",
     "."
 ]
+addopts = """
+    -vvv
+    --cov=src/glove80
+    --cov-report term
+    --cov-report html
+    --cov-report xml
+"""
 
 [build-system]
 requires = ["hatchling"]
@@ -32,8 +39,20 @@ dev = [
     "mypy>=1.18.2",
     "pre-commit>=4.3.0",
     "pytest>=9.0.0",
+    "pytest-cov>=7.0.0",
     "ruff>=0.14.4",
 ]
 
 [tool.ruff]
 line-length = 120
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING",
+    "if __name__ == .__main__.:",
+]
+
+[tool.coverage.run]
+omit = []
