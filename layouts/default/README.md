@@ -13,5 +13,5 @@ The `layouts/default` directory tracks the JSON artifacts exported from the layo
 - [Workman Layout](https://my.glove80.com/#/layout/workman) (accessed 8 Nov 2025)
 - [Kinesis Advantage-like Layout](https://my.glove80.com/#/layout/kinesis) (accessed 8 Nov 2025)
 
-These JSON files are mirrored under `src/glove80/default/data` so the CLI can regenerate them deterministically.
-Keeping them under version control ensures we can diff against MoErgo’s published versions while still treating the packaged data as the source of truth.
+These JSON files are mirrored in the Python sources under `src/glove80/default`, where each layout is described as declarative layer specs similar to TailorKey and QuantumTouch.
+Keeping them under version control ensures we can diff against MoErgo’s published versions while treating the code-driven specs as the source of truth.
