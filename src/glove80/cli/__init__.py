@@ -33,6 +33,9 @@ def _print_results(results: list[GenerationResult]) -> None:
         )
 
     console.print(table)
+    summary = ", ".join(f"{r.layout}:{r.variant}" for r in results)
+    if summary:
+        console.print(summary)
 
 
 @app.command("families")

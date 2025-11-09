@@ -2,22 +2,24 @@
 
 from __future__ import annotations
 
-from typing import Any, Sequence
+from typing import Sequence, TypeAlias
 
 from glove80.base import KeySpec, LayerRef, LayerSpec
 from glove80.specs.utils import kp
 
-Token = Any
+TokenTuple: TypeAlias = tuple["Token", ...]
+Token: TypeAlias = KeySpec | TokenTuple | str | int | LayerRef
+ParamToken: TypeAlias = Token
 
 
-def _normalize_param_token(param: Token) -> KeySpec:
+def _normalize_param_token(param: ParamToken) -> KeySpec:
     if isinstance(param, KeySpec):
         return param
     if isinstance(param, tuple):
         return _token_to_key(param)
     if isinstance(param, (str, int, LayerRef)):
         return KeySpec(param)
-    raise TypeError(f"Unsupported parameter token type: {param!r}")  # pragma: no cover
+    raise TypeError(f"Unsupported parameter token type: {param!r}")
 
 
 def _token_to_key(token: Token) -> KeySpec:
@@ -33,7 +35,7 @@ def _token_to_key(token: Token) -> KeySpec:
         return kp(token)
     if isinstance(token, (int, LayerRef)):
         return KeySpec(token)
-    raise TypeError(f"Unsupported token type: {token!r}")  # pragma: no cover
+    raise TypeError(f"Unsupported token type: {token!r}")
 
 
 def rows_to_layer_spec(rows: Sequence[Sequence[Token]]) -> LayerSpec:

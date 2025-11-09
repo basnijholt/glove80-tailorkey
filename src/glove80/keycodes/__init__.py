@@ -3,11 +3,52 @@
 from __future__ import annotations
 
 import json
+import inspect
+import sys
 from functools import lru_cache
 from importlib import resources
-from typing import Iterable, NewType
+from typing import Iterable, NewType, TypeGuard
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+def _patch_typing_for_pydantic() -> None:
+    """Allow Pydantic 2.x to run on Python versions that drop legacy params."""
+
+    if sys.version_info < (3, 14):
+        return
+    try:
+        typing_module = __import__("typing")
+        original_eval_type = getattr(typing_module, "_eval_type")
+    except AttributeError:  # pragma: no cover - typing internals differ per Python
+        return
+    signature = inspect.signature(original_eval_type)
+    if "prefer_fwd_module" in signature.parameters:
+        return
+    type_params_default = signature.parameters["type_params"].default
+
+    def _compat_eval_type(
+        t,
+        globalns,
+        localns,
+        type_params=type_params_default,
+        *,
+        prefer_fwd_module=None,
+        recursive_guard=frozenset(),
+        **kwargs,
+    ):
+        return original_eval_type(
+            t,
+            globalns,
+            localns,
+            type_params=type_params,
+            recursive_guard=recursive_guard,
+        )
+
+    setattr(typing_module, "_eval_type", _compat_eval_type)
+
+
+_patch_typing_for_pydantic()
 
 
 class KeyOption(BaseModel):
@@ -94,7 +135,7 @@ KEY_NAME_VALUES, _KNOWN_KEY_NAMES = _load_known_key_names()
 KnownKeyName = NewType("KnownKeyName", str)
 
 
-def is_known_key_name(name: str) -> bool:
+def is_known_key_name(name: str) -> TypeGuard[KnownKeyName]:
     """Check whether the provided token is a recognized key name."""
 
     return name in _KNOWN_KEY_NAMES
