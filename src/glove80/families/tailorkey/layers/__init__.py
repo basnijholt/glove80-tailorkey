@@ -6,7 +6,7 @@ from glove80.base import Layer, LayerMap
 
 from ..alpha_layouts import base_variant_for, variant_alias
 from .autoshift import build_autoshift_layer
-from .bilateral import build_bilateral_training_layers
+from .bilateral import assemble_bilateral_layers, build_bilateral_training_layers
 from .cursor import build_cursor_layer
 from .gaming import build_gaming_layer
 from .hrm import build_hrm_layers
@@ -62,6 +62,7 @@ __all__ = [
     "LayerMap",
     "build_all_layers",
     "build_autoshift_layer",
+    "assemble_bilateral_layers",
     "build_bilateral_training_layers",
     "build_cursor_layer",
     "build_gaming_layer",

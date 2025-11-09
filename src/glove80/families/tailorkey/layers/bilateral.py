@@ -218,6 +218,21 @@ _MAC_PATCHES: Dict[str, PatchSpec] = {
 }
 
 
+def assemble_bilateral_layers(variant: str, *, mac: bool = False, remap: bool = True) -> LayerMap:
+    """Return bilateral layers tailored for the requested platform/variant."""
+
+    layers = _build_bilateral_layers()
+    if mac:
+        for name, patch in _MAC_PATCHES.items():
+            apply_patch(layers[name], patch)
+
+    if remap and needs_alpha_remap(variant):
+        for layer in layers.values():
+            remap_layer_keys(layer, variant)
+
+    return layers
+
+
 def build_bilateral_training_layers(variant: str) -> LayerMap:
     """Return the eight bilateral training layers if needed."""
 
@@ -225,13 +240,4 @@ def build_bilateral_training_layers(variant: str) -> LayerMap:
     if base_variant not in {"bilateral_windows", "bilateral_mac"}:
         return {}
 
-    layers = _build_bilateral_layers()
-    if base_variant == "bilateral_mac":
-        for name, patch in _MAC_PATCHES.items():
-            apply_patch(layers[name], patch)
-
-    if needs_alpha_remap(variant):
-        for layer in layers.values():
-            remap_layer_keys(layer, variant)
-
-    return layers
+    return assemble_bilateral_layers(variant, mac=(base_variant == "bilateral_mac"))

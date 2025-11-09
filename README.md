@@ -10,6 +10,7 @@ Every release JSON under `layouts/*/releases` can be regenerated deterministical
 - Metadata travels with the package (`src/glove80/families/*/metadata.json`), so the CLI and library always agree on UUIDs, release notes, and output paths.
 - A Typer-powered CLI (`glove80 generate …`) replaces ad-hoc scripts and keeps the regeneration workflow uniform across layouts.
 - Release artifacts are grouped under `layouts/<layout>/releases`, keeping the repo root clean while preserving the published JSON verbatim.
+- Reusable "feature" helpers under `glove80.features` (e.g., `bilateral_home_row_components`) bundle macros plus ready-made layers so you can drop complex behaviors into custom layouts without spelunking through family internals.
 
 ## Quick Start
 1. Install dependencies (the repo uses [uv](https://github.com/astral-sh/uv)):
@@ -36,9 +37,12 @@ The public API lives on the root package:
 
 ```python
 from glove80 import build_layout, list_families
+from glove80.features import apply_feature, bilateral_home_row_components
 
 print(list_families())  # ['default', 'tailorkey', 'quantum_touch', 'glorious_engrammer']
 layout = build_layout("tailorkey", "mac")
+components = bilateral_home_row_components("mac", platform="mac", remap=True)
+apply_feature(layout, components)
 ```
 
 `build_layout(<family>, <variant>)` always returns the same dictionary that the CLI would write into `layouts/<family>/releases/…`.
