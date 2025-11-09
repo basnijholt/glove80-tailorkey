@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from pydantic import ConfigDict, field_validator, model_validator
 from pydantic.dataclasses import dataclass as pydantic_dataclass
 
 from .keycodes import KnownKeyName, is_known_key_name
 
-Layer = List[Dict[str, Any]]
-LayerMap = Dict[str, Layer]
+Layer = list[dict[str, Any]]
+LayerMap = dict[str, Layer]
 
 
 @pydantic_dataclass(config=ConfigDict(frozen=True))
@@ -21,7 +21,7 @@ class LayerRef:
     name: str
 
 
-KeyParamTuple = Tuple["KeySpec", ...]
+KeyParamTuple = tuple["KeySpec", ...]
 
 
 @pydantic_dataclass(config=ConfigDict(frozen=True))
@@ -36,11 +36,12 @@ class KeySpec:
     def _validate_value(cls, value: Any) -> Any:
         if isinstance(value, str) and not value.startswith("&"):
             if not is_known_key_name(value):
-                raise ValueError(f"Unknown key name '{value}'")
+                msg = f"Unknown key name '{value}'"
+                raise ValueError(msg)
             return value
         return value
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "value": self.value,
             "params": [_coerce_param(param) for param in self.params],
@@ -51,20 +52,21 @@ class KeySpec:
 class LayerSpec:
     """Sparse layer representation."""
 
-    overrides: Dict[int, KeySpec]
+    overrides: dict[int, KeySpec]
     length: int = 80
     default: KeySpec = KeySpec("&trans")
 
     @model_validator(mode="after")
-    def _validate_overrides(self) -> "LayerSpec":
+    def _validate_overrides(self) -> LayerSpec:
         if not self.overrides:
             return self
         upper_bound = self.length - 1
-        normalized: Dict[int, KeySpec] = {}
+        normalized: dict[int, KeySpec] = {}
         for raw_index, spec in self.overrides.items():
             index = self._coerce_override_index(raw_index)
             if index < 0 or index > upper_bound:
-                raise ValueError(f"Override index {index} is outside the valid range 0-{upper_bound}")
+                msg = f"Override index {index} is outside the valid range 0-{upper_bound}"
+                raise ValueError(msg)
             normalized[index] = spec
         object.__setattr__(self, "overrides", normalized)
         return self
@@ -72,19 +74,23 @@ class LayerSpec:
     @staticmethod
     def _coerce_override_index(raw_index: Any) -> int:
         if isinstance(raw_index, bool):
-            raise TypeError("Override indices must be integers, not bools")
+            msg = "Override indices must be integers, not bools"
+            raise TypeError(msg)
         if isinstance(raw_index, int):
             return raw_index
         if isinstance(raw_index, str):
             try:
                 return int(raw_index, 10)
             except ValueError as exc:
-                raise TypeError(f"Override index '{raw_index}' is not an integer string") from exc
+                msg = f"Override index '{raw_index}' is not an integer string"
+                raise TypeError(msg) from exc
         if isinstance(raw_index, float):
             if raw_index.is_integer():
                 return int(raw_index)
-            raise TypeError(f"Override index {raw_index} has a fractional component")
-        raise TypeError(f"Unsupported override index type: {type(raw_index).__name__}")
+            msg = f"Override index {raw_index} has a fractional component"
+            raise TypeError(msg)
+        msg = f"Unsupported override index type: {type(raw_index).__name__}"
+        raise TypeError(msg)
 
     def to_layer(self) -> Layer:
         layer = [self.default.to_dict() for _ in range(self.length)]
@@ -115,29 +121,31 @@ def build_layer_from_spec(spec: LayerSpec) -> Layer:
     return spec.to_layer()
 
 
-def _coerce_param(param: Any) -> Dict[str, Any]:
+def _coerce_param(param: Any) -> dict[str, Any]:
     if isinstance(param, KeySpec):
         return param.to_dict()
     if isinstance(param, LayerRef):
-        raise TypeError("LayerRef must be resolved before serializing")
+        msg = "LayerRef must be resolved before serializing"
+        raise TypeError(msg)
     if isinstance(param, dict):
         return deepcopy(param)
     if isinstance(param, (str, int)):
         return {"value": param, "params": []}
-    raise TypeError(f"Unsupported param type: {type(param)!r}")  # pragma: no cover
+    msg = f"Unsupported param type: {type(param)!r}"
+    raise TypeError(msg)  # pragma: no cover
 
 
-PatchSpec = Dict[int, KeySpec]
+PatchSpec = dict[int, KeySpec]
 
 
-def resolve_layer_refs(obj: Any, resolver: Dict[str, int]) -> Any:
+def resolve_layer_refs(obj: Any, resolver: dict[str, int]) -> Any:
     """Replace LayerRef placeholders recursively using the provided mapping."""
-
     if isinstance(obj, LayerRef):
         try:
             return resolver[obj.name]
         except KeyError as exc:  # pragma: no cover
-            raise KeyError(f"Unknown layer reference '{obj.name}'") from exc
+            msg = f"Unknown layer reference '{obj.name}'"
+            raise KeyError(msg) from exc
     if isinstance(obj, list):
         return [resolve_layer_refs(item, resolver) for item in obj]
     if isinstance(obj, dict):

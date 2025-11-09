@@ -1,10 +1,10 @@
 """Layer construction helpers and registry."""
 
-from typing import Callable, Iterable
+from collections.abc import Callable, Iterable
 
 from glove80.base import Layer, LayerMap
+from glove80.families.tailorkey.alpha_layouts import base_variant_for, variant_alias
 
-from ..alpha_layouts import base_variant_for, variant_alias
 from .autoshift import build_autoshift_layer
 from .bilateral import assemble_bilateral_layers, build_bilateral_finger_layers
 from .cursor import build_cursor_layer
@@ -50,7 +50,6 @@ LAYER_PROVIDERS: Iterable[LayerProvider] = [
 
 def build_all_layers(variant: str) -> LayerMap:
     """Return every layer needed for the given variant."""
-
     layers: LayerMap = {}
     for provider in LAYER_PROVIDERS:
         layers.update(provider(variant))
@@ -60,9 +59,9 @@ def build_all_layers(variant: str) -> LayerMap:
 __all__ = [
     "Layer",
     "LayerMap",
+    "assemble_bilateral_layers",
     "build_all_layers",
     "build_autoshift_layer",
-    "assemble_bilateral_layers",
     "build_bilateral_finger_layers",
     "build_cursor_layer",
     "build_gaming_layer",

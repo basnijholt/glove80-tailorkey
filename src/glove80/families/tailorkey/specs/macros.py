@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Dict
-
+from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 from glove80.specs import MacroSpec
 from glove80.specs.utils import call, kp, ks, layer_param, mod
 
-from ..alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 from .finger_data import FINGERS
 
 
@@ -448,7 +446,7 @@ MACRO_ORDER = {
 }
 
 
-MACRO_OVERRIDES: Dict[str, Dict[str, MacroSpec]] = {
+MACRO_OVERRIDES: dict[str, dict[str, MacroSpec]] = {
     "bilateral_windows": {
         "&mod_tab_chord_v2_TKZ": MacroSpec(
             name="&mod_tab_chord_v2_TKZ",
@@ -471,8 +469,8 @@ MACRO_OVERRIDES: Dict[str, Dict[str, MacroSpec]] = {
             params=("code", "layer"),
             wait_ms=0,
             tap_ms=0,
-        )
-    }
+        ),
+    },
 }
 
 

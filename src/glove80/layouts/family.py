@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Protocol
+from typing import TYPE_CHECKING, Protocol
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class LayoutFamily(Protocol):
@@ -31,11 +34,12 @@ class LayoutRegistry:
     """Simple registry for layout families."""
 
     def __init__(self) -> None:
-        self._families: Dict[str, LayoutFamily] = {}
+        self._families: dict[str, LayoutFamily] = {}
 
     def register(self, family: LayoutFamily) -> None:
         if family.name in self._families:  # pragma: no cover
-            raise ValueError(f"Duplicate layout family '{family.name}'")
+            msg = f"Duplicate layout family '{family.name}'"
+            raise ValueError(msg)
         self._families[family.name] = family
 
     def get(self, name: str) -> LayoutFamily:
@@ -61,11 +65,11 @@ def build_layout(family: str, variant: str) -> dict:
 
 
 __all__ = [
+    "REGISTRY",
     "LayoutFamily",
     "LayoutRegistry",
     "RegisteredFamily",
-    "REGISTRY",
+    "build_layout",
     "get_family",
     "list_families",
-    "build_layout",
 ]

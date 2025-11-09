@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from glove80.layouts.components import LayoutFeatureComponents
 from glove80.layouts.builder import LayoutBuilder
 from glove80.layouts.common import BASE_COMMON_FIELDS, compose_layout
+from glove80.layouts.components import LayoutFeatureComponents
 
 
 def _mock_layer(token: str) -> list[dict[str, object]]:

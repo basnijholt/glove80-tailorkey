@@ -15,7 +15,7 @@ def _canonical_layers(variant: str, loader):
 
 
 @pytest.mark.parametrize("variant", TAILORKEY_VARIANTS)
-def test_hrm_layers(variant, load_tailorkey_variant):
+def test_hrm_layers(variant, load_tailorkey_variant) -> None:
     expected = _canonical_layers(variant, load_tailorkey_variant)
     actual = build_hrm_layers(variant)
     assert actual.keys() == expected.keys()

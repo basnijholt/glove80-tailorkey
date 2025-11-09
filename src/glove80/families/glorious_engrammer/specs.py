@@ -2,12 +2,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from importlib import resources
-from typing import Any, Dict, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
-from glove80.base import LayerSpec
 from glove80.layouts.common import _build_common_fields
 
 from .layers import LAYER_SPECS
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from glove80.base import LayerSpec
 
 
 def _load_text(name: str) -> str:
@@ -55,12 +59,12 @@ LAYER_ORDER: Sequence[str] = (
 
 @dataclass(frozen=True)
 class VariantSpec:
-    common_fields: Dict[str, Any]
+    common_fields: dict[str, Any]
     layer_names: Sequence[str]
     layer_specs: Mapping[str, LayerSpec]
 
 
-VARIANT_SPECS: Dict[str, VariantSpec] = {
+VARIANT_SPECS: dict[str, VariantSpec] = {
     "v42_rc6_preview": VariantSpec(
         common_fields=_build_common_fields(
             creator="sunaku",
@@ -105,4 +109,4 @@ VARIANT_SPECS: Dict[str, VariantSpec] = {
     ),
 }
 
-__all__ = ["VARIANT_SPECS", "VariantSpec", "LAYER_ORDER"]
+__all__ = ["LAYER_ORDER", "VARIANT_SPECS", "VariantSpec"]

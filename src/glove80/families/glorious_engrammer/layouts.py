@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Sequence
+from typing import TYPE_CHECKING, Any
 
 from glove80.layouts import LayoutBuilder
-from glove80.layouts.family import LayoutFamily, REGISTRY
+from glove80.layouts.family import REGISTRY, LayoutFamily
 
 from .layers import build_all_layers
 from .specs import VARIANT_SPECS
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 FIELD_ORDER: Sequence[str] = (
     "keyboard",
@@ -35,8 +38,8 @@ FIELD_ORDER: Sequence[str] = (
 )
 
 
-def _order_layout_fields(layout: Dict[str, Any]) -> Dict[str, Any]:
-    ordered: Dict[str, Any] = {}
+def _order_layout_fields(layout: dict[str, Any]) -> dict[str, Any]:
+    ordered: dict[str, Any] = {}
     for field in FIELD_ORDER:
         ordered[field] = layout[field]
     return ordered
@@ -51,12 +54,13 @@ class Family(LayoutFamily):
     def metadata_key(self) -> str:
         return "glorious_engrammer"
 
-    def build(self, variant: str) -> Dict:
+    def build(self, variant: str) -> dict:
         try:
             spec = VARIANT_SPECS[variant]
         except KeyError as exc:
+            msg = f"Unknown Glorious Engrammer variant '{variant}'. Available: {sorted(VARIANT_SPECS)}"
             raise KeyError(
-                f"Unknown Glorious Engrammer variant '{variant}'. Available: {sorted(VARIANT_SPECS)}"
+                msg,
             ) from exc
 
         generated_layers = build_all_layers(variant)

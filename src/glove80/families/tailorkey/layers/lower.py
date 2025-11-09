@@ -11,9 +11,7 @@ from glove80.base import (
     build_layer_from_spec,
     copy_layer,
 )
-
-from ..alpha_layouts import base_variant_for
-
+from glove80.families.tailorkey.alpha_layouts import base_variant_for
 
 LOWER_LAYER_SPEC = LayerSpec(
     overrides={
@@ -80,7 +78,7 @@ LOWER_LAYER_SPEC = LayerSpec(
         76: KeySpec("&kp", (KeySpec("KP_N0"),)),
         77: KeySpec("&kp", (KeySpec("KP_DOT"),)),
         78: KeySpec("&kp", (KeySpec("KP_ENTER"),)),
-    }
+    },
 )
 
 _BASE_LOWER_LAYER: Layer = build_layer_from_spec(LOWER_LAYER_SPEC)
@@ -93,7 +91,6 @@ _DUAL_PATCH: PatchSpec = {
 
 def build_lower_layer(variant: str) -> Layer:
     """Return the Lower layer customized for the given variant."""
-
     layer = copy_layer(_BASE_LOWER_LAYER)
     apply_patch_if(layer, base_variant_for(variant) == "dual", _DUAL_PATCH)
     return layer

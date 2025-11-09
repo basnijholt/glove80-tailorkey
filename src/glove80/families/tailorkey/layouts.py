@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
 from glove80.layouts import LayoutBuilder
 from glove80.layouts.components import LayoutFeatureComponents
-from glove80.layouts.family import LayoutFamily, REGISTRY
+from glove80.layouts.family import REGISTRY, LayoutFamily
 from glove80.specs.primitives import materialize_named_sequence, materialize_sequence
 
 from .layers import build_all_layers
@@ -22,26 +22,30 @@ from .specs import (
     MACRO_OVERRIDES,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
-def _get_variant_section(sections: Mapping[str, Sequence[Any]], variant: str, label: str) -> List[Any]:
+
+def _get_variant_section(sections: Mapping[str, Sequence[Any]], variant: str, label: str) -> list[Any]:
     try:
         return list(sections[variant])
     except KeyError as exc:  # pragma: no cover
-        raise KeyError(f"No {label} for variant '{variant}'") from exc
+        msg = f"No {label} for variant '{variant}'"
+        raise KeyError(msg) from exc
 
 
-def _build_macros(variant: str) -> List[Dict[str, Any]]:
+def _build_macros(variant: str) -> list[dict[str, Any]]:
     order = _get_variant_section(MACRO_ORDER, variant, "macro order")
     overrides = MACRO_OVERRIDES.get(variant)
     return materialize_named_sequence(MACRO_DEFS, order, overrides)
 
 
-def _build_hold_taps(variant: str) -> List[Dict[str, Any]]:
+def _build_hold_taps(variant: str) -> list[dict[str, Any]]:
     order = _get_variant_section(HOLD_TAP_ORDER, variant, "hold-tap order")
     return materialize_named_sequence(HOLD_TAP_DEFS, order)
 
 
-def _layer_names(variant: str) -> List[str]:
+def _layer_names(variant: str) -> list[str]:
     return list(_get_variant_section(LAYER_NAME_MAP, variant, "layer names"))
 
 
@@ -54,7 +58,7 @@ class Family(LayoutFamily):
     def metadata_key(self) -> str:
         return "tailorkey"
 
-    def build(self, variant: str) -> Dict:
+    def build(self, variant: str) -> dict:
         combos = materialize_sequence(_get_variant_section(COMBO_DATA, variant, "combo definitions"))
         listeners = materialize_sequence(_get_variant_section(INPUT_LISTENER_DATA, variant, "input listeners"))
         generated_layers = build_all_layers(variant)
@@ -83,7 +87,8 @@ class Family(LayoutFamily):
             before, after = _group_anchor(layer_names, hrm_names)
             anchor = after if before is None else before
             if anchor is None:
-                raise ValueError("TailorKey layout requires at least one non-HRM layer")
+                msg = "TailorKey layout requires at least one non-HRM layer"
+                raise ValueError(msg)
             builder.add_home_row_mods(
                 target_layer=anchor,
                 insert_after=anchor,

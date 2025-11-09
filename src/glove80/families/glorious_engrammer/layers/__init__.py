@@ -6,8 +6,8 @@ from glove80.base import LayerMap, LayerSpec, build_layer_from_spec
 
 from .alpha_layers import ALPHA_LAYER_SPECS
 from .finger_layers import FINGER_LAYER_SPECS
-from .utility_layers import UTILITY_LAYER_SPECS
 from .mouse_layers import MOUSE_LAYER_SPECS
+from .utility_layers import UTILITY_LAYER_SPECS
 
 LAYER_SPEC_GROUPS = (
     ALPHA_LAYER_SPECS,
@@ -22,7 +22,8 @@ def _merge_specs() -> dict[str, LayerSpec]:
     for group in LAYER_SPEC_GROUPS:
         overlap = set(specs).intersection(group)
         if overlap:  # pragma: no cover
-            raise ValueError(f"Duplicate layer specs: {sorted(overlap)}")
+            msg = f"Duplicate layer specs: {sorted(overlap)}"
+            raise ValueError(msg)
         specs.update(group)
     return specs
 

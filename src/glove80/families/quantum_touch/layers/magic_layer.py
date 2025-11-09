@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec
 
-
 MAGIC_LAYER_SPEC = LayerSpec(
     overrides={
         0: KeySpec("&bt", (KeySpec("BT_CLR"),)),
@@ -87,7 +86,7 @@ MAGIC_LAYER_SPEC = LayerSpec(
         77: KeySpec("&none"),
         78: KeySpec("&none"),
         79: KeySpec("&none"),
-    }
+    },
 )
 
 

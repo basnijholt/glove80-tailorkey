@@ -1,8 +1,7 @@
 """Common metadata for TailorKey specs."""
 
+from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 from glove80.layouts.common import _build_common_fields
-
-from ..alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 
 COMMON_FIELDS = _build_common_fields(creator="moosy")
 

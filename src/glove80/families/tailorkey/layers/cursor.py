@@ -11,9 +11,7 @@ from glove80.base import (
     build_layer_from_spec,
     copy_layer,
 )
-
-from ..alpha_layouts import base_variant_for
-
+from glove80.families.tailorkey.alpha_layouts import base_variant_for
 
 CURSOR_SPEC = LayerSpec(
     overrides={
@@ -97,7 +95,7 @@ CURSOR_SPEC = LayerSpec(
         77: KeySpec("&kp", (KeySpec("LC", (KeySpec("G"),)),)),
         78: KeySpec("&kp", (KeySpec("LC", (KeySpec("H"),)),)),
         79: KeySpec("&kp", (KeySpec("LC", (KeySpec("K"),)),)),
-    }
+    },
 )
 
 _BASE_CURSOR_LAYER: Layer = build_layer_from_spec(CURSOR_SPEC)

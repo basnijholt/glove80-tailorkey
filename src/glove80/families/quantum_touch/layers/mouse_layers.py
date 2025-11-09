@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Dict
-
 from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec, copy_layer
 from glove80.layers.mouse_helpers import build_transparent_mouse_layer
 
-
-_MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
+_MOUSE_LAYER_SPECS: dict[str, LayerSpec] = {
     "Mouse": LayerSpec(
         overrides={
             24: KeySpec("&msc", (KeySpec("SCRL_LEFT"),)),
@@ -43,7 +40,7 @@ _MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             77: KeySpec("&mkp", (KeySpec("MCLK"),)),
             78: KeySpec("&mkp", (KeySpec("MB4"),)),
             79: KeySpec("&mkp", (KeySpec("MB5"),)),
-        }
+        },
     ),
 }
 
@@ -74,11 +71,11 @@ def build_mouse_warp_layer(_variant: str) -> Layer:
 
 
 __all__ = [
+    "MOUSE_LAYER_BUILDERS",
+    "build_mouse_fast_layer",
     "build_mouse_layer",
     "build_mouse_slow_layer",
-    "build_mouse_fast_layer",
     "build_mouse_warp_layer",
-    "MOUSE_LAYER_BUILDERS",
 ]
 
 

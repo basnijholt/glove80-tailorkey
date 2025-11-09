@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from glove80.base import LayerSpec
+from typing import TYPE_CHECKING
 
-from glove80.layouts.layers import rows_to_layer_spec, _transparent_layer
+from glove80.layouts.layers import _transparent_layer, rows_to_layer_spec
+
+if TYPE_CHECKING:
+    from glove80.base import LayerSpec
 
 # --- Base layers ---------------------------------------------------------
 
@@ -456,13 +459,13 @@ MOUSE_EXTRAS: dict[str, dict[str, LayerSpec]] = {
         "MouseSlow": TRANSPARENT_MOUSE_LAYER,
         "MouseFast": TRANSPARENT_MOUSE_LAYER,
         "MouseWarp": TRANSPARENT_MOUSE_LAYER,
-    }
+    },
 }
 
 __all__ = [
     "BASE_LAYERS",
+    "FACTORY_LAYERS",
     "LOWER_LAYERS",
     "MAGIC_LAYERS",
-    "FACTORY_LAYERS",
     "MOUSE_EXTRAS",
 ]

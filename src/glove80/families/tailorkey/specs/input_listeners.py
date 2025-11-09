@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Dict, Sequence, Tuple
+from typing import TYPE_CHECKING
 
 from glove80.base import LayerRef
+from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 from glove80.specs import InputListenerNodeSpec, InputListenerSpec, InputProcessorSpec
 
-from ..alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 LAYER_SEQUENCE = ("MouseSlow", "MouseFast", "MouseWarp")
 
@@ -26,7 +28,7 @@ def _listeners(
     slow_scroll_desc: str,
     warp_desc_xy: str,
     warp_desc_scroll: str,
-) -> Tuple[InputListenerSpec, InputListenerSpec]:
+) -> tuple[InputListenerSpec, InputListenerSpec]:
     xy_nodes = [
         _node(slow_xy_desc, "MouseSlow", "&zip_xy_scaler", (1, 9)),
         _node("LAYER_MouseFast", "MouseFast", "&zip_xy_scaler", (3, 1)),
@@ -43,7 +45,7 @@ def _listeners(
     )
 
 
-INPUT_LISTENER_DATA: Dict[str, list[InputListenerSpec]] = {
+INPUT_LISTENER_DATA: dict[str, list[InputListenerSpec]] = {
     "windows": list(_listeners("LAYER_MouseSlow", "LAYER_MouseSlow", "LAYER_MouseFast", "LAYER_MouseWarp")),
     "mac": list(_listeners("LAYER_MouseSlow\n", "LAYER_MouseSlow\n", "LAYER_MouseWarp", "LAYER_MouseWarp")),
     "dual": list(_listeners("LAYER_MouseSlow", "LAYER_MouseSlow\n", "LAYER_MouseWarp", "LAYER_MouseWarp")),

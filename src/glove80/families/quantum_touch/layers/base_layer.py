@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec
 
-
 BASE_LAYER_SPEC = LayerSpec(
     overrides={
         0: KeySpec("&kp", (KeySpec("F1"),)),
@@ -87,11 +86,10 @@ BASE_LAYER_SPEC = LayerSpec(
         77: KeySpec("&mt", (KeySpec("LBRC"), KeySpec("LBKT"))),
         78: KeySpec("&mt", (KeySpec("RBRC"), KeySpec("RBKT"))),
         79: KeySpec("&kp", (KeySpec("PG_DN"),)),
-    }
+    },
 )
 
 
 def build_base_layer(_variant: str) -> Layer:
     """Return the declarative Base layer."""
-
     return build_layer_from_spec(BASE_LAYER_SPEC)

@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Iterable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
-from ..base import Layer, LayerMap, resolve_layer_refs
-from ..metadata import get_variant_metadata
+from glove80.base import Layer, LayerMap, resolve_layer_refs
+from glove80.metadata import get_variant_metadata
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
 
 META_FIELDS = ("title", "uuid", "parent_uuid", "date", "notes", "tags")
 DEFAULT_REF_FIELDS = ("macros", "holdTaps", "combos", "inputListeners")
@@ -33,7 +36,6 @@ def build_layout_payload(
     input_listeners: Sequence[Any] | None = None,
 ) -> dict[str, Any]:
     """Create a baseline layout payload from shared metadata and sections."""
-
     # Make a concrete, mutable dict copy for mypy and runtime safety.
     layout: dict[str, Any] = deepcopy(dict(common_fields))
     layout["layer_names"] = list(layer_names)
@@ -59,7 +61,6 @@ def compose_layout(
     ref_fields: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     """Compose a full layout payload given common metadata and generated layers."""
-
     layout = build_layout_payload(
         common_fields,
         layer_names=layer_names,
@@ -90,7 +91,6 @@ def _build_common_fields(
     extra: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return the shared metadata dict populated for a layout family."""
-
     fields: dict[str, Any] = dict(BASE_COMMON_FIELDS)
     fields["creator"] = creator
     fields["locale"] = locale
@@ -110,7 +110,6 @@ def _resolve_referenced_fields(
     fields: Iterable[str] = DEFAULT_REF_FIELDS,
 ) -> None:
     """Resolve LayerRef placeholders for the requested fields."""
-
     layer_indices = {name: idx for idx, name in enumerate(layer_names)}
     for field in fields:
         layout[field] = resolve_layer_refs(layout[field], layer_indices)
@@ -118,19 +117,18 @@ def _resolve_referenced_fields(
 
 def _assemble_layers(layer_names: Sequence[str], generated_layers: LayerMap, *, variant: str) -> list[Layer]:
     """Return the ordered list of layers, erroring if any are missing."""
-
     ordered: list[Layer] = []
     for name in layer_names:
         try:
             ordered.append(generated_layers[name])
         except KeyError as exc:  # pragma: no cover
-            raise KeyError(f"No generated layer data for '{name}' in variant '{variant}'") from exc
+            msg = f"No generated layer data for '{name}' in variant '{variant}'"
+            raise KeyError(msg) from exc
     return ordered
 
 
 def _attach_variant_metadata(layout: dict, *, variant: str, layout_key: str) -> None:
     """Inject metadata fields into the layout payload."""
-
     meta = get_variant_metadata(variant, layout=layout_key)
     for field in META_FIELDS:
         layout[field] = meta.get(field)

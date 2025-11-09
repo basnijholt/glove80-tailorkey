@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Dict, Tuple
+from typing import TYPE_CHECKING
 
-from glove80.base import LayerSpec
 from glove80.layouts.layers import Token, rows_to_layer_spec
 
-LayerRows = Tuple[Tuple[Token, ...], ...]
+if TYPE_CHECKING:
+    from glove80.base import LayerSpec
+
+LayerRows = tuple[tuple[Token, ...], ...]
 
 
-ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
+ALPHA_LAYER_SPECS: dict[str, LayerSpec] = {
     "Enthium": rows_to_layer_spec(
         (
             (
@@ -109,7 +111,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "PG_DN",
                 "&magic",
             ),
-        )
+        ),
     ),
     "Engrammer": rows_to_layer_spec(
         (
@@ -209,7 +211,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "PG_DN",
                 "&magic",
             ),
-        )
+        ),
     ),
     "Engram": rows_to_layer_spec(
         (
@@ -309,7 +311,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "PG_DN",
                 "&magic",
             ),
-        )
+        ),
     ),
     "Dvorak": rows_to_layer_spec(
         (
@@ -409,7 +411,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "PG_DN",
                 "&magic",
             ),
-        )
+        ),
     ),
     "Colemak": rows_to_layer_spec(
         (
@@ -509,7 +511,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "PG_DN",
                 "&magic",
             ),
-        )
+        ),
     ),
     "QWERTY": rows_to_layer_spec(
         (
@@ -609,7 +611,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "PG_DN",
                 "&magic",
             ),
-        )
+        ),
     ),
     "ColemakDH": rows_to_layer_spec(
         (
@@ -709,7 +711,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "PG_DN",
                 "&magic",
             ),
-        )
+        ),
     ),
     "Typing": rows_to_layer_spec(
         (
@@ -809,6 +811,6 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "&trans",
                 "&trans",
             ),
-        )
+        ),
     ),
 }

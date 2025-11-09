@@ -1,18 +1,22 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
-from glove80.base import LayerSpec
 from glove80.layouts.common import _build_common_fields
 from glove80.specs.primitives import InputListenerNodeSpec, InputListenerSpec, InputProcessorSpec
 
 from .layer_data import BASE_LAYERS, FACTORY_LAYERS, LOWER_LAYERS, MAGIC_LAYERS, MOUSE_EXTRAS
 
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from glove80.base import LayerSpec
+
 
 @dataclass(frozen=True)
 class VariantSpec:
-    common_fields: Dict[str, Any]
+    common_fields: dict[str, Any]
     layer_names: Sequence[str]
     layer_specs: Mapping[str, LayerSpec]
     input_listeners: Sequence[InputListenerSpec] = ()
@@ -68,7 +72,7 @@ MOUSE_INPUT_LISTENERS: Sequence[InputListenerSpec] = (
 )
 
 
-def _variant_layers(name: str, *, extra_layers: Mapping[str, LayerSpec] | None = None) -> Dict[str, LayerSpec]:
+def _variant_layers(name: str, *, extra_layers: Mapping[str, LayerSpec] | None = None) -> dict[str, LayerSpec]:
     layers = {
         "Base": BASE_LAYERS[name],
         "Lower": LOWER_LAYERS[name],
@@ -81,7 +85,7 @@ def _variant_layers(name: str, *, extra_layers: Mapping[str, LayerSpec] | None =
     return layers
 
 
-VARIANT_SPECS: Dict[str, VariantSpec] = {
+VARIANT_SPECS: dict[str, VariantSpec] = {
     "factory_default": VariantSpec(
         common_fields=_build_common_fields(creator="moergo"),
         layer_names=("Base", "Lower", "Magic", "Factory"),

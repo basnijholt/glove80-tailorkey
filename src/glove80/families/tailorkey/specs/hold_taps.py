@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Tuple
 
+from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 from glove80.specs import HoldTapSpec
 
-from ..alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 from .finger_data import FINGERS
 
 FINGER_MAP = {f"{meta.hand}_{meta.finger}": meta for meta in FINGERS}
@@ -26,7 +25,7 @@ BASE_DESCRIPTIONS = {
 }
 
 
-HOLD_TAP_DEFS: Dict[str, HoldTapSpec] = {
+HOLD_TAP_DEFS: dict[str, HoldTapSpec] = {
     "&AS_HT_v2_TKZ": HoldTapSpec(
         name="&AS_HT_v2_TKZ",
         description="AutoShift Helper - &AS main macro is chained to &AS_HT hold tap and &AS_Shifted macro. For faster typists, it is recommended to decrease the tapping-term-ms value. A suggested value is 135 ms.\nMore: https://github.com/nickcoutsos/keymap-editor/wiki/Autoshift-using-ZMK-behaviors",
@@ -82,7 +81,7 @@ class BilateralTemplate:
     binding_kind: str  # "hold" or "tap"
 
 
-BILATERAL_TEMPLATES: Tuple[BilateralTemplate, ...] = (
+BILATERAL_TEMPLATES: tuple[BilateralTemplate, ...] = (
     BilateralTemplate(
         name="&HRM_left_index_middy_v1B_TKZ",
         finger_key="left_index",
@@ -326,7 +325,7 @@ POSITION_OVERRIDES = {
         24,
         12,
         36,
-    )
+    ),
 }
 
 

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Dict
-
 from glove80.specs import MacroSpec
 from glove80.specs.utils import call, kp, ks, layer_param
 
@@ -69,6 +67,6 @@ for meta in FINGERS:
     MACRO_DEFS[tap.name] = tap
 
 MACRO_ORDER = tuple(MACRO_DEFS)
-MACRO_OVERRIDES: Dict[str, Dict[str, MacroSpec]] = {}
+MACRO_OVERRIDES: dict[str, dict[str, MacroSpec]] = {}
 
 __all__ = ["MACRO_DEFS", "MACRO_ORDER", "MACRO_OVERRIDES"]

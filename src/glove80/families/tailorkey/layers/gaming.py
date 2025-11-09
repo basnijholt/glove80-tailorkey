@@ -10,7 +10,6 @@ from glove80.base import (
     copy_layer,
 )
 
-
 GAMING_SPEC = LayerSpec(
     overrides={
         0: KeySpec("&kp", (KeySpec("ESC"),)),
@@ -93,7 +92,7 @@ GAMING_SPEC = LayerSpec(
         77: KeySpec("&kp", (KeySpec("RBKT"),)),
         78: KeySpec("&kp", (KeySpec("BSLH"),)),
         79: KeySpec("&kp", (KeySpec("EQUAL"),)),
-    }
+    },
 )
 
 _BASE_GAMING_LAYER: Layer = build_layer_from_spec(GAMING_SPEC)

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Dict
-
 from glove80.base import (
     KeySpec,
     Layer,
@@ -13,11 +11,10 @@ from glove80.base import (
     build_layer_from_spec,
     copy_layers_map,
 )
+from glove80.families.tailorkey.alpha_layouts import base_variant_for
 from glove80.layers.mouse_helpers import build_transparent_mouse_layer
 
-from ..alpha_layouts import base_variant_for
-
-MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
+MOUSE_LAYER_SPECS: dict[str, LayerSpec] = {
     "Mouse": LayerSpec(
         overrides={
             0: KeySpec("&none"),
@@ -100,7 +97,7 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             77: KeySpec("&mmv", (KeySpec("MOVE_RIGHT"),)),
             78: KeySpec("&mkp", (KeySpec("MCLK"),)),
             79: KeySpec("&kp", (KeySpec("K_APP"),)),
-        }
+        },
     ),
 }
 
@@ -134,7 +131,7 @@ _BILATERAL_MOUSE_PATCH: PatchSpec = {
 }
 
 
-def build_mouse_layers(variant: str) -> Dict[str, Layer]:
+def build_mouse_layers(variant: str) -> dict[str, Layer]:
     """Return the four mouse-related layers for the requested variant."""
     layers = copy_layers_map(_BASE_MOUSE_LAYERS)
     mouse = layers["Mouse"]

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Tuple
 
 
 @dataclass(frozen=True)
@@ -15,10 +14,10 @@ class FingerMeta:
     tapping_term_ms: int
     quick_tap_ms: int
     require_prior_idle_ms: int
-    hold_trigger_positions: Tuple[int, ...]
+    hold_trigger_positions: tuple[int, ...]
 
 
-FINGERS: Tuple[FingerMeta, ...] = (
+FINGERS: tuple[FingerMeta, ...] = (
     FingerMeta(
         hand="L",
         name="Pinky",
@@ -478,9 +477,9 @@ FINGERS: Tuple[FingerMeta, ...] = (
 )
 
 
-FINGER_BY_LABEL: Dict[str, FingerMeta] = {
+FINGER_BY_LABEL: dict[str, FingerMeta] = {
     ("Left" if meta.hand == "L" else "Right") + meta.name: meta for meta in FINGERS
 }
 
 
-__all__ = ["FingerMeta", "FINGERS", "FINGER_BY_LABEL"]
+__all__ = ["FINGERS", "FINGER_BY_LABEL", "FingerMeta"]

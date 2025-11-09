@@ -33,4 +33,5 @@ def test_manual_placeholders_allowed() -> None:
 
 def test_registry_contains_aliases() -> None:
     registry = key_options_by_name()
-    assert "A" in registry and "N1" in registry
+    assert "A" in registry
+    assert "N1" in registry

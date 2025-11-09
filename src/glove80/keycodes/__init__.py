@@ -3,52 +3,14 @@
 from __future__ import annotations
 
 import json
-import inspect
-import sys
 from functools import lru_cache
 from importlib import resources
-from typing import Iterable, NewType, TypeGuard
+from typing import TYPE_CHECKING, NewType, TypeGuard
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-def _patch_typing_for_pydantic() -> None:
-    """Allow Pydantic 2.x to run on Python versions that drop legacy params."""
-
-    if sys.version_info < (3, 14):
-        return
-    try:
-        typing_module = __import__("typing")
-        original_eval_type = getattr(typing_module, "_eval_type")
-    except AttributeError:  # pragma: no cover - typing internals differ per Python
-        return
-    signature = inspect.signature(original_eval_type)
-    if "prefer_fwd_module" in signature.parameters:
-        return
-    type_params_default = signature.parameters["type_params"].default
-
-    def _compat_eval_type(
-        t,
-        globalns,
-        localns,
-        type_params=type_params_default,
-        *,
-        prefer_fwd_module=None,
-        recursive_guard=frozenset(),
-        **kwargs,
-    ):
-        return original_eval_type(
-            t,
-            globalns,
-            localns,
-            type_params=type_params,
-            recursive_guard=recursive_guard,
-        )
-
-    setattr(typing_module, "_eval_type", _compat_eval_type)
-
-
-_patch_typing_for_pydantic()
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class KeyOption(BaseModel):
@@ -95,7 +57,6 @@ def _iter_aliases(option: KeyOption) -> Iterable[str]:
 @lru_cache(maxsize=1)
 def key_options_by_name() -> dict[str, KeyOption]:
     """Return a lookup table for every alias."""
-
     mapping: dict[str, KeyOption] = {}
     for option in _raw_key_options():
         for alias in _iter_aliases(option):
@@ -137,29 +98,27 @@ KnownKeyName = NewType("KnownKeyName", str)
 
 def is_known_key_name(name: str) -> TypeGuard[KnownKeyName]:
     """Check whether the provided token is a recognized key name."""
-
     return name in _KNOWN_KEY_NAMES
 
 
 def assert_known_key_name(name: str) -> None:
     """Fail loudly when a layer references a key the editor does not expose."""
-
     if name not in _KNOWN_KEY_NAMES:
-        raise ValueError(f"Unknown key name '{name}'. Update key metadata if this is an intentional addition.")
+        msg = f"Unknown key name '{name}'. Update key metadata if this is an intentional addition."
+        raise ValueError(msg)
 
 
 def all_key_names() -> Iterable[str]:
     """Expose every known name (aliases included)."""
-
     return KEY_NAME_VALUES
 
 
 __all__ = [
+    "KEY_NAME_VALUES",
     "KeyOption",
     "KnownKeyName",
-    "KEY_NAME_VALUES",
+    "all_key_names",
     "assert_known_key_name",
     "is_known_key_name",
     "key_options_by_name",
-    "all_key_names",
 ]

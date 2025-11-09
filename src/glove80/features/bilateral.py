@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Literal
 
-from glove80.layouts.components import LayoutFeatureComponents
 from glove80.families.tailorkey.layers.bilateral import assemble_bilateral_layers
 from glove80.families.tailorkey.specs.macros import MACRO_DEFS
+from glove80.layouts.components import LayoutFeatureComponents
 
 _BILATERAL_MACRO_NAMES = [
     "&HRM_left_index_hold_v1B_TKZ",
@@ -44,8 +44,8 @@ def bilateral_home_row_components(
         Determines whether the mac-specific finger patches are applied.
     remap:
         When True, the layer keys are remapped according to the provided *variant*.
-    """
 
+    """
     macros = [MACRO_DEFS[name].to_dict() for name in _BILATERAL_MACRO_NAMES]
     layers = assemble_bilateral_layers(variant, mac=(platform == "mac"), remap=remap)
     return LayoutFeatureComponents(macros=macros, layers=layers)

@@ -1,5 +1,5 @@
-from glove80.features import apply_feature, bilateral_home_row_components
 from glove80.families.tailorkey.layouts import Family as TailorKeyFamily
+from glove80.features import apply_feature, bilateral_home_row_components
 
 
 def test_bilateral_feature_adds_macros_and_layers() -> None:

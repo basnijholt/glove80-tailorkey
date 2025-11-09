@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Dict
-
 from glove80.base import (
     KeySpec,
     LayerMap,
@@ -12,11 +10,9 @@ from glove80.base import (
     apply_patch,
     build_layer_from_spec,
 )
+from glove80.families.tailorkey.alpha_layouts import base_variant_for, needs_alpha_remap, remap_layer_keys
 
-from ..alpha_layouts import base_variant_for, needs_alpha_remap, remap_layer_keys
-
-
-_LEFT_TAP_KEYS: Dict[int, str] = {
+_LEFT_TAP_KEYS: dict[int, str] = {
     0: "F1",
     1: "F2",
     2: "F3",
@@ -41,7 +37,7 @@ _LEFT_TAP_KEYS: Dict[int, str] = {
     51: "B",
 }
 
-_RIGHT_TAP_KEYS: Dict[int, str] = {
+_RIGHT_TAP_KEYS: dict[int, str] = {
     5: "F6",
     6: "F7",
     7: "F8",
@@ -67,14 +63,14 @@ _RIGHT_TAP_KEYS: Dict[int, str] = {
     61: "DOT",
 }
 
-_LEFT_KP_OVERRIDES: Dict[int, KeySpec] = {
+_LEFT_KP_OVERRIDES: dict[int, KeySpec] = {
     41: KeySpec("&kp", (KeySpec("J"),)),
     42: KeySpec("&kp", (KeySpec("K"),)),
     43: KeySpec("&kp", (KeySpec("L"),)),
     44: KeySpec("&kp", (KeySpec("SEMI"),)),
 }
 
-_RIGHT_KP_OVERRIDES: Dict[int, KeySpec] = {
+_RIGHT_KP_OVERRIDES: dict[int, KeySpec] = {
     35: KeySpec("&kp", (KeySpec("A"),)),
     36: KeySpec("&kp", (KeySpec("S"),)),
     37: KeySpec("&kp", (KeySpec("D"),)),
@@ -160,25 +156,25 @@ _RIGHT_FINGER_SPECS = {
 }
 
 
-def _build_left_layer_spec(tap_macro: str, extras: Dict[int, KeySpec]) -> LayerSpec:
+def _build_left_layer_spec(tap_macro: str, extras: dict[int, KeySpec]) -> LayerSpec:
     overrides = {index: KeySpec(tap_macro, (KeySpec(code),)) for index, code in _LEFT_TAP_KEYS.items()}
     overrides.update(_LEFT_KP_OVERRIDES)
     overrides.update(extras)
     return LayerSpec(overrides=overrides, length=80)
 
 
-def _build_right_layer_spec(tap_macro: str, extras: Dict[int, KeySpec]) -> LayerSpec:
+def _build_right_layer_spec(tap_macro: str, extras: dict[int, KeySpec]) -> LayerSpec:
     overrides = {index: KeySpec(tap_macro, (KeySpec(code),)) for index, code in _RIGHT_TAP_KEYS.items()}
     overrides.update(_RIGHT_KP_OVERRIDES)
     overrides.update(extras)
     return LayerSpec(overrides=overrides, length=80)
 
 
-_BILATERAL_LAYER_SPECS: Dict[str, LayerSpec] = {
+_BILATERAL_LAYER_SPECS: dict[str, LayerSpec] = {
     name: _build_left_layer_spec(tap_macro, extras) for name, (tap_macro, extras) in _LEFT_FINGER_SPECS.items()
 }
 _BILATERAL_LAYER_SPECS.update(
-    {name: _build_right_layer_spec(tap_macro, extras) for name, (tap_macro, extras) in _RIGHT_FINGER_SPECS.items()}
+    {name: _build_right_layer_spec(tap_macro, extras) for name, (tap_macro, extras) in _RIGHT_FINGER_SPECS.items()},
 )
 
 
@@ -186,7 +182,7 @@ def _build_bilateral_layers() -> LayerMap:
     return {name: build_layer_from_spec(spec) for name, spec in _BILATERAL_LAYER_SPECS.items()}
 
 
-_MAC_PATCHES: Dict[str, PatchSpec] = {
+_MAC_PATCHES: dict[str, PatchSpec] = {
     "LeftIndex": {
         35: KeySpec("&HRM_left_index_pinky_v1B_TKZ", (KeySpec("LCTRL"), KeySpec("A"))),
         37: KeySpec("&HRM_left_index_middy_v1B_TKZ", (KeySpec("LGUI"), KeySpec("D"))),
@@ -220,7 +216,6 @@ _MAC_PATCHES: Dict[str, PatchSpec] = {
 
 def assemble_bilateral_layers(variant: str, *, mac: bool = False, remap: bool = True) -> LayerMap:
     """Return bilateral layers tailored for the requested platform/variant."""
-
     layers = _build_bilateral_layers()
     if mac:
         for name, patch in _MAC_PATCHES.items():
@@ -235,7 +230,6 @@ def assemble_bilateral_layers(variant: str, *, mac: bool = False, remap: bool = 
 
 def build_bilateral_finger_layers(variant: str) -> LayerMap:
     """Return the eight bilateral finger layers if needed."""
-
     base_variant = base_variant_for(variant)
     if base_variant not in {"bilateral_windows", "bilateral_mac"}:
         return {}

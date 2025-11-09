@@ -2,35 +2,39 @@
 
 from __future__ import annotations
 
-from typing import Dict, Sequence, Tuple
+from typing import TYPE_CHECKING
 
-from glove80.base import LayerSpec
 from glove80.layouts.layers import Token, rows_to_layer_spec
 
-LayerRows = Tuple[Tuple[Token, ...], ...]
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from glove80.base import LayerSpec
+
+LayerRows = tuple[tuple[Token, ...], ...]
 
 
 def _custom(code: str) -> Token:
     return ("Custom", code)
 
 
-def _repeat(token: Token, count: int) -> Tuple[Token, ...]:
+def _repeat(token: Token, count: int) -> tuple[Token, ...]:
     return tuple(token for _ in range(count))
 
 
-def _taps(macro: str, coords: Sequence[str]) -> Tuple[Token, ...]:
+def _taps(macro: str, coords: Sequence[str]) -> tuple[Token, ...]:
     return tuple(("Custom", f"&{macro}_tap {coord}") for coord in coords)
 
 
-def _lh(*coords: str) -> Tuple[str, ...]:
+def _lh(*coords: str) -> tuple[str, ...]:
     return tuple(f"KEY_LH_{coord}" for coord in coords)
 
 
-def _rh(*coords: str) -> Tuple[str, ...]:
+def _rh(*coords: str) -> tuple[str, ...]:
     return tuple(f"KEY_RH_{coord}" for coord in coords)
 
 
-FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
+FINGER_LAYER_SPECS: dict[str, LayerSpec] = {
     "LeftPinky": rows_to_layer_spec(
         (
             (

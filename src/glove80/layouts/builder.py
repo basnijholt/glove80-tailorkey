@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Any, Callable, Iterable, Mapping, Sequence
-from typing import Literal
-
-from glove80.base import LayerMap
-from glove80.layouts.components import LayoutFeatureComponents
+from typing import TYPE_CHECKING, Any, Literal
 
 from .common import compose_layout
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Mapping, Sequence
+
+    from glove80.base import LayerMap
+    from glove80.layouts.components import LayoutFeatureComponents
 
 
 def _unique_sequence(values: Iterable[str]) -> list[str]:
@@ -61,7 +63,7 @@ class LayoutBuilder:
     # ------------------------------------------------------------------
     # Base section wiring
     # ------------------------------------------------------------------
-    def set_layer_order(self, layer_names: Sequence[str]) -> "LayoutBuilder":
+    def set_layer_order(self, layer_names: Sequence[str]) -> LayoutBuilder:
         self._sections.layer_names = _unique_sequence(layer_names)
         return self
 
@@ -72,24 +74,25 @@ class LayoutBuilder:
         insert_after: str | None = None,
         insert_before: str | None = None,
         explicit_order: Sequence[str] | None = None,
-    ) -> "LayoutBuilder":
+    ) -> LayoutBuilder:
         """Merge *layers* into the builder and update the layer order."""
-
         if not layers:
             return self
 
         if insert_after is not None and insert_before is not None:
-            raise ValueError("Specify only one of insert_after or insert_before")
+            msg = "Specify only one of insert_after or insert_before"
+            raise ValueError(msg)
 
         order = list(explicit_order or layers.keys())
         for name in order:
             if name not in layers:
-                raise KeyError(f"Layer '{name}' missing from provided mapping")
+                msg = f"Layer '{name}' missing from provided mapping"
+                raise KeyError(msg)
             self._sections.layers[name] = layers[name]
         self._insert_layer_names(order, after=insert_after, before=insert_before)
         return self
 
-    def update_layer(self, name: str, layer_data: Any) -> "LayoutBuilder":
+    def update_layer(self, name: str, layer_data: Any) -> LayoutBuilder:
         if name not in self._sections.layer_names:
             self._sections.layer_names.append(name)
         self._sections.layers[name] = layer_data
@@ -100,7 +103,7 @@ class LayoutBuilder:
         macros: Sequence[Mapping[str, Any]],
         *,
         prepend: bool = False,
-    ) -> "LayoutBuilder":
+    ) -> LayoutBuilder:
         if not macros:
             return self
 
@@ -122,42 +125,44 @@ class LayoutBuilder:
             existing[name] = dict(macro)
         return self
 
-    def add_hold_taps(self, hold_taps: Sequence[Mapping[str, Any]]) -> "LayoutBuilder":
+    def add_hold_taps(self, hold_taps: Sequence[Mapping[str, Any]]) -> LayoutBuilder:
         self._sections.hold_taps.extend(dict(spec) for spec in hold_taps)
         return self
 
-    def add_combos(self, combos: Sequence[Mapping[str, Any]]) -> "LayoutBuilder":
+    def add_combos(self, combos: Sequence[Mapping[str, Any]]) -> LayoutBuilder:
         self._sections.combos.extend(dict(spec) for spec in combos)
         return self
 
-    def add_input_listeners(self, listeners: Sequence[Mapping[str, Any]]) -> "LayoutBuilder":
+    def add_input_listeners(self, listeners: Sequence[Mapping[str, Any]]) -> LayoutBuilder:
         self._sections.input_listeners.extend(dict(spec) for spec in listeners)
         return self
 
     # ------------------------------------------------------------------
     # Feature-oriented helpers
     # ------------------------------------------------------------------
-    def set_mouse_layers_provider(self, provider: Callable[[str], LayerMap]) -> "LayoutBuilder":
+    def set_mouse_layers_provider(self, provider: Callable[[str], LayerMap]) -> LayoutBuilder:
         self._mouse_layers_provider = provider
         return self
 
-    def set_cursor_layers_provider(self, provider: Callable[[str], LayerMap]) -> "LayoutBuilder":
+    def set_cursor_layers_provider(self, provider: Callable[[str], LayerMap]) -> LayoutBuilder:
         self._cursor_layers_provider = provider
         return self
 
-    def set_home_row_provider(self, provider: Callable[[str], LayoutFeatureComponents]) -> "LayoutBuilder":
+    def set_home_row_provider(self, provider: Callable[[str], LayoutFeatureComponents]) -> LayoutBuilder:
         self._home_row_provider = provider
         return self
 
-    def add_mouse_layers(self, *, insert_after: str | None = None) -> "LayoutBuilder":
+    def add_mouse_layers(self, *, insert_after: str | None = None) -> LayoutBuilder:
         if self._mouse_layers_provider is None:
-            raise ValueError("Mouse layer provider is not configured for this builder")
+            msg = "Mouse layer provider is not configured for this builder"
+            raise ValueError(msg)
         layers = self._mouse_layers_provider(self.variant)
         return self.add_layers(layers, insert_after=insert_after)
 
-    def add_cursor_layer(self, *, insert_after: str | None = None) -> "LayoutBuilder":
+    def add_cursor_layer(self, *, insert_after: str | None = None) -> LayoutBuilder:
         if self._cursor_layers_provider is None:
-            raise ValueError("Cursor layer provider is not configured for this builder")
+            msg = "Cursor layer provider is not configured for this builder"
+            raise ValueError(msg)
         layers = self._cursor_layers_provider(self.variant)
         return self.add_layers(layers, insert_after=insert_after)
 
@@ -168,7 +173,7 @@ class LayoutBuilder:
         insert_after: str | None = None,
         position: Literal["before", "after"] = "after",
         feature_provider: Callable[[str], LayoutFeatureComponents] | None = None,
-    ) -> "LayoutBuilder":
+    ) -> LayoutBuilder:
         """Attach home-row modifiers and associated macros/combos.
 
         Parameters
@@ -182,13 +187,15 @@ class LayoutBuilder:
         feature_provider:
             Optional override for the configured home-row provider. The
             callable must return a :class:`LayoutFeatureComponents` instance.
-        """
 
+        """
         provider = feature_provider or self._home_row_provider
         if provider is None:
-            raise ValueError("Home-row modifier provider is not configured for this builder")
+            msg = "Home-row modifier provider is not configured for this builder"
+            raise ValueError(msg)
         if target_layer not in self._sections.layer_names:
-            raise ValueError(f"Unknown target layer '{target_layer}'")
+            msg = f"Unknown target layer '{target_layer}'"
+            raise ValueError(msg)
         components = provider(self.variant)
         anchor = insert_after or target_layer
         if position == "before":
@@ -231,7 +238,8 @@ class LayoutBuilder:
         if not names:
             return
         if after is not None and before is not None:
-            raise ValueError("Specify only one of 'after' or 'before'")
+            msg = "Specify only one of 'after' or 'before'"
+            raise ValueError(msg)
 
         names = _unique_sequence(names)
         current = self._sections.layer_names
@@ -248,7 +256,8 @@ class LayoutBuilder:
             try:
                 anchor_index = filtered.index(before)
             except ValueError:
-                raise ValueError(f"Layer '{before}' is not present in the order") from None
+                msg = f"Layer '{before}' is not present in the order"
+                raise ValueError(msg) from None
             updated = (
                 filtered[:anchor_index] + [name for name in names if name not in filtered] + filtered[anchor_index:]
             )
@@ -259,7 +268,8 @@ class LayoutBuilder:
             try:
                 anchor_index = filtered.index(after)
             except ValueError:
-                raise ValueError(f"Layer '{after}' is not present in the order") from None
+                msg = f"Layer '{after}' is not present in the order"
+                raise ValueError(msg) from None
             updated = (
                 filtered[: anchor_index + 1]
                 + [name for name in names if name not in filtered]
@@ -302,9 +312,11 @@ def _macro_name(macro: Mapping[str, Any]) -> str:
     try:
         name = macro["name"]
     except KeyError as exc:  # pragma: no cover - enforced via tests
-        raise KeyError("Macro definitions must include a 'name'") from exc
+        msg = "Macro definitions must include a 'name'"
+        raise KeyError(msg) from exc
     if not isinstance(name, str):  # pragma: no cover - sanity guard
-        raise TypeError("Macro name must be a string")
+        msg = "Macro name must be a string"
+        raise TypeError(msg)
     return name
 
 

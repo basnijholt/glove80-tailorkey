@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Tuple
+from typing import TYPE_CHECKING
 
 from glove80.base import LayerRef
+from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
 from glove80.specs import ComboSpec
-from glove80.specs.utils import kp, ks, mod, layer_param
+from glove80.specs.utils import kp, ks, layer_param, mod
 
-from ..alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
-
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 ORDER = (
     "capslock_v1_TKZ",
@@ -95,14 +96,14 @@ def _with_description(combo: ComboSpec, description: str) -> ComboSpec:
     )
 
 
-def _layers(*names: str) -> Tuple[LayerRef, ...]:
+def _layers(*names: str) -> tuple[LayerRef, ...]:
     return tuple(LayerRef(name) for name in names)
 
 
 WINDOWS_STICKY_DESC = 'sticky "hyper" modifiers (Win + Alt + Ctrl + Shift) - Use with Tab - TailorKey'
 WINDOWS_MEH_DESC = 'sticky "meh" modifiers (Alt + Ctrl + Shift) - Use with Tab - TailorKey'
 
-COMBO_DATA: Dict[str, List[ComboSpec]] = {
+COMBO_DATA: dict[str, list[ComboSpec]] = {
     "windows": [
         BASE_COMBOS["capslock_v1_TKZ"],
         BASE_COMBOS["F11_v1_TKZ"],
@@ -114,8 +115,8 @@ COMBO_DATA: Dict[str, List[ComboSpec]] = {
 }
 
 
-def _variant_list(layer_names: Tuple[str, ...]) -> List[ComboSpec]:
-    combos: List[ComboSpec] = []
+def _variant_list(layer_names: tuple[str, ...]) -> list[ComboSpec]:
+    combos: list[ComboSpec] = []
     for name in ORDER:
         combo = BASE_COMBOS[name]
         if combo.layers == (-1,):

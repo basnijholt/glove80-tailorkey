@@ -17,7 +17,7 @@ from tests.assertions import assert_layout_equal
         "kinesis",
     ],
 )
-def test_default_layout_matches_release(variant, load_default_variant):
+def test_default_layout_matches_release(variant, load_default_variant) -> None:
     expected = load_default_variant(variant)
     built = build_family_layout("default", variant)
     assert_layout_equal(built, expected, label=f"default:{variant}")

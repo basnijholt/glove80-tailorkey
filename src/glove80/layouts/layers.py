@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any, Sequence, TypeAlias
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 from glove80.base import KeySpec, LayerRef, LayerSpec
 from glove80.specs.utils import kp
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 TokenTuple: TypeAlias = tuple[Any, ...]
 Token: TypeAlias = KeySpec | TokenTuple | str | int | LayerRef
@@ -19,7 +22,8 @@ def _normalize_param_token(param: ParamToken) -> KeySpec:
         return _token_to_key(param)
     if isinstance(param, (str, int, LayerRef)):
         return KeySpec(param)
-    raise TypeError(f"Unsupported parameter token type: {param!r}")
+    msg = f"Unsupported parameter token type: {param!r}"
+    raise TypeError(msg)
 
 
 def _token_to_key(token: Token) -> KeySpec:
@@ -38,13 +42,15 @@ def _token_to_key(token: Token) -> KeySpec:
         return kp(token)
     if isinstance(token, (int, LayerRef)):
         return KeySpec(token)
-    raise TypeError(f"Unsupported token type: {token!r}")
+    msg = f"Unsupported token type: {token!r}"
+    raise TypeError(msg)
 
 
 def rows_to_layer_spec(rows: Sequence[Sequence[Any]]) -> LayerSpec:
     flat: list[Token] = [token for row in rows for token in row]
     if len(flat) != 80:  # pragma: no cover
-        raise ValueError(f"Expected 80 entries for a layer, got {len(flat)}")
+        msg = f"Expected 80 entries for a layer, got {len(flat)}"
+        raise ValueError(msg)
     overrides = {idx: _token_to_key(token) for idx, token in enumerate(flat)}
     return LayerSpec(overrides=overrides)
 
@@ -53,4 +59,4 @@ def _transparent_layer() -> LayerSpec:
     return LayerSpec(overrides={})
 
 
-__all__ = ["rows_to_layer_spec", "_transparent_layer", "_token_to_key", "Token"]
+__all__ = ["Token", "_token_to_key", "_transparent_layer", "rows_to_layer_spec"]

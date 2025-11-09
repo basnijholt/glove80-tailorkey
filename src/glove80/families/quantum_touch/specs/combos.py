@@ -30,7 +30,7 @@ COMBO_DATA = {
             key_positions=(69, 70),
             layers=(-1,),
         ),
-    )
+    ),
 }
 
 __all__ = ["COMBO_DATA"]

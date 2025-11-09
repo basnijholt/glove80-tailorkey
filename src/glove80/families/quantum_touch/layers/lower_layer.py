@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec
 
-
 LOWER_LAYER_SPEC = LayerSpec(
     overrides={
         0: KeySpec("&kp", (KeySpec("C_BRI_DN"),)),
@@ -70,7 +69,7 @@ LOWER_LAYER_SPEC = LayerSpec(
         76: KeySpec("&kp", (KeySpec("KP_N0"),)),
         77: KeySpec("&kp", (KeySpec("KP_DOT"),)),
         78: KeySpec("&kp", (KeySpec("KP_ENTER"),)),
-    }
+    },
 )
 
 

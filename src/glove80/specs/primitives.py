@@ -4,14 +4,16 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Iterable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
-from ..base import KeySpec, LayerRef
+from glove80.base import KeySpec, LayerRef
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
 
 
 def _serialize_simple(value: Any) -> Any:
     """Convert supported parameter types into JSON-friendly structures."""
-
     if isinstance(value, KeySpec):
         return value.to_dict()
     if isinstance(value, LayerRef):
@@ -22,7 +24,8 @@ def _serialize_simple(value: Any) -> Any:
         return {k: _serialize_simple(v) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
         return [_serialize_simple(item) for item in value]
-    raise TypeError(f"Unsupported parameter type: {type(value)!r}")  # pragma: no cover
+    msg = f"Unsupported parameter type: {type(value)!r}"
+    raise TypeError(msg)  # pragma: no cover
 
 
 @dataclass(frozen=True)
@@ -167,7 +170,6 @@ def _materialize_item(item: Any) -> Any:
 
 def materialize_sequence(items: Iterable[Any]) -> list[Any]:
     """Convert spec objects (with to_dict) into dictionaries."""
-
     return [_materialize_item(item) for item in items]
 
 
@@ -177,12 +179,12 @@ def materialize_named_sequence(
     overrides: Mapping[str, Any] | None = None,
 ) -> list[Any]:
     """Materialize a named sequence with optional overrides."""
-
     resolved: list[Any] = []
     overrides = overrides or {}
     for name in order:
         value = overrides.get(name, definitions.get(name))
         if value is None:
-            raise KeyError(f"Unknown definition '{name}'")
+            msg = f"Unknown definition '{name}'"
+            raise KeyError(msg)
         resolved.append(_materialize_item(value))
     return resolved

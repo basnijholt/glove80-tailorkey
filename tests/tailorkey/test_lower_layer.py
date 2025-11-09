@@ -12,5 +12,5 @@ def _load_canonical_layer(variant: str, loader):
 
 
 @pytest.mark.parametrize("variant", TAILORKEY_VARIANTS)
-def test_lower_layer_matches_canonical(variant, load_tailorkey_variant):
+def test_lower_layer_matches_canonical(variant, load_tailorkey_variant) -> None:
     assert build_lower_layer(variant) == _load_canonical_layer(variant, load_tailorkey_variant)

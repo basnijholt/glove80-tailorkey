@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Tuple
 
 
 @dataclass(frozen=True)
@@ -15,11 +14,11 @@ class FingerMeta:
     tapping_term_ms: int
     quick_tap_ms: int
     require_prior_idle_ms: int
-    hold_trigger_positions: Tuple[int, ...]
-    bilateral_positions: Tuple[int, ...] | None = None
+    hold_trigger_positions: tuple[int, ...]
+    bilateral_positions: tuple[int, ...] | None = None
 
 
-FINGERS: Tuple[FingerMeta, ...] = (
+FINGERS: tuple[FingerMeta, ...] = (
     FingerMeta(
         hand="left",
         finger="index",

@@ -13,5 +13,5 @@ def _load_canonical_layer(variant: str, loader):
 
 
 @pytest.mark.parametrize("variant", TAILORKEY_VARIANTS)
-def test_cursor_layer_matches_canonical(variant, load_tailorkey_variant):
+def test_cursor_layer_matches_canonical(variant, load_tailorkey_variant) -> None:
     assert build_cursor_layer(variant) == _load_canonical_layer(variant, load_tailorkey_variant)

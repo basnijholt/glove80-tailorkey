@@ -5,14 +5,17 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from ..families import default as _default_family  # noqa: F401  # ensure registration
-from ..families import tailorkey as _tailorkey_family  # noqa: F401
-from ..families import quantum_touch as _quantum_touch_family  # noqa: F401
-from ..families import glorious_engrammer as _glorious_engrammer_family  # noqa: F401
-from ..layouts.family import LayoutFamily, REGISTRY
-from ..metadata import MetadataByVariant, VariantMetadata, load_metadata
+from glove80.families import default as _default_family  # noqa: F401  # ensure registration
+from glove80.families import glorious_engrammer as _glorious_engrammer_family  # noqa: F401
+from glove80.families import quantum_touch as _quantum_touch_family  # noqa: F401
+from glove80.families import tailorkey as _tailorkey_family  # noqa: F401
+from glove80.layouts.family import REGISTRY, LayoutFamily
+from glove80.metadata import MetadataByVariant, VariantMetadata, load_metadata
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
 
 META_FIELDS = ("title", "uuid", "parent_uuid", "date", "notes", "tags")
 
@@ -27,9 +30,8 @@ class GenerationResult:
     changed: bool
 
 
-def available_layouts() -> List[str]:
+def available_layouts() -> list[str]:
     """Return the sorted list of known layout families."""
-
     return sorted(registered.name for registered in REGISTRY.families())
 
 
@@ -41,7 +43,8 @@ def _normalize_layout_name(layout: str | None) -> Iterable[tuple[str, LayoutFami
         family = REGISTRY.get(layout)
         return [(layout, family)]
     except KeyError as exc:  # pragma: no cover
-        raise KeyError(f"Unknown layout '{layout}'. Available: {available_layouts()}") from exc
+        msg = f"Unknown layout '{layout}'. Available: {available_layouts()}"
+        raise KeyError(msg) from exc
 
 
 def _iter_variants(
@@ -55,7 +58,8 @@ def _iter_variants(
     try:
         yield variant, metadata[variant]
     except KeyError as exc:  # pragma: no cover
-        raise KeyError(f"Unknown variant '{variant}' for layout '{layout}'. Available: {sorted(metadata)}") from exc
+        msg = f"Unknown variant '{variant}' for layout '{layout}'. Available: {sorted(metadata)}"
+        raise KeyError(msg) from exc
 
 
 def _write_layout(data: dict, destination: Path) -> bool:
@@ -69,7 +73,7 @@ def _write_layout(data: dict, destination: Path) -> bool:
 
 
 def _augment_layout_with_metadata(layout: dict, meta: VariantMetadata) -> None:
-    meta_dict = cast(Dict[str, Any], meta)
+    meta_dict = cast("dict[str, Any]", meta)
     for field in META_FIELDS:
         if field in meta_dict:
             layout[field] = meta_dict[field]
@@ -81,10 +85,9 @@ def generate_layouts(
     variant: str | None = None,
     metadata_path: Path | None = None,
     dry_run: bool = False,
-) -> List[GenerationResult]:
+) -> list[GenerationResult]:
     """Generate layouts and write (or check) their release artifacts."""
-
-    results: List[GenerationResult] = []
+    results: list[GenerationResult] = []
     for layout_name, family in _normalize_layout_name(layout):
         metadata = load_metadata(layout=layout_name, path=metadata_path)
         for variant_name, meta in _iter_variants(layout_name, metadata, variant):
@@ -108,6 +111,6 @@ def generate_layouts(
                     variant=variant_name,
                     destination=destination,
                     changed=changed,
-                )
+                ),
             )
     return results

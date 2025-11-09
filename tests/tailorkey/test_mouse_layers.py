@@ -17,7 +17,7 @@ def _load_canonical_layers(variant: str, loader):
 
 
 @pytest.mark.parametrize("variant", TAILORKEY_VARIANTS)
-def test_mouse_layers_match_canonical(variant, load_tailorkey_variant):
+def test_mouse_layers_match_canonical(variant, load_tailorkey_variant) -> None:
     expected = _load_canonical_layers(variant, load_tailorkey_variant)
     generated = build_mouse_layers(variant)
     assert generated == expected

@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec, copy_layer
-
-from ..alpha_layouts import needs_alpha_remap, remap_layer_keys
-
+from glove80.families.tailorkey.alpha_layouts import needs_alpha_remap, remap_layer_keys
 
 AUTOSHIFT_SPEC = LayerSpec(
     overrides={
@@ -57,7 +55,7 @@ AUTOSHIFT_SPEC = LayerSpec(
         64: KeySpec("&magic"),
         77: KeySpec("&AS_v1_TKZ", (KeySpec("LBKT"),)),
         78: KeySpec("&AS_v1_TKZ", (KeySpec("RBKT"),)),
-    }
+    },
 )
 
 _BASE_AUTOSHIFT_LAYER: Layer = build_layer_from_spec(AUTOSHIFT_SPEC)

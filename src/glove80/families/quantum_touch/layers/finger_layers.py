@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Callable, Dict, Tuple
+from typing import TYPE_CHECKING
 
 from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec
-from ..specs.finger_data import FINGER_BY_LABEL, FingerMeta
+from glove80.families.quantum_touch.specs.finger_data import FINGER_BY_LABEL, FingerMeta
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
-LEFT_TAP_KEYS: Dict[int, str] = {
+LEFT_TAP_KEYS: dict[int, str] = {
     0: "F1",
     1: "F2",
     2: "F3",
@@ -33,7 +35,7 @@ LEFT_TAP_KEYS: Dict[int, str] = {
     51: "B",
 }
 
-RIGHT_TAP_KEYS: Dict[int, str] = {
+RIGHT_TAP_KEYS: dict[int, str] = {
     5: "F6",
     6: "F7",
     7: "F8",
@@ -62,7 +64,7 @@ RIGHT_TAP_KEYS: Dict[int, str] = {
 LEFT_KP_KEYS = {41: "J", 42: "K", 43: "L", 44: "SEMI"}
 RIGHT_KP_KEYS = {35: "A", 36: "S", 37: "D", 38: "F"}
 
-COMBO_OVERRIDES: Dict[str, Dict[int, Tuple[str | None, Tuple[str, ...]]]] = {
+COMBO_OVERRIDES: dict[str, dict[int, tuple[str | None, tuple[str, ...]]]] = {
     "LeftIndex": {
         35: ("Pinky", ("LCTRL", "A")),
         36: ("Ring", ("LALT", "S")),
@@ -127,7 +129,7 @@ def _build_finger_layer(label: str) -> Layer:
     tap_keys = LEFT_TAP_KEYS if meta.hand == "L" else RIGHT_TAP_KEYS
     kp_keys = LEFT_KP_KEYS if meta.hand == "L" else RIGHT_KP_KEYS
 
-    overrides: Dict[int, KeySpec] = {}
+    overrides: dict[int, KeySpec] = {}
     tap_macro = _tap_macro(meta)
     for position, key in tap_keys.items():
         overrides[position] = KeySpec(tap_macro, (KeySpec(key),))
@@ -178,7 +180,7 @@ def build_right_pinky_layer(_variant: str) -> Layer:
     return _build_finger_layer("RightPinky")
 
 
-FINGER_LAYER_BUILDERS: Dict[str, Callable[[str], Layer]] = {
+FINGER_LAYER_BUILDERS: dict[str, Callable[[str], Layer]] = {
     "LeftIndex": build_left_index_layer,
     "LeftMiddle": build_left_middle_layer,
     "LeftRing": build_left_ring_layer,
@@ -191,13 +193,13 @@ FINGER_LAYER_BUILDERS: Dict[str, Callable[[str], Layer]] = {
 
 
 __all__ = [
+    "FINGER_LAYER_BUILDERS",
     "build_left_index_layer",
     "build_left_middle_layer",
-    "build_left_ring_layer",
     "build_left_pinky_layer",
+    "build_left_ring_layer",
     "build_right_index_layer",
     "build_right_middle_layer",
-    "build_right_ring_layer",
     "build_right_pinky_layer",
-    "FINGER_LAYER_BUILDERS",
+    "build_right_ring_layer",
 ]

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Dict, Sequence
+from typing import TYPE_CHECKING
 
 from glove80.layouts import LayoutBuilder
-from glove80.layouts.family import LayoutFamily, REGISTRY
+from glove80.layouts.family import REGISTRY, LayoutFamily
 from glove80.specs.primitives import materialize_named_sequence, materialize_sequence
 
 from .layers import build_all_layers
@@ -20,6 +20,9 @@ from .specs import (
     MACRO_ORDER,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 class Family(LayoutFamily):
     name = "quantum_touch"
@@ -30,7 +33,7 @@ class Family(LayoutFamily):
     def metadata_key(self) -> str:
         return "quantum_touch"
 
-    def build(self, variant: str = "default") -> Dict:
+    def build(self, variant: str = "default") -> dict:
         combos = materialize_sequence(COMBO_DATA["default"])
         listeners = materialize_sequence(INPUT_LISTENER_DATA["default"])
         macros = materialize_named_sequence(MACRO_DEFS, MACRO_ORDER)

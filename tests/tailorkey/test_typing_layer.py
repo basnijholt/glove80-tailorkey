@@ -12,5 +12,5 @@ def _load_layer(variant: str, loader):
 
 
 @pytest.mark.parametrize("variant", TAILORKEY_VARIANTS)
-def test_typing_layer(variant, load_tailorkey_variant):
+def test_typing_layer(variant, load_tailorkey_variant) -> None:
     assert build_typing_layer(variant) == _load_layer(variant, load_tailorkey_variant)

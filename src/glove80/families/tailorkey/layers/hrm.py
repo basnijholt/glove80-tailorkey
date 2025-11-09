@@ -12,9 +12,7 @@ from glove80.base import (
     build_layer_from_spec,
     copy_layer,
 )
-
-from ..alpha_layouts import base_variant_for, needs_alpha_remap, remap_layer_keys
-
+from glove80.families.tailorkey.alpha_layouts import base_variant_for, needs_alpha_remap, remap_layer_keys
 
 _BASE_HRM_SPEC = LayerSpec(
     overrides={
@@ -157,7 +155,6 @@ def _maybe_remap(layer: Layer, variant: str, remap_required: bool) -> None:
 
 def build_hrm_layers(variant: str) -> LayerMap:
     """Return the HRM layers needed for the variant."""
-
     layers: LayerMap = {}
     remap_required = needs_alpha_remap(variant)
     base_variant = base_variant_for(variant)
@@ -194,6 +191,7 @@ def build_hrm_layers(variant: str) -> LayerMap:
         _maybe_remap(layer, variant, remap_required)
         layers["HRM_macOS"] = layer
     else:  # pragma: no cover
-        raise ValueError(f"Unsupported variant: {variant}")
+        msg = f"Unsupported variant: {variant}"
+        raise ValueError(msg)
 
     return layers

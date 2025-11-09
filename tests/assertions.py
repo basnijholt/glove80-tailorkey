@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from hashlib import sha256
 import json
+from hashlib import sha256
 from typing import Any
 
 __all__ = ["assert_layout_equal"]
@@ -11,7 +11,6 @@ __all__ = ["assert_layout_equal"]
 
 def assert_layout_equal(actual: dict, expected: dict, *, label: str | None = None, max_diffs: int = 5) -> None:
     """Compare two layout dictionaries without dumping megabytes of JSON."""
-
     if actual == expected:
         return
 
@@ -26,8 +25,9 @@ def assert_layout_equal(actual: dict, expected: dict, *, label: str | None = Non
 
     scope = f" for {label}" if label else ""
     summary = "; ".join(mismatches) if mismatches else "unexpected structural mismatch"
+    msg = f"Layout mismatch{scope}: {summary}. Run `just regen` to refresh releases or inspect the generated JSON."
     raise AssertionError(
-        f"Layout mismatch{scope}: {summary}. Run `just regen` to refresh releases or inspect the generated JSON."
+        msg,
     )
 
 
@@ -51,7 +51,7 @@ def _describe_mismatch(key: str, actual: Any, expected: Any) -> str:
 def _describe_sequence_difference(left: list[Any], right: list[Any]) -> str | None:
     if len(left) != len(right):
         return f"length {len(left)} != {len(right)}"
-    for idx, (l_entry, r_entry) in enumerate(zip(left, right)):
+    for idx, (l_entry, r_entry) in enumerate(zip(left, right, strict=False)):
         if l_entry != r_entry:
             return f"index {idx} {_short_repr(l_entry)} != {_short_repr(r_entry)}"
     return None

@@ -11,9 +11,7 @@ from glove80.base import (
     build_layer_from_spec,
     copy_layer,
 )
-
-from ..alpha_layouts import base_variant_for
-
+from glove80.families.tailorkey.alpha_layouts import base_variant_for
 
 MAGIC_SPEC = LayerSpec(
     overrides={
@@ -97,7 +95,7 @@ MAGIC_SPEC = LayerSpec(
         77: KeySpec("&none"),
         78: KeySpec("&none"),
         79: KeySpec("&none"),
-    }
+    },
 )
 
 _BASE_MAGIC_LAYER: Layer = build_layer_from_spec(MAGIC_SPEC)

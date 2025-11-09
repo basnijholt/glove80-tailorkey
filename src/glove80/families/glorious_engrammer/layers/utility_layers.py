@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Dict, Tuple
+from typing import TYPE_CHECKING
 
-from glove80.base import LayerSpec
 from glove80.layouts.layers import Token, rows_to_layer_spec
 
-LayerRows = Tuple[Tuple[Token, ...], ...]
+if TYPE_CHECKING:
+    from glove80.base import LayerSpec
+
+LayerRows = tuple[tuple[Token, ...], ...]
 
 
-UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
+UTILITY_LAYER_SPECS: dict[str, LayerSpec] = {
     "Cursor": rows_to_layer_spec(
         (
             (
@@ -109,7 +111,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 ("Custom", "&kp _C(H)"),
                 ("Custom", "&kp _C(K)"),
             ),
-        )
+        ),
     ),
     "Number": rows_to_layer_spec(
         (
@@ -209,7 +211,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "RPAR",
                 "AT",
             ),
-        )
+        ),
     ),
     "Function": rows_to_layer_spec(
         (
@@ -309,7 +311,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "C_BRI_MIN",
                 "C_BRI_AUTO",
             ),
-        )
+        ),
     ),
     "Emoji": rows_to_layer_spec(
         (
@@ -409,7 +411,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 ("Custom", "&emoji_cross"),
                 ("Custom", "&emoji_question"),
             ),
-        )
+        ),
     ),
     "World": rows_to_layer_spec(
         (
@@ -509,7 +511,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "&none",
                 "&none",
             ),
-        )
+        ),
     ),
     "Symbol": rows_to_layer_spec(
         (
@@ -609,7 +611,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "&none",
                 "&none",
             ),
-        )
+        ),
     ),
     "System": rows_to_layer_spec(
         (
@@ -709,7 +711,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "CAPS",
                 ("Custom", "&kp _POWER"),
             ),
-        )
+        ),
     ),
     "Gaming": rows_to_layer_spec(
         (
@@ -809,7 +811,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "EQUAL",
                 "GRAVE",
             ),
-        )
+        ),
     ),
     "Factory": rows_to_layer_spec(
         (
@@ -909,7 +911,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "RBKT",
                 "PG_DN",
             ),
-        )
+        ),
     ),
     "Lower": rows_to_layer_spec(
         (
@@ -1009,7 +1011,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "&none",
                 "&none",
             ),
-        )
+        ),
     ),
     "Magic": rows_to_layer_spec(
         (
@@ -1109,6 +1111,6 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
                 "&none",
                 "&none",
             ),
-        )
+        ),
     ),
 }
