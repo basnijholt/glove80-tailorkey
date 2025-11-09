@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Sequence
 
-from glove80.layouts.common import compose_layout
+from glove80.layouts import LayoutBuilder
 from glove80.layouts.family import LayoutFamily, REGISTRY
 
 from .layers import build_all_layers
@@ -60,14 +60,15 @@ class Family(LayoutFamily):
             ) from exc
 
         generated_layers = build_all_layers(variant)
-        layout = compose_layout(
-            spec.common_fields,
-            layer_names=spec.layer_names,
-            generated_layers=generated_layers,
+        builder = LayoutBuilder(
             metadata_key=self.metadata_key(),
             variant=variant,
+            common_fields=spec.common_fields,
+            layer_names=spec.layer_names,
             resolve_refs=False,
         )
+        builder.add_layers({name: generated_layers[name] for name in spec.layer_names})
+        layout = builder.build()
         return _order_layout_fields(layout)
 
 
