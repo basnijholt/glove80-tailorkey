@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Any, Callable, Dict, List, Mapping, Sequence
 
 from glove80.layouts import LayoutBuilder
+from glove80.layouts.components import LayoutFeatureComponents
 from glove80.layouts.family import LayoutFamily, REGISTRY
 from glove80.specs.primitives import materialize_named_sequence, materialize_sequence
 
@@ -59,18 +60,97 @@ class Family(LayoutFamily):
         generated_layers = build_all_layers(variant)
         layer_names = _layer_names(variant)
 
+        hrm_names = [name for name in layer_names if name.startswith("HRM_")]
+        cursor_names = [name for name in layer_names if name.startswith("Cursor")]
+        mouse_names = [name for name in layer_names if name.startswith("Mouse")]
+
         builder = LayoutBuilder(
             metadata_key=self.metadata_key(),
             variant=variant,
             common_fields=COMMON_FIELDS,
             layer_names=layer_names,
+            mouse_layers_provider=_subset_layer_provider(mouse_names, generated_layers),
+            cursor_layers_provider=_subset_layer_provider(cursor_names, generated_layers),
+            home_row_provider=_home_row_provider(hrm_names, generated_layers),
         )
         builder.add_layers({name: generated_layers[name] for name in layer_names})
         builder.add_macros(_build_macros(variant))
         builder.add_hold_taps(_build_hold_taps(variant))
         builder.add_combos(combos)
         builder.add_input_listeners(listeners)
+
+        if hrm_names:
+            before, after = _group_anchor(layer_names, hrm_names)
+            anchor = after if before is None else before
+            if anchor is None:
+                raise ValueError("TailorKey layout requires at least one non-HRM layer")
+            builder.add_home_row_mods(
+                target_layer=anchor,
+                insert_after=anchor,
+                position="before" if before is None else "after",
+            )
+
+        if cursor_names:
+            before, _ = _group_anchor(layer_names, cursor_names)
+            if before:
+                builder.add_cursor_layer(insert_after=before)
+
+        if mouse_names:
+            before, _ = _group_anchor(layer_names, mouse_names)
+            if before:
+                builder.add_mouse_layers(insert_after=before)
+
         return builder.build()
+
+
+def _subset_layer_provider(names: Sequence[str], layers: Mapping[str, Any]):
+    if not names:
+        return None
+
+    def provider(_variant: str) -> dict[str, Any]:
+        return {name: layers[name] for name in names}
+
+    return provider
+
+
+def _home_row_provider(names: Sequence[str], layers: Mapping[str, Any]):
+    if not names:
+        return None
+
+    def provider(_variant: str) -> LayoutFeatureComponents:
+        return LayoutFeatureComponents(layers={name: layers[name] for name in names})
+
+    return provider
+
+
+def _group_anchor(
+    layer_names: Sequence[str], group_names: Sequence[str]
+) -> tuple[str | None, str | None]:
+    if not group_names:
+        return None, None
+
+    indices = [idx for idx, name in enumerate(layer_names) if name in group_names]
+    if not indices:
+        return None, None
+
+    first = min(indices)
+    last = max(indices)
+
+    before = None
+    for idx in range(first - 1, -1, -1):
+        candidate = layer_names[idx]
+        if candidate not in group_names:
+            before = candidate
+            break
+
+    after = None
+    for idx in range(last + 1, len(layer_names)):
+        candidate = layer_names[idx]
+        if candidate not in group_names:
+            after = candidate
+            break
+
+    return before, after
 
 
 REGISTRY.register(Family())

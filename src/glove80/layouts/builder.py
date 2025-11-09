@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable, Mapping, MutableSequence, Sequence
+from typing import Literal
 
 from glove80.base import LayerMap
 from glove80.layouts.components import LayoutFeatureComponents
@@ -69,6 +70,7 @@ class LayoutBuilder:
         layers: LayerMap,
         *,
         insert_after: str | None = None,
+        insert_before: str | None = None,
         explicit_order: Sequence[str] | None = None,
     ) -> "LayoutBuilder":
         """Merge *layers* into the builder and update the layer order."""
@@ -76,12 +78,15 @@ class LayoutBuilder:
         if not layers:
             return self
 
+        if insert_after is not None and insert_before is not None:
+            raise ValueError("Specify only one of insert_after or insert_before")
+
         order = list(explicit_order or layers.keys())
         for name in order:
             if name not in layers:
                 raise KeyError(f"Layer '{name}' missing from provided mapping")
             self._sections.layers[name] = layers[name]
-        self._insert_layer_names(order, after=insert_after)
+        self._insert_layer_names(order, after=insert_after, before=insert_before)
         return self
 
     def update_layer(self, name: str, layer_data: Any) -> "LayoutBuilder":
@@ -167,6 +172,7 @@ class LayoutBuilder:
         *,
         target_layer: str,
         insert_after: str | None = None,
+        position: Literal["before", "after"] = "after",
         feature_provider: Callable[[str], LayoutFeatureComponents] | None = None,
     ) -> "LayoutBuilder":
         """Attach home-row modifiers and associated macros/combos.
@@ -191,7 +197,10 @@ class LayoutBuilder:
             raise ValueError(f"Unknown target layer '{target_layer}'")
         components = provider(self.variant)
         anchor = insert_after or target_layer
-        self._merge_feature_components(components, insert_after=anchor)
+        if position == "before":
+            self._merge_feature_components(components, insert_before=anchor)
+        else:
+            self._merge_feature_components(components, insert_after=anchor)
         return self
 
     # ------------------------------------------------------------------
@@ -220,34 +229,61 @@ class LayoutBuilder:
     # ------------------------------------------------------------------
     # Internals
     # ------------------------------------------------------------------
-    def _insert_layer_names(self, names: Sequence[str], *, after: str | None = None) -> None:
+    def _insert_layer_names(
+        self,
+        names: Sequence[str],
+        *,
+        after: str | None = None,
+        before: str | None = None,
+    ) -> None:
         if not names:
             return
+        if after is not None and before is not None:
+            raise ValueError("Specify only one of 'after' or 'before'")
+
         names = _unique_sequence(names)
         current = self._sections.layer_names
-        if after is None:
+
+        if after is None and before is None:
             for name in names:
                 if name not in current:
                     current.append(name)
             return
 
         filtered = [name for name in current if name not in names]
-        try:
-            anchor_index = filtered.index(after)
-        except ValueError:
-            raise ValueError(f"Layer '{after}' is not present in the order") from None
-        updated = (
-            filtered[: anchor_index + 1]
-            + [name for name in names if name not in filtered]
-            + filtered[anchor_index + 1 :]
-        )
-        self._sections.layer_names = updated
+
+        if before is not None:
+            try:
+                anchor_index = filtered.index(before)
+            except ValueError:
+                raise ValueError(f"Layer '{before}' is not present in the order") from None
+            updated = (
+                filtered[:anchor_index]
+                + [name for name in names if name not in filtered]
+                + filtered[anchor_index:]
+            )
+            self._sections.layer_names = updated
+            return
+
+        if after is not None:
+            try:
+                anchor_index = filtered.index(after)
+            except ValueError:
+                raise ValueError(f"Layer '{after}' is not present in the order") from None
+            updated = (
+                filtered[: anchor_index + 1]
+                + [name for name in names if name not in filtered]
+                + filtered[anchor_index + 1 :]
+            )
+            self._sections.layer_names = updated
+
 
     def _merge_feature_components(
         self,
         components: LayoutFeatureComponents,
         *,
         insert_after: str | None = None,
+        insert_before: str | None = None,
     ) -> None:
         macros_section = self._sections.macros
 
@@ -268,6 +304,7 @@ class LayoutBuilder:
             self.add_layers(
                 components.layers,
                 insert_after=insert_after,
+                insert_before=insert_before,
                 explicit_order=list(components.layers.keys()),
             )
 
