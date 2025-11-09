@@ -1,8 +1,8 @@
 [project]
 name = "glove80"
-version = "0.1.0"
 description = "Deterministic Glove80 layout toolkit"
 readme = "README.md"
+dynamic = ["version"]
 authors = [
     { name = "Bas Nijholt", email = "bas@nijho.lt" }
 ]
@@ -28,7 +28,7 @@ addopts = """
 """
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "versioningit"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
@@ -56,3 +56,19 @@ exclude_lines = [
 
 [tool.coverage.run]
 omit = []
+
+[tool.hatch.version]
+source = "versioningit"
+
+[tool.versioningit]
+default-version = "0.0.0"
+
+[tool.versioningit.vcs]
+method = "git"
+match = ["v*"]
+default-tag = "0.0.0"
+
+[tool.versioningit.format]
+dirty = "{version}.dev{distance}+{branch}.{vcs}{rev}.dirty"
+distance = "{version}.dev{distance}+{branch}.{vcs}{rev}"
+distance-dirty = "{version}.dev{distance}+{branch}.{vcs}{rev}.dirty"
