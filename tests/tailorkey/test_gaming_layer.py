@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.tailorkey.layers.gaming import build_gaming_layer
+from glove80.layout_families.tailorkey.layers.gaming import build_gaming_layer
 
 
 VARIANTS = [

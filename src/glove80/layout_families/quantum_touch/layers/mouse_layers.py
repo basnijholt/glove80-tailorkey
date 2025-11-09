@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Dict
 
-from ...base import KeySpec, Layer, LayerSpec, build_layer_from_spec, copy_layer
-from ...layers.mouse_helpers import build_transparent_mouse_layer
+from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec, copy_layer
+from glove80.layers.mouse_helpers import build_transparent_mouse_layer
 
 
 _MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {

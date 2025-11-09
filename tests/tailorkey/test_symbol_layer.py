@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.tailorkey.layers.symbol import build_symbol_layer
+from glove80.layout_families.tailorkey.layers.symbol import build_symbol_layer
 
 
 VARIANTS = [

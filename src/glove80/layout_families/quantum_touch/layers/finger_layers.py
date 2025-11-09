@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Callable, Dict, Tuple
 
-from ...base import KeySpec, Layer, LayerSpec, build_layer_from_spec
+from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec
 from ..specs.finger_data import FINGER_BY_LABEL, FingerMeta
 
 

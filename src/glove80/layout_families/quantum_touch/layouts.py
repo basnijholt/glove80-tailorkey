@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Dict, Sequence
 
-from ..layouts.common import (
+from glove80.layouts.common import (
     assemble_layers,
     attach_variant_metadata,
     resolve_referenced_fields,

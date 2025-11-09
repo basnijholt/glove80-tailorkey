@@ -1,8 +1,16 @@
-"""QuantumTouch Lower layer."""
+"""Generate the Lower layer across TailorKey variants."""
 
 from __future__ import annotations
 
-from ...base import KeySpec, Layer, LayerSpec, build_layer_from_spec
+from glove80.base import (
+    KeySpec,
+    Layer,
+    LayerSpec,
+    PatchSpec,
+    apply_patch_if,
+    build_layer_from_spec,
+    copy_layer,
+)
 
 
 LOWER_LAYER_SPEC = LayerSpec(
@@ -24,7 +32,7 @@ LOWER_LAYER_SPEC = LayerSpec(
         15: KeySpec("&kp", (KeySpec("HOME"),)),
         16: KeySpec("&kp", (KeySpec("LEFT_PARENTHESIS"),)),
         17: KeySpec("&kp", (KeySpec("KP_NUM"),)),
-        18: KeySpec("&kp", (KeySpec("KP_EQUAL"),)),
+        18: KeySpec("&kp", (KeySpec("EQUAL"),)),
         19: KeySpec("&kp", (KeySpec("KP_SLASH"),)),
         20: KeySpec("&kp", (KeySpec("KP_MULTIPLY"),)),
         21: KeySpec("&kp", (KeySpec("PRINTSCREEN"),)),
@@ -73,6 +81,17 @@ LOWER_LAYER_SPEC = LayerSpec(
     }
 )
 
+_BASE_LOWER_LAYER: Layer = build_layer_from_spec(LOWER_LAYER_SPEC)
 
-def build_lower_layer(_variant: str) -> Layer:
-    return build_layer_from_spec(LOWER_LAYER_SPEC)
+
+_DUAL_PATCH: PatchSpec = {
+    54: KeySpec("&to", (KeySpec(1),)),
+}
+
+
+def build_lower_layer(variant: str) -> Layer:
+    """Return the Lower layer customized for the given variant."""
+
+    layer = copy_layer(_BASE_LOWER_LAYER)
+    apply_patch_if(layer, variant == "dual", _DUAL_PATCH)
+    return layer

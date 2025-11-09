@@ -3,7 +3,7 @@ import json
 import pytest
 
 from glove80.metadata import load_metadata
-from glove80.tailorkey.layouts import build_layout
+from glove80.layout_families.tailorkey.layouts import build_layout
 
 
 TAILORKEY_VARIANTS = sorted(load_metadata(layout="tailorkey").keys())

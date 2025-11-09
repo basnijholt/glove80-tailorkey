@@ -2,7 +2,7 @@
 
 from typing import Callable, Dict
 
-from ...base import Layer, LayerMap
+from glove80.base import Layer, LayerMap
 from .base_layer import build_base_layer
 from .hrm import build_hrm_layer
 from .finger_layers import FINGER_LAYER_BUILDERS

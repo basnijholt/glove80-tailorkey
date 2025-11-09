@@ -1,4 +1,4 @@
-from glove80.quantum_touch.layouts import build_layout
+from glove80.layout_families.quantum_touch.layouts import build_layout
 
 
 def test_quantum_touch_matches_original(load_quantum_touch_variant):

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ...base import KeySpec, Layer, LayerSpec, build_layer_from_spec
+from glove80.base import KeySpec, Layer, LayerSpec, build_layer_from_spec
 
 
 ORIGINAL_LAYER_SPEC = LayerSpec(

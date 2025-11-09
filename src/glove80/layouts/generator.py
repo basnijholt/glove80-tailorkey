@@ -7,10 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Iterator, List, cast
 
-from ..default.layouts import build_layout as build_default_layout
+from ..layout_families.default.layouts import build_layout as build_default_layout
+from ..layout_families.quantum_touch.layouts import build_layout as build_quantum_touch_layout
+from ..layout_families.tailorkey.layouts import build_layout as build_tailorkey_layout
 from ..metadata import MetadataByVariant, VariantMetadata, load_metadata
-from ..quantum_touch.layouts import build_layout as build_quantum_touch_layout
-from ..tailorkey.layouts import build_layout as build_tailorkey_layout
 
 LayoutBuilder = Callable[[str], dict]
 

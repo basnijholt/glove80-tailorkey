@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.tailorkey.layers.typing import build_typing_layer
+from glove80.layout_families.tailorkey.layers.typing import build_typing_layer
 
 
 VARIANTS = [

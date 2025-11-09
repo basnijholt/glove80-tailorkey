@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ...base import (
+from glove80.base import (
     KeySpec,
     Layer,
     LayerSpec,

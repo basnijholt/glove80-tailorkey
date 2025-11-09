@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.tailorkey.layers.hrm import build_hrm_layers
+from glove80.layout_families.tailorkey.layers.hrm import build_hrm_layers
 
 
 VARIANTS = [
