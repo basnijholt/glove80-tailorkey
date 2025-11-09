@@ -4,16 +4,20 @@ from __future__ import annotations
 
 from typing import Any, Sequence
 
-from glove80.base import KeySpec, LayerSpec
+from glove80.base import KeySpec, LayerRef, LayerSpec
 from glove80.specs.utils import kp
 
 Token = Any
 
 
-def _normalize_param_token(param: Token) -> Token:
+def _normalize_param_token(param: Token) -> KeySpec:
+    if isinstance(param, KeySpec):
+        return param
     if isinstance(param, tuple):
         return _token_to_key(param)
-    return param
+    if isinstance(param, (str, int, LayerRef)):
+        return KeySpec(param)
+    raise TypeError(f"Unsupported parameter token type: {param!r}")  # pragma: no cover
 
 
 def _token_to_key(token: Token) -> KeySpec:
@@ -27,6 +31,8 @@ def _token_to_key(token: Token) -> KeySpec:
         if token.startswith("&"):
             return KeySpec(token)
         return kp(token)
+    if isinstance(token, (int, LayerRef)):
+        return KeySpec(token)
     raise TypeError(f"Unsupported token type: {token!r}")  # pragma: no cover
 
 

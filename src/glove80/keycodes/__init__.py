@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from importlib import resources
-from typing import Iterable
+from typing import Iterable, NewType
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -91,7 +91,7 @@ def _load_known_key_names() -> tuple[tuple[str, ...], frozenset[str]]:
 
 
 KEY_NAME_VALUES, _KNOWN_KEY_NAMES = _load_known_key_names()
-KnownKeyName = str
+KnownKeyName = NewType("KnownKeyName", str)
 
 
 def is_known_key_name(name: str) -> bool:
