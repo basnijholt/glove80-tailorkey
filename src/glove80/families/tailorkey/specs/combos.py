@@ -2,35 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 from glove80.base import LayerRef
-from typing import List
-
 from glove80.specs import ComboSpec
 from glove80.specs.utils import kp, ks, mod, layer_param
-
-
-def _sk_hyper() -> ComboSpec:
-    return ComboSpec(
-        name="sticky_hyp_rght_v1_TKZ",
-        description='sticky "hyper" modifiers (Win + Alt + Ctrl + Shift) - Use with Tab - TailorKey',
-        binding=ks("&sk", mod("LG", mod("LA", mod("LC", "LSHFT")))),
-        key_positions=(74, 57),
-        timeout_ms=50,
-        layers=(LayerRef("HRM_WinLinx"), LayerRef("Autoshift")),
-    )
-
-
-def _sk_meh() -> ComboSpec:
-    return ComboSpec(
-        name="sticky_meh_rght_v1_TKZ",
-        description='sticky "meh" modifiers (Alt + Ctrl + Shift) - Use with Tab - TailorKey',
-        binding=ks("&sk", mod("LA", mod("LC", "LSHFT"))),
-        key_positions=(73, 74),
-        timeout_ms=50,
-        layers=(LayerRef("HRM_WinLinx"), LayerRef("Autoshift")),
-    )
 
 
 ORDER = (
