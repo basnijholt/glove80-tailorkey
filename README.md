@@ -50,8 +50,11 @@ layout = build_layout("tailorkey", "mac")
 .
 ├─ layouts/                     # checked-in release JSON + layout-specific README.md files
 │  ├─ default/
+│  │  └─ releases/
 │  ├─ tailorkey/
+│  │  └─ releases/
 │  └─ quantum_touch/
+│     └─ releases/
 ├─ docs/                        # architecture overview
 ├─ src/glove80/
 │  ├─ cli/                      # Typer CLI

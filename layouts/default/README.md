@@ -1,7 +1,7 @@
 # Default Layout Examples
 
 Glove80 ships several stock layouts curated by MoErgo.
-The `layouts/default` directory tracks the JSON artifacts exported from the layout editor so they can be referenced alongside TailorKey and QuantumTouch.
+The `layouts/default/releases` directory tracks the JSON artifacts exported from the layout editor so they can be referenced alongside TailorKey and QuantumTouch.
 
 ## Canonical Layouts (accessed 8 Nov 2025)
 - [Glove80 Factory Default Layout](https://my.glove80.com/#/layout/glove80) (accessed 8 Nov 2025)
