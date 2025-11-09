@@ -29,4 +29,20 @@ class Macro(BaseModel):
     tapMs: Optional[int] = None
 
 
-__all__ = ["Macro"]
+class HoldTap(BaseModel):
+    """Hold-tap behavior entry."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    name: str
+    description: Optional[str] = None
+    bindings: List[str]
+    tappingTermMs: Optional[int] = None
+    flavor: Optional[str] = None
+    quickTapMs: Optional[int] = None
+    requirePriorIdleMs: Optional[int] = None
+    holdTriggerOnRelease: Optional[bool] = None
+    holdTriggerKeyPositions: Optional[List[int]] = None
+
+
+__all__ = ["Macro", "HoldTap"]
