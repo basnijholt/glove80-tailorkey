@@ -1,8 +1,8 @@
-"""Hold-tap specifications for QuantumTouch."""
+"""Hold-tap definitions for QuantumTouch (Pydantic models)."""
 
 from __future__ import annotations
 
-from glove80.specs import HoldTapSpec
+from glove80.layouts.schema import HoldTap
 
 from .finger_data import FINGERS, FingerMeta
 
@@ -99,31 +99,31 @@ HOLD_TAP_DEFS = {}
 for meta in FINGERS:
     base_name = _base_name(meta)
     HOLD_TAP_ORDER.append(base_name)
-    HOLD_TAP_DEFS[base_name] = HoldTapSpec(
+    HOLD_TAP_DEFS[base_name] = HoldTap(
         name=base_name,
         description="HRM: tap→key, hold→layer",
-        bindings=(_hold_macro_name(meta), "&kp"),
-        tapping_term_ms=meta.tapping_term_ms,
+        bindings=[_hold_macro_name(meta), "&kp"],
+        tappingTermMs=meta.tapping_term_ms,
         flavor="tap-preferred",
-        quick_tap_ms=meta.quick_tap_ms,
-        require_prior_idle_ms=meta.require_prior_idle_ms,
-        hold_trigger_on_release=True,
-        hold_trigger_key_positions=meta.hold_trigger_positions,
+        quickTapMs=meta.quick_tap_ms,
+        requirePriorIdleMs=meta.require_prior_idle_ms,
+        holdTriggerOnRelease=True,
+        holdTriggerKeyPositions=list(meta.hold_trigger_positions),
     )
 
     for partner in _combo_order(meta):
         combo_name = f"{base_name}_{partner}"
         HOLD_TAP_ORDER.append(combo_name)
-        HOLD_TAP_DEFS[combo_name] = HoldTapSpec(
+        HOLD_TAP_DEFS[combo_name] = HoldTap(
             name=combo_name,
             description=f"Combo: {meta.name} + {partner}",
-            bindings=("&kp", _tap_macro_name(meta)),
-            tapping_term_ms=meta.tapping_term_ms,
+            bindings=["&kp", _tap_macro_name(meta)],
+            tappingTermMs=meta.tapping_term_ms,
             flavor="tap-preferred",
-            quick_tap_ms=meta.quick_tap_ms,
-            require_prior_idle_ms=REQUIRE_IDLE_OVERRIDES.get(combo_name, meta.require_prior_idle_ms),
-            hold_trigger_on_release=True,
-            hold_trigger_key_positions=POSITION_OVERRIDES.get(combo_name, meta.hold_trigger_positions),
+            quickTapMs=meta.quick_tap_ms,
+            requirePriorIdleMs=REQUIRE_IDLE_OVERRIDES.get(combo_name, meta.require_prior_idle_ms),
+            holdTriggerOnRelease=True,
+            holdTriggerKeyPositions=list(POSITION_OVERRIDES.get(combo_name, meta.hold_trigger_positions)),
         )
 
 

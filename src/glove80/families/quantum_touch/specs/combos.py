@@ -1,34 +1,34 @@
-"""Combo specifications for QuantumTouch."""
+"""Combo definitions for QuantumTouch (Pydantic models)."""
 
 from __future__ import annotations
 
-from glove80.specs import ComboSpec
+from glove80.layouts.schema import Combo
 from glove80.specs.utils import kp
 
 COMBO_DATA = {
     "default": (
-        ComboSpec(
+        Combo(
             name="combo_enter",
             description="E + D for Enter",
-            binding=kp("RET"),
-            key_positions=(25, 37),
-            timeout_ms=50,
-            layers=(-1,),
+            binding=kp("RET").to_dict(),
+            keyPositions=[25, 37],
+            timeoutMs=50,
+            layers=[-1],
         ),
-        ComboSpec(
+        Combo(
             name="combo_space",
             description="R + F for Enter",
-            binding=kp("SPACE"),
-            key_positions=(26, 38),
-            timeout_ms=50,
-            layers=(-1,),
+            binding=kp("SPACE").to_dict(),
+            keyPositions=[26, 38],
+            timeoutMs=50,
+            layers=[-1],
         ),
-        ComboSpec(
+        Combo(
             name="Hyper",
             description="",
-            binding=kp("RGUI"),
-            key_positions=(69, 70),
-            layers=(-1,),
+            binding=kp("RGUI").to_dict(),
+            keyPositions=[69, 70],
+            layers=[-1],
         ),
     ),
 }
