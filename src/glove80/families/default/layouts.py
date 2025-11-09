@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Dict
 
 from glove80.base import LayerMap, build_layer_from_spec
-from glove80.layouts.common import compose_layout
+from glove80.layouts import LayoutBuilder
 from glove80.layouts.family import LayoutFamily, REGISTRY
 from glove80.specs.primitives import materialize_sequence
 
@@ -32,15 +32,16 @@ class Family(LayoutFamily):
             raise KeyError(f"Unknown default layout '{variant}'. Available: {sorted(VARIANT_SPECS)}") from exc
 
         layers = _build_layers_map(spec)
-        return compose_layout(
-            spec.common_fields,
-            layer_names=spec.layer_names,
-            input_listeners=materialize_sequence(spec.input_listeners),
-            generated_layers=layers,
+        builder = LayoutBuilder(
             metadata_key=self.metadata_key(),
             variant=variant,
+            common_fields=spec.common_fields,
+            layer_names=spec.layer_names,
             resolve_refs=False,
         )
+        builder.add_layers(layers)
+        builder.add_input_listeners(materialize_sequence(spec.input_listeners))
+        return builder.build()
 
 
 REGISTRY.register(Family())
