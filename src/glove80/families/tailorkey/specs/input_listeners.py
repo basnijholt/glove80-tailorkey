@@ -1,4 +1,4 @@
-"""Input listener specifications for TailorKey variants."""
+"""Input listener definitions for TailorKey variants (Pydantic models)."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from glove80.base import LayerRef
 from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
-from glove80.specs import InputListenerNodeSpec, InputListenerSpec, InputProcessorSpec
+from glove80.layouts.schema import InputListener, InputProcessor, ListenerNode
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -14,12 +14,12 @@ if TYPE_CHECKING:
 LAYER_SEQUENCE = ("MouseSlow", "MouseFast", "MouseWarp")
 
 
-def _node(description: str, layer: str, processor: str, params: Sequence[int]) -> InputListenerNodeSpec:
-    return InputListenerNodeSpec(
+def _node(description: str, layer: str, processor: str, params: Sequence[int]) -> ListenerNode:
+    return ListenerNode(
         code=f"LAYER_{layer}",
         description=description,
-        layers=(LayerRef(layer),),
-        input_processors=(InputProcessorSpec(code=processor, params=params),),
+        layers=[LayerRef(layer)],
+        inputProcessors=[InputProcessor(code=processor, params=list(params))],
     )
 
 
@@ -28,7 +28,7 @@ def _listeners(
     slow_scroll_desc: str,
     warp_desc_xy: str,
     warp_desc_scroll: str,
-) -> tuple[InputListenerSpec, InputListenerSpec]:
+) -> tuple[InputListener, InputListener]:
     xy_nodes = [
         _node(slow_xy_desc, "MouseSlow", "&zip_xy_scaler", (1, 9)),
         _node("LAYER_MouseFast", "MouseFast", "&zip_xy_scaler", (3, 1)),
@@ -40,12 +40,12 @@ def _listeners(
         _node(warp_desc_scroll, "MouseWarp", "&zip_scroll_scaler", (12, 1)),
     ]
     return (
-        InputListenerSpec(code="&mmv_input_listener", nodes=tuple(xy_nodes)),
-        InputListenerSpec(code="&msc_input_listener", nodes=tuple(scroll_nodes)),
+        InputListener(code="&mmv_input_listener", nodes=list(xy_nodes)),
+        InputListener(code="&msc_input_listener", nodes=list(scroll_nodes)),
     )
 
 
-INPUT_LISTENER_DATA: dict[str, list[InputListenerSpec]] = {
+INPUT_LISTENER_DATA: dict[str, list[InputListener]] = {
     "windows": list(_listeners("LAYER_MouseSlow", "LAYER_MouseSlow", "LAYER_MouseFast", "LAYER_MouseWarp")),
     "mac": list(_listeners("LAYER_MouseSlow\n", "LAYER_MouseSlow\n", "LAYER_MouseWarp", "LAYER_MouseWarp")),
     "dual": list(_listeners("LAYER_MouseSlow", "LAYER_MouseSlow\n", "LAYER_MouseWarp", "LAYER_MouseWarp")),
