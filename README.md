@@ -3,6 +3,8 @@
 This repository is the canonical, code-first source of the Glove80 layout families ([Default](layouts/default/README.md), [TailorKey](layouts/tailorkey/README.md), [QuantumTouch](layouts/quantum_touch/README.md), and [Glorious Engrammer](layouts/glorious-engrammer/README.md)).
 Every release JSON under `layouts/*/releases` can be regenerated deterministically from the declarative specs and metadata checked into `src/glove80`.
 
+**Why this exists:** TailorKey (and now QuantumTouch, Glorious Engrammer, etc.) used to be kept in sync by hand in the layout editor, which made even trivial tweaks error-prone and slow to propagate across Windows/macOS/Dual/Bilateral variants. By expressing every layer, macro, combo, and alpha layout in Python, we get reproducible builds, automated regression tests, and the ability to spin up new variants (Colemak, Colemak-DH, Dvorak, custom mixes) by reusing the same building blocks instead of copying JSON around. You can still download the generated JSON into the editor for visualization, but the code here is the single source of truth that guarantees consistency.
+
 ## Highlights
 - The default, TailorKey, QuantumTouch, and Glorious Engrammer families live under `src/glove80/families/` with typed specs, factories, and regression tests.
 - Metadata travels with the package (`src/glove80/families/*/metadata.json`), so the CLI and library always agree on UUIDs, release notes, and output paths.
