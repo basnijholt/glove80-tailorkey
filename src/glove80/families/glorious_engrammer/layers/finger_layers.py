@@ -5,13 +5,9 @@ from __future__ import annotations
 from typing import Dict, Sequence, Tuple
 
 from glove80.base import LayerSpec
-from glove80.layouts.layers import Token, _rows_to_layer_spec
+from glove80.layouts.layers import Token, rows_to_layer_spec
 
 LayerRows = Tuple[Tuple[Token, ...], ...]
-
-
-def _layer(rows: LayerRows) -> LayerSpec:
-    return _rows_to_layer_spec(rows)
 
 
 def _custom(code: str) -> Token:
@@ -35,7 +31,7 @@ def _rh(*coords: str) -> Tuple[str, ...]:
 
 
 FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
-    "LeftPinky": _layer(
+    "LeftPinky": rows_to_layer_spec(
         (
             (
                 *_taps("left_pinky", _lh("C6R1", "C5R1", "C4R1", "C3R1", "C2R1")),
@@ -87,7 +83,7 @@ FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         ),
     ),
-    "LeftRingy": _layer(
+    "LeftRingy": rows_to_layer_spec(
         (
             (
                 *_taps("left_ringy", _lh("C6R1", "C5R1", "C4R1", "C3R1", "C2R1")),
@@ -139,7 +135,7 @@ FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         ),
     ),
-    "LeftMiddy": _layer(
+    "LeftMiddy": rows_to_layer_spec(
         (
             (
                 *_taps("left_middy", _lh("C6R1", "C5R1", "C4R1", "C3R1", "C2R1")),
@@ -191,7 +187,7 @@ FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         ),
     ),
-    "LeftIndex": _layer(
+    "LeftIndex": rows_to_layer_spec(
         (
             (
                 *_taps("left_index", _lh("C6R1", "C5R1", "C4R1", "C3R1", "C2R1")),
@@ -243,7 +239,7 @@ FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         ),
     ),
-    "RightPinky": _layer(
+    "RightPinky": rows_to_layer_spec(
         (
             (
                 *_repeat("&trans", 5),
@@ -297,7 +293,7 @@ FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         ),
     ),
-    "RightRingy": _layer(
+    "RightRingy": rows_to_layer_spec(
         (
             (
                 *_repeat("&trans", 5),
@@ -351,7 +347,7 @@ FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         ),
     ),
-    "RightMiddy": _layer(
+    "RightMiddy": rows_to_layer_spec(
         (
             (
                 *_repeat("&trans", 5),
@@ -405,7 +401,7 @@ FINGER_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         ),
     ),
-    "RightIndex": _layer(
+    "RightIndex": rows_to_layer_spec(
         (
             (
                 *_repeat("&trans", 5),

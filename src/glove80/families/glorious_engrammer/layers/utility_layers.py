@@ -5,17 +5,13 @@ from __future__ import annotations
 from typing import Dict, Tuple
 
 from glove80.base import LayerSpec
-from glove80.layouts.layers import Token, _rows_to_layer_spec
+from glove80.layouts.layers import Token, rows_to_layer_spec
 
 LayerRows = Tuple[Tuple[Token, ...], ...]
 
 
-def _layer(rows: LayerRows) -> LayerSpec:
-    return _rows_to_layer_spec(rows)
-
-
 UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
-    "Cursor": _layer(
+    "Cursor": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -115,7 +111,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Number": _layer(
+    "Number": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -215,7 +211,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Function": _layer(
+    "Function": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -315,7 +311,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Emoji": _layer(
+    "Emoji": rows_to_layer_spec(
         (
             (
                 ("Custom", "&emoji_cloudy"),
@@ -415,7 +411,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "World": _layer(
+    "World": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -515,7 +511,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Symbol": _layer(
+    "Symbol": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -615,7 +611,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "System": _layer(
+    "System": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -715,7 +711,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Gaming": _layer(
+    "Gaming": rows_to_layer_spec(
         (
             (
                 "ESC",
@@ -815,7 +811,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Factory": _layer(
+    "Factory": rows_to_layer_spec(
         (
             (
                 "F1",
@@ -915,7 +911,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Lower": _layer(
+    "Lower": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -1015,7 +1011,7 @@ UTILITY_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Magic": _layer(
+    "Magic": rows_to_layer_spec(
         (
             (
                 ("&bt", "BT_CLR"),

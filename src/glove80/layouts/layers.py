@@ -30,7 +30,7 @@ def _token_to_key(token: Token) -> KeySpec:
     raise TypeError(f"Unsupported token type: {token!r}")  # pragma: no cover
 
 
-def _rows_to_layer_spec(rows: Sequence[Sequence[Token]]) -> LayerSpec:
+def rows_to_layer_spec(rows: Sequence[Sequence[Token]]) -> LayerSpec:
     flat: list[Token] = [token for row in rows for token in row]
     if len(flat) != 80:  # pragma: no cover
         raise ValueError(f"Expected 80 entries for a layer, got {len(flat)}")
@@ -42,4 +42,4 @@ def _transparent_layer() -> LayerSpec:
     return LayerSpec(overrides={})
 
 
-__all__ = ["_rows_to_layer_spec", "_transparent_layer", "_token_to_key", "Token"]
+__all__ = ["rows_to_layer_spec", "_transparent_layer", "_token_to_key", "Token"]

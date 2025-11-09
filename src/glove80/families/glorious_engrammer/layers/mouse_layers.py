@@ -5,17 +5,13 @@ from __future__ import annotations
 from typing import Dict, Tuple
 
 from glove80.base import LayerSpec
-from glove80.layouts.layers import Token, _rows_to_layer_spec
+from glove80.layouts.layers import Token, rows_to_layer_spec
 
 LayerRows = Tuple[Tuple[Token, ...], ...]
 
 
-def _layer(rows: LayerRows) -> LayerSpec:
-    return _rows_to_layer_spec(rows)
-
-
 MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
-    "Mouse": _layer(
+    "Mouse": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -115,7 +111,7 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "MouseFine": _layer(
+    "MouseFine": rows_to_layer_spec(
         (
             (
                 "&trans",
@@ -215,7 +211,7 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "MouseSlow": _layer(
+    "MouseSlow": rows_to_layer_spec(
         (
             (
                 "&trans",
@@ -315,7 +311,7 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "MouseFast": _layer(
+    "MouseFast": rows_to_layer_spec(
         (
             (
                 "&trans",
@@ -415,7 +411,7 @@ MOUSE_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "MouseWarp": _layer(
+    "MouseWarp": rows_to_layer_spec(
         (
             (
                 "&trans",

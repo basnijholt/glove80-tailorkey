@@ -5,17 +5,13 @@ from __future__ import annotations
 from typing import Dict, Tuple
 
 from glove80.base import LayerSpec
-from glove80.layouts.layers import Token, _rows_to_layer_spec
+from glove80.layouts.layers import Token, rows_to_layer_spec
 
 LayerRows = Tuple[Tuple[Token, ...], ...]
 
 
-def _layer(rows: LayerRows) -> LayerSpec:
-    return _rows_to_layer_spec(rows)
-
-
 ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
-    "Enthium": _layer(
+    "Enthium": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -115,7 +111,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Engrammer": _layer(
+    "Engrammer": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -215,7 +211,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Engram": _layer(
+    "Engram": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -315,7 +311,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Dvorak": _layer(
+    "Dvorak": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -415,7 +411,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Colemak": _layer(
+    "Colemak": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -515,7 +511,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "QWERTY": _layer(
+    "QWERTY": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -615,7 +611,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "ColemakDH": _layer(
+    "ColemakDH": rows_to_layer_spec(
         (
             (
                 "&none",
@@ -715,7 +711,7 @@ ALPHA_LAYER_SPECS: Dict[str, LayerSpec] = {
             ),
         )
     ),
-    "Typing": _layer(
+    "Typing": rows_to_layer_spec(
         (
             (
                 "&trans",

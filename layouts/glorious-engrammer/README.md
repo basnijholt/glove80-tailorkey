@@ -7,7 +7,7 @@ The sources in `src/glove80/families/glorious_engrammer` describe the layout dec
 - [Glorious Engrammer v42-rc6 (preview)](https://my.glove80.com/#/layout/user/7cf03288-20db-42e0-9b80-4ace1c2fdbde) (accessed 8 Nov 2025)
 
 ## Structure
-- `layer_rows.py` mirrors each of the 32 layers as row tuples that feed `_rows_to_layer_spec`.
+- `layer_rows.py` mirrors each of the 32 layers as row tuples that feed `rows_to_layer_spec`.
 - `layers.py` converts the row data into `LayerSpec` objects and exposes `build_all_layers`.
 - `specs.py` defines the `VariantSpec`, Sunaku's custom behavior strings, and the canonical layer order.
 - `layouts.py` assembles the final payload, attaches metadata, and writes to `layouts/glorious-engrammer/releases`.
