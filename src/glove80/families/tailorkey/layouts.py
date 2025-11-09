@@ -8,7 +8,7 @@ from glove80.layouts import LayoutBuilder
 from glove80.layouts.schema import HoldTap, Macro
 from glove80.layouts.components import LayoutFeatureComponents
 from glove80.layouts.family import REGISTRY, LayoutFamily
-from glove80.specs.primitives import materialize_named_sequence, materialize_sequence
+# Build ordered sequences of models without legacy helpers.
 
 from .layers import build_all_layers
 from .specs import (
@@ -37,13 +37,25 @@ def _get_variant_section(sections: Mapping[str, Sequence[Any]], variant: str, la
 
 def _build_macros(variant: str) -> list[Macro]:
     order = _get_variant_section(MACRO_ORDER, variant, "macro order")
-    overrides = MACRO_OVERRIDES.get(variant)
-    return materialize_named_sequence(MACRO_DEFS, order, overrides)
+    overrides = MACRO_OVERRIDES.get(variant, {}) or {}
+    result: list[Macro] = []
+    for name in order:
+        value = overrides.get(name, MACRO_DEFS.get(name))
+        if value is None:
+            raise KeyError(f"Unknown definition '{name}'")
+        result.append(value)
+    return result
 
 
 def _build_hold_taps(variant: str) -> list[HoldTap]:
     order = _get_variant_section(HOLD_TAP_ORDER, variant, "hold-tap order")
-    return materialize_named_sequence(HOLD_TAP_DEFS, order)
+    result: list[HoldTap] = []
+    for name in order:
+        value = HOLD_TAP_DEFS.get(name)
+        if value is None:
+            raise KeyError(f"Unknown definition '{name}'")
+        result.append(value)
+    return result
 
 
 def _layer_names(variant: str) -> list[str]:
@@ -60,8 +72,8 @@ class Family(LayoutFamily):
         return "tailorkey"
 
     def build(self, variant: str) -> dict:
-        combos = materialize_sequence(_get_variant_section(COMBO_DATA, variant, "combo definitions"))
-        listeners = materialize_sequence(_get_variant_section(INPUT_LISTENER_DATA, variant, "input listeners"))
+        combos = _get_variant_section(COMBO_DATA, variant, "combo definitions")
+        listeners = _get_variant_section(INPUT_LISTENER_DATA, variant, "input listeners")
         generated_layers = build_all_layers(variant)
         layer_names = _layer_names(variant)
 

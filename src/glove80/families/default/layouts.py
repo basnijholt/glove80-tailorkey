@@ -5,7 +5,6 @@ from __future__ import annotations
 from glove80.base import LayerMap, build_layer_from_spec
 from glove80.layouts import LayoutBuilder
 from glove80.layouts.family import REGISTRY, LayoutFamily
-from glove80.specs.primitives import materialize_sequence
 
 from .specs import VARIANT_SPECS, VariantSpec
 
@@ -39,7 +38,7 @@ class Family(LayoutFamily):
             resolve_refs=False,
         )
         builder.add_layers(layers)
-        builder.add_input_listeners(materialize_sequence(spec.input_listeners))
+        builder.add_input_listeners(list(spec.input_listeners))
         return builder.build()
 
 

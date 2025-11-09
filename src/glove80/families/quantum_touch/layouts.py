@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from glove80.layouts import LayoutBuilder
 from glove80.layouts.family import REGISTRY, LayoutFamily
-from glove80.specs.primitives import materialize_named_sequence, materialize_sequence
 
 from .layers import build_all_layers
 from .specs import (
@@ -34,10 +33,10 @@ class Family(LayoutFamily):
         return "quantum_touch"
 
     def build(self, variant: str = "default") -> dict:
-        combos = materialize_sequence(COMBO_DATA["default"])
-        listeners = materialize_sequence(INPUT_LISTENER_DATA["default"])
-        macros = materialize_named_sequence(MACRO_DEFS, MACRO_ORDER)
-        hold_taps = materialize_named_sequence(HOLD_TAP_DEFS, HOLD_TAP_ORDER)
+        combos = list(COMBO_DATA["default"])  # already Pydantic models
+        listeners = list(INPUT_LISTENER_DATA["default"])  # already models
+        macros = [MACRO_DEFS[name] for name in MACRO_ORDER]
+        hold_taps = [HOLD_TAP_DEFS[name] for name in HOLD_TAP_ORDER]
         generated_layers = build_all_layers(variant)
 
         builder = LayoutBuilder(
