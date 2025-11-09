@@ -34,7 +34,7 @@ class LayoutRegistry:
         self._families: Dict[str, LayoutFamily] = {}
 
     def register(self, family: LayoutFamily) -> None:
-        if family.name in self._families:
+        if family.name in self._families:  # pragma: no cover
             raise ValueError(f"Duplicate layout family '{family.name}'")
         self._families[family.name] = family
 

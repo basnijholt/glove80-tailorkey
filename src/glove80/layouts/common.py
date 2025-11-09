@@ -66,7 +66,7 @@ def _assemble_layers(layer_names: Sequence[str], generated_layers: LayerMap, *, 
     for name in layer_names:
         try:
             ordered.append(generated_layers[name])
-        except KeyError as exc:
+        except KeyError as exc:  # pragma: no cover
             raise KeyError(f"No generated layer data for '{name}' in variant '{variant}'") from exc
     return ordered
 

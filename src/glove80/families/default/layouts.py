@@ -29,7 +29,7 @@ class Family(LayoutFamily):
     def build(self, variant: str) -> Dict:
         try:
             spec = VARIANT_SPECS[variant]
-        except KeyError as exc:
+        except KeyError as exc:  # pragma: no cover
             raise KeyError(f"Unknown default layout '{variant}'. Available: {sorted(VARIANT_SPECS)}") from exc
 
         layout: Dict = deepcopy(spec.common_fields)

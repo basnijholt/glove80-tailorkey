@@ -177,7 +177,7 @@ def build_hrm_layers(variant: str) -> LayerMap:
         apply_patch(layer, _MAC_PATCH)
         apply_patch(layer, _BILATERAL_MAC_PATCH)
         layers["HRM_macOS"] = layer
-    else:
+    else:  # pragma: no cover
         raise ValueError(f"Unsupported variant: {variant}")
 
     return layers

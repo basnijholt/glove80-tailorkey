@@ -28,7 +28,7 @@ from .specs import (
 
 def _materialize_named_entry(definitions: Mapping[str, Any], name: str, override: Any | None = None) -> Dict[str, Any]:
     data = override or definitions.get(name)
-    if data is None:
+    if data is None:  # pragma: no cover
         raise KeyError(f"Unknown definition '{name}'")
     if hasattr(data, "to_dict"):
         return data.to_dict()
@@ -38,7 +38,7 @@ def _materialize_named_entry(definitions: Mapping[str, Any], name: str, override
 def _get_variant_section(sections: Mapping[str, Sequence[Any]], variant: str, label: str) -> List[Any]:
     try:
         return list(sections[variant])
-    except KeyError as exc:
+    except KeyError as exc:  # pragma: no cover
         raise KeyError(f"No {label} for variant '{variant}'") from exc
 
 

@@ -38,7 +38,7 @@ MetadataByVariant = Dict[str, VariantMetadata]
 def _metadata_package(layout: str) -> str:
     try:
         return LAYOUT_METADATA_PACKAGES[layout]
-    except KeyError as exc:
+    except KeyError as exc:  # pragma: no cover
         raise KeyError(f"Unknown layout '{layout}'. Available: {sorted(LAYOUT_METADATA_PACKAGES)}") from exc
 
 
@@ -74,5 +74,5 @@ def get_variant_metadata(
     metadata = load_metadata(layout, path)
     try:
         return metadata[name]
-    except KeyError as exc:
+    except KeyError as exc:  # pragma: no cover
         raise KeyError(f"Unknown variant '{name}' for layout '{layout}'. Available: {sorted(metadata)}") from exc

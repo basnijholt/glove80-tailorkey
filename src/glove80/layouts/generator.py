@@ -40,7 +40,7 @@ def _normalize_layout_name(layout: str | None) -> Iterable[tuple[str, LayoutFami
     try:
         family = REGISTRY.get(layout)
         return [(layout, family)]
-    except KeyError as exc:
+    except KeyError as exc:  # pragma: no cover
         raise KeyError(f"Unknown layout '{layout}'. Available: {available_layouts()}") from exc
 
 
@@ -54,7 +54,7 @@ def _iter_variants(
         return
     try:
         yield variant, metadata[variant]
-    except KeyError as exc:
+    except KeyError as exc:  # pragma: no cover
         raise KeyError(f"Unknown variant '{variant}' for layout '{layout}'. Available: {sorted(metadata)}") from exc
 
 

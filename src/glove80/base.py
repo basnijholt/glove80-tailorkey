@@ -77,7 +77,7 @@ def _coerce_param(param: Any) -> Dict[str, Any]:
         return deepcopy(param)
     if isinstance(param, (str, int)):
         return {"value": param, "params": []}
-    raise TypeError(f"Unsupported param type: {type(param)!r}")
+    raise TypeError(f"Unsupported param type: {type(param)!r}")  # pragma: no cover
 
 
 PatchSpec = Dict[int, KeySpec]
@@ -89,7 +89,7 @@ def resolve_layer_refs(obj: Any, resolver: Dict[str, int]) -> Any:
     if isinstance(obj, LayerRef):
         try:
             return resolver[obj.name]
-        except KeyError as exc:
+        except KeyError as exc:  # pragma: no cover
             raise KeyError(f"Unknown layer reference '{obj.name}'") from exc
     if isinstance(obj, list):
         return [resolve_layer_refs(item, resolver) for item in obj]

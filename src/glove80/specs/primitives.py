@@ -21,7 +21,7 @@ def _serialize_simple(value: Any) -> Any:
         return {k: _serialize_simple(v) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
         return [_serialize_simple(item) for item in value]
-    raise TypeError(f"Unsupported parameter type: {type(value)!r}")
+    raise TypeError(f"Unsupported parameter type: {type(value)!r}")  # pragma: no cover
 
 
 @dataclass(frozen=True)

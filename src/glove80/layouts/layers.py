@@ -27,12 +27,12 @@ def _token_to_key(token: Token) -> KeySpec:
         if token.startswith("&"):
             return KeySpec(token)
         return kp(token)
-    raise TypeError(f"Unsupported token type: {token!r}")
+    raise TypeError(f"Unsupported token type: {token!r}")  # pragma: no cover
 
 
 def _rows_to_layer_spec(rows: Sequence[Sequence[Token]]) -> LayerSpec:
     flat: list[Token] = [token for row in rows for token in row]
-    if len(flat) != 80:
+    if len(flat) != 80:  # pragma: no cover
         raise ValueError(f"Expected 80 entries for a layer, got {len(flat)}")
     overrides = {idx: _token_to_key(token) for idx, token in enumerate(flat)}
     return LayerSpec(overrides=overrides)

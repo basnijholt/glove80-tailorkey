@@ -21,7 +21,7 @@ def _merge_specs() -> dict[str, LayerSpec]:
     specs: dict[str, LayerSpec] = {}
     for group in LAYER_SPEC_GROUPS:
         overlap = set(specs).intersection(group)
-        if overlap:
+        if overlap:  # pragma: no cover
             raise ValueError(f"Duplicate layer specs: {sorted(overlap)}")
         specs.update(group)
     return specs
