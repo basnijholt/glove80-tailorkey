@@ -1,6 +1,6 @@
 # Glove80 Layout Toolkit
 
-This repository is the canonical, code-first source of the Glove80 layout families (Default, TailorKey, QuantumTouch, and Glorious Engrammer).
+This repository is the canonical, code-first source of the Glove80 layout families ([Default](layouts/default/README.md), [TailorKey](layouts/tailorkey/README.md), [QuantumTouch](layouts/quantum_touch/README.md), and [Glorious Engrammer](layouts/glorious-engrammer/README.md)).
 Every release JSON under `layouts/*/releases` can be regenerated deterministically from the declarative specs and metadata checked into `src/glove80`.
 
 ## Highlights
