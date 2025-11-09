@@ -1,3 +1,5 @@
+"""Shared helpers for declarative layer construction."""
+
 from __future__ import annotations
 
 from typing import Any, Sequence

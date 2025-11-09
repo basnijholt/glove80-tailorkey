@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from glove80.base import LayerSpec
 
-from .helpers import rows_to_layer_spec, transparent_layer
+from glove80.layouts.layers import rows_to_layer_spec, transparent_layer
 
 # --- Base layers ---------------------------------------------------------
 
