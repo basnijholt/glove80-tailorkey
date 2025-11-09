@@ -5,7 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import ConfigDict, field_validator, model_validator
+from pydantic.dataclasses import dataclass as pydantic_dataclass
 
 from .keycodes import KnownKeyName, is_known_key_name
 
@@ -13,35 +14,22 @@ Layer = List[Dict[str, Any]]
 LayerMap = Dict[str, Layer]
 
 
-class LayerRef(BaseModel):
+@pydantic_dataclass(config=ConfigDict(frozen=True))
+class LayerRef:
     """Reference to a layer by name (resolved at layout build time)."""
 
-    model_config = ConfigDict(frozen=True)
-
     name: str
-
-    def __init__(self, name: str, **data: Any) -> None:
-        super().__init__(name=name, **data)
 
 
 KeyParamTuple = Tuple["KeySpec", ...]
 
 
-class KeySpec(BaseModel):
+@pydantic_dataclass(config=ConfigDict(frozen=True))
+class KeySpec:
     """Declarative spec for a single key in a layer."""
-
-    model_config = ConfigDict(frozen=True)
 
     value: KnownKeyName | str | int | LayerRef
     params: KeyParamTuple = ()
-
-    def __init__(
-        self,
-        value: KnownKeyName | str | int | LayerRef,
-        params: KeyParamTuple = (),
-        **data: Any,
-    ) -> None:
-        super().__init__(value=value, params=params, **data)
 
     @field_validator("value")
     @classmethod
@@ -59,10 +47,9 @@ class KeySpec(BaseModel):
         }
 
 
-class LayerSpec(BaseModel):
+@pydantic_dataclass(config=ConfigDict(frozen=True))
+class LayerSpec:
     """Sparse layer representation."""
-
-    model_config = ConfigDict(frozen=True)
 
     overrides: Dict[int, KeySpec]
     length: int = 80
