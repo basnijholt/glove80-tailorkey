@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.layout_families.tailorkey.layers.autoshift import build_autoshift_layer
+from glove80.families.tailorkey.layers.autoshift import build_autoshift_layer
 
 
 VARIANTS = [

@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.layout_families.tailorkey.layers.lower import build_lower_layer
+from glove80.families.tailorkey.layers.lower import build_lower_layer
 
 
 VARIANTS = [

@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.layout_families.tailorkey.layers.cursor import build_cursor_layer
+from glove80.families.tailorkey.layers.cursor import build_cursor_layer
 
 
 VARIANTS = [

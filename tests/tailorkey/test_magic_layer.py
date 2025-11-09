@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.layout_families.tailorkey.layers.magic import build_magic_layer
+from glove80.families.tailorkey.layers.magic import build_magic_layer
 
 
 VARIANTS = [

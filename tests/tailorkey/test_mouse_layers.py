@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.layout_families.tailorkey.layers.mouse import build_mouse_layers
+from glove80.families.tailorkey.layers.mouse import build_mouse_layers
 
 
 VARIANTS = [

@@ -5,7 +5,7 @@ release JSON under `layouts/*/releases` can be regenerated deterministically fro
 checked into `src/glove80`.
 
 ## Highlights
-- The default, TailorKey, and QuantumTouch families live under `src/glove80/layout_families/` with typed specs, factories, and regression tests.
+- The default, TailorKey, and QuantumTouch families live under `src/glove80/families/` with typed specs, factories, and regression tests.
 - Metadata travels with the package (`src/glove80/layouts/*/metadata.json`), so the CLI and library always agree on
   UUIDs, release notes, and output paths.
 - A Typer-powered CLI (`python -m glove80 generate …`) replaces ad-hoc scripts and keeps the regeneration workflow
@@ -44,7 +44,7 @@ checked into `src/glove80`.
 ├─ src/glove80/
 │  ├─ cli/                      # Typer CLI
 │  ├─ layouts/                  # packaged metadata + generator helpers
-│  └─ layout_families/          # default, TailorKey, QuantumTouch implementations
+│  └─ families/          # default, TailorKey, QuantumTouch implementations
 │     ├─ default/
 │     ├─ tailorkey/
 │     └─ quantum_touch/

@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.layout_families.tailorkey.layers.bilateral import build_bilateral_training_layers
+from glove80.families.tailorkey.layers.bilateral import build_bilateral_training_layers
 
 
 @pytest.mark.parametrize("variant", ["windows", "mac", "dual"])

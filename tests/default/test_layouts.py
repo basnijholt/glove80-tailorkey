@@ -1,6 +1,6 @@
 import pytest
 
-from glove80.layout_families.default.layouts import build_layout
+from glove80.families.default.layouts import build_layout
 
 
 @pytest.mark.parametrize(
