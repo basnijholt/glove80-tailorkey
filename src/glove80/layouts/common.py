@@ -11,6 +11,7 @@ from glove80.metadata import get_variant_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
+    from glove80.layouts.schema import Macro, HoldTap, Combo, InputListener
 
 META_FIELDS = ("title", "uuid", "parent_uuid", "date", "notes", "tags")
 DEFAULT_REF_FIELDS = ("macros", "holdTaps", "combos", "inputListeners")
@@ -31,10 +32,10 @@ def build_layout_payload(
     common_fields: Mapping[str, Any],
     *,
     layer_names: Sequence[str],
-    macros: Sequence[Any] | None = None,
-    hold_taps: Sequence[Any] | None = None,
-    combos: Sequence[Any] | None = None,
-    input_listeners: Sequence[Any] | None = None,
+    macros: Sequence["Macro"] | None = None,
+    hold_taps: Sequence["HoldTap"] | None = None,
+    combos: Sequence["Combo"] | None = None,
+    input_listeners: Sequence["InputListener"] | None = None,
 ) -> dict[str, Any]:
     """Create a baseline layout payload from shared metadata and sections."""
     # Validate/normalize common fields via Pydantic, then dump to a plain dict
@@ -55,10 +56,10 @@ def compose_layout(
     generated_layers: LayerMap,
     metadata_key: str,
     variant: str,
-    macros: Sequence[Any] | None = None,
-    hold_taps: Sequence[Any] | None = None,
-    combos: Sequence[Any] | None = None,
-    input_listeners: Sequence[Any] | None = None,
+    macros: Sequence["Macro"] | None = None,
+    hold_taps: Sequence["HoldTap"] | None = None,
+    combos: Sequence["Combo"] | None = None,
+    input_listeners: Sequence["InputListener"] | None = None,
     resolve_refs: bool = True,
     ref_fields: Iterable[str] | None = None,
 ) -> dict[str, Any]:

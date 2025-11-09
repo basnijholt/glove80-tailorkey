@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
     from glove80.base import LayerMap
     from glove80.layouts.components import LayoutFeatureComponents
+    from glove80.layouts.schema import Combo, HoldTap, InputListener, Macro
 
 
 def _unique_sequence(values: Iterable[str]) -> list[str]:
@@ -30,10 +31,10 @@ def _unique_sequence(values: Iterable[str]) -> list[str]:
 class _Sections:
     layer_names: list[str] = field(default_factory=list)
     layers: LayerMap = field(default_factory=dict)
-    macros: OrderedDict[str, Any] = field(default_factory=OrderedDict)
-    hold_taps: list[Any] = field(default_factory=list)
-    combos: list[Any] = field(default_factory=list)
-    input_listeners: list[Any] = field(default_factory=list)
+    macros: OrderedDict[str, "Macro"] = field(default_factory=OrderedDict)
+    hold_taps: list["HoldTap"] = field(default_factory=list)
+    combos: list["Combo"] = field(default_factory=list)
+    input_listeners: list["InputListener"] = field(default_factory=list)
 
 
 class LayoutBuilder:
@@ -100,7 +101,7 @@ class LayoutBuilder:
 
     def add_macros(
         self,
-        macros: Sequence[Any],
+        macros: Sequence["Macro"],
         *,
         prepend: bool = False,
     ) -> LayoutBuilder:
@@ -125,15 +126,15 @@ class LayoutBuilder:
             existing[name] = macro
         return self
 
-    def add_hold_taps(self, hold_taps: Sequence[Any]) -> LayoutBuilder:
+    def add_hold_taps(self, hold_taps: Sequence["HoldTap"]) -> LayoutBuilder:
         self._sections.hold_taps.extend(hold_taps)
         return self
 
-    def add_combos(self, combos: Sequence[Any]) -> LayoutBuilder:
+    def add_combos(self, combos: Sequence["Combo"]) -> LayoutBuilder:
         self._sections.combos.extend(combos)
         return self
 
-    def add_input_listeners(self, listeners: Sequence[Any]) -> LayoutBuilder:
+    def add_input_listeners(self, listeners: Sequence["InputListener"]) -> LayoutBuilder:
         self._sections.input_listeners.extend(listeners)
         return self
 

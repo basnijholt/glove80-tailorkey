@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, AliasChoices
 
 from glove80.base import LayerRef
 
@@ -25,10 +25,10 @@ class Macro(BaseModel):
 
     name: str
     description: Optional[str] = None
-    bindings: List[Dict[str, Any]]
+    bindings: List[Any]
     params: List[str] = Field(default_factory=list)
-    waitMs: Optional[int] = None
-    tapMs: Optional[int] = None
+    waitMs: Optional[int] = Field(default=None, validation_alias=AliasChoices("waitMs", "wait_ms"))
+    tapMs: Optional[int] = Field(default=None, validation_alias=AliasChoices("tapMs", "tap_ms"))
 
     @field_validator("name")
     @classmethod
@@ -37,12 +37,25 @@ class Macro(BaseModel):
             raise ValueError("macro name must start with '&'")
         return v
 
-    @field_validator("bindings")
+    @field_validator("bindings", mode="before")
     @classmethod
-    def _validate_bindings(cls, v: List[Any]) -> List[Any]:
-        if not v:
-            raise ValueError("bindings must be non-empty")
-        return v
+    def _validate_bindings(cls, v: Any) -> List[Any]:
+        from glove80.base import KeySpec  # lazy import to avoid cycles
+
+        if isinstance(v, list) or isinstance(v, tuple):
+            out: List[Any] = []
+            for item in v:
+                if isinstance(item, KeySpec):
+                    out.append(item.to_dict())
+                else:
+                    out.append(item)
+            if not out:
+                raise ValueError("bindings must be non-empty")
+            return out
+        # If it's already a list-like, accept it as-is; Pydantic will validate later.
+        from typing import cast
+
+        return cast(List[Any], v)
 
 
 class HoldTap(BaseModel):
@@ -53,12 +66,20 @@ class HoldTap(BaseModel):
     name: str
     description: Optional[str] = None
     bindings: List[str]
-    tappingTermMs: Optional[int] = None
+    tappingTermMs: Optional[int] = Field(
+        default=None, validation_alias=AliasChoices("tappingTermMs", "tapping_term_ms")
+    )
     flavor: Optional[Literal["balanced", "tap-preferred", "hold-preferred"]] = None
-    quickTapMs: Optional[int] = None
-    requirePriorIdleMs: Optional[int] = None
-    holdTriggerOnRelease: Optional[bool] = None
-    holdTriggerKeyPositions: Optional[List[int]] = None
+    quickTapMs: Optional[int] = Field(default=None, validation_alias=AliasChoices("quickTapMs", "quick_tap_ms"))
+    requirePriorIdleMs: Optional[int] = Field(
+        default=None, validation_alias=AliasChoices("requirePriorIdleMs", "require_prior_idle_ms")
+    )
+    holdTriggerOnRelease: Optional[bool] = Field(
+        default=None, validation_alias=AliasChoices("holdTriggerOnRelease", "hold_trigger_on_release")
+    )
+    holdTriggerKeyPositions: Optional[List[int]] = Field(
+        default=None, validation_alias=AliasChoices("holdTriggerKeyPositions", "hold_trigger_key_positions")
+    )
 
     @classmethod
     def model_validate(cls, obj: Any, *args: Any, **kwargs: Any) -> "HoldTap":
@@ -89,15 +110,26 @@ class Combo(BaseModel):
     layers: List[Union[int, "LayerRef"]]
     timeoutMs: Optional[int] = None
 
+    @field_validator("binding", mode="before")
     @classmethod
-    def model_validate(cls, obj: Any, *args: Any, **kwargs: Any) -> "Combo":
-        inst = super().model_validate(obj, *args, **kwargs)
-        for pos in inst.keyPositions:
+    def _coerce_binding(cls, v: Any) -> Any:
+        try:
+            from glove80.base import KeySpec
+        except Exception:
+            KeySpec = None  # type: ignore
+        if KeySpec is not None and isinstance(v, KeySpec):
+            return v.to_dict()
+        return v
+
+    @field_validator("keyPositions")
+    @classmethod
+    def _validate_key_positions(cls, v: List[int]) -> List[int]:
+        for pos in v:
             if not (0 <= pos <= 79):
                 raise ValueError("keyPositions must be within 0..79")
-        if not inst.keyPositions:
+        if not v:
             raise ValueError("keyPositions cannot be empty")
-        return inst
+        return v
 
 
 __all__.append("Combo")
@@ -109,12 +141,12 @@ class InputProcessor(BaseModel):
     code: str
     params: List[Any] = Field(default_factory=list)
 
+    @field_validator("code")
     @classmethod
-    def model_validate(cls, obj: Any, *args: Any, **kwargs: Any) -> "InputProcessor":
-        inst = super().model_validate(obj, *args, **kwargs)
-        if not inst.code:
+    def _validate_code(cls, v: str) -> str:
+        if not v:
             raise ValueError("processor code must be non-empty")
-        return inst
+        return v
 
 
 class ListenerNode(BaseModel):

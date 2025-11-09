@@ -154,7 +154,7 @@ class InputListenerNodeSpec:
             code=self.code,
             layers=list(self.layers),
             description=self.description,
-            inputProcessors=[InputProcessorModel(**proc.to_dict()) for proc in self.input_processors],
+            inputProcessors=[proc.to_model() for proc in self.input_processors],
         )
 
     def to_dict(self) -> dict[str, Any]:

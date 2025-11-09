@@ -1,28 +1,28 @@
-"""Declarative macro specs for TailorKey variants."""
+"""Declarative macro definitions for TailorKey variants (Pydantic models)."""
 
 from __future__ import annotations
 
 from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS, base_variant_for
-from glove80.specs import MacroSpec
+from glove80.layouts.schema import Macro
 from glove80.specs.utils import call, kp, ks, layer_param, mod
 
 from .finger_data import FINGERS
 
 
-def _cursor_macro(name: str, description: str, *bindings) -> MacroSpec:
-    return MacroSpec(
+def _cursor_macro(name: str, description: str, *bindings) -> Macro:
+    return Macro(
         name=name,
         description=description,
-        bindings=bindings,
-        wait_ms=1,
-        tap_ms=1,
+        bindings=list(bindings),
+        waitMs=1,
+        tapMs=1,
     )
 
 
-AS_SHIFTED = MacroSpec(
+AS_SHIFTED = Macro(
     name="&AS_Shifted_v1_TKZ",
     description="AutoShift Helper- &AS main macro is chained to &AS_HT hold tap and &AS_Shifted macro - TailorKey",
-    bindings=(
+    bindings=[
         call("&macro_press"),
         kp("LSHFT"),
         call("&macro_tap"),
@@ -30,15 +30,15 @@ AS_SHIFTED = MacroSpec(
         kp("N1"),
         call("&macro_release"),
         kp("LSHFT"),
-    ),
-    params=("code",),
+    ],
+    params=["code"],
 )
 
 
-AS_ASSIGN = MacroSpec(
+AS_ASSIGN = Macro(
     name="&AS_v1_TKZ",
     description="AutoShift (Assign &AS to a Key) - &AS main macro is chained to &AS_HT hold tap and &AS_Shifted macro - TailorKey",
-    bindings=(
+    bindings=[
         call("&macro_press"),
         call("&macro_param_1to1"),
         call("&macro_param_1to2"),
@@ -48,10 +48,10 @@ AS_ASSIGN = MacroSpec(
         call("&macro_param_1to1"),
         call("&macro_param_1to2"),
         ks("&AS_HT_v2_TKZ", "A", "A"),
-    ),
-    params=("code",),
-    wait_ms=10,
-    tap_ms=10,
+    ],
+    params=["code"],
+    waitMs=10,
+    tapMs=10,
 )
 
 
@@ -115,10 +115,10 @@ CURSOR_MACROS_MAC = [
 ]
 
 
-MOD_TAB_CHORD = MacroSpec(
+MOD_TAB_CHORD = Macro(
     name="&mod_tab_chord_v2_TKZ",
     description="mod_tab_switcher_chord -  TailorKey",
-    bindings=(
+    bindings=[
         call("&macro_press"),
         call("&macro_param_2to1"),
         ks("&mo", "MACRO_PLACEHOLDER"),
@@ -132,17 +132,17 @@ MOD_TAB_CHORD = MacroSpec(
         call("&macro_release"),
         call("&macro_param_2to1"),
         ks("&mo", "MACRO_PLACEHOLDER"),
-    ),
-    params=("code", "layer"),
-    wait_ms=0,
-    tap_ms=0,
+    ],
+    params=["code", "layer"],
+    waitMs=0,
+    tapMs=0,
 )
 
 
-MOD_TAB = MacroSpec(
+MOD_TAB = Macro(
     name="&mod_tab_v2_TKZ",
     description="mod_tab_switcher - TailorKey\n\n",
-    bindings=(
+    bindings=[
         call("&macro_press"),
         call("&macro_param_1to1"),
         kp("MACRO_PLACEHOLDER"),
@@ -152,17 +152,17 @@ MOD_TAB = MacroSpec(
         call("&macro_release"),
         call("&macro_param_1to1"),
         kp("MACRO_PLACEHOLDER"),
-    ),
-    params=("code",),
-    wait_ms=0,
-    tap_ms=0,
+    ],
+    params=["code"],
+    waitMs=0,
+    tapMs=0,
 )
 
 
-MOD_TAB_V1 = MacroSpec(
+MOD_TAB_V1 = Macro(
     name="&mod_tab_v1_TKZ",
     description="mod_tab_switcher - TailorKey\n\n",
-    bindings=(
+    bindings=[
         call("&macro_press"),
         call("&macro_param_1to1"),
         kp("MACRO_PLACEHOLDER"),
@@ -172,17 +172,17 @@ MOD_TAB_V1 = MacroSpec(
         call("&macro_release"),
         call("&macro_param_1to1"),
         kp("MACRO_PLACEHOLDER"),
-    ),
-    params=("code",),
-    wait_ms=0,
-    tap_ms=0,
+    ],
+    params=["code"],
+    waitMs=0,
+    tapMs=0,
 )
 
 
-MSTR1 = MacroSpec(
+MSTR1 = Macro(
     name="&mstr1_v1_TKZ",
     description='macro string1 sample - Magic Layer F1 - Text output sample macro 1 "¡Hola!" - TailorKey',
-    bindings=(
+    bindings=[
         call("&macro_press"),
         kp("RALT"),
         call("&macro_tap"),
@@ -205,14 +205,14 @@ MSTR1 = MacroSpec(
         kp("EXCL"),
         kp("SPACE"),
         kp("RET"),
-    ),
+    ],
 )
 
 
-MSTR2 = MacroSpec(
+MSTR2 = Macro(
     name="&mstr2_v1_TKZ",
     description='macro string2 sample - Magic Layer F2 - Text output sample macro 2 "grammar check: <paste>" - TailorKey',
-    bindings=(
+    bindings=[
         call("&macro_tap"),
         kp("G"),
         kp("R"),
@@ -230,20 +230,20 @@ MSTR2 = MacroSpec(
         kp("COLON"),
         kp(mod("LC", "V")),
         kp("RET"),
-    ),
+    ],
 )
 
 
-SYMB_DOTDOT = MacroSpec(
+SYMB_DOTDOT = Macro(
     name="&symb_dotdot_v1_TKZ",
     description="Symbol layer dot dot",
-    bindings=(
+    bindings=[
         call("&macro_tap"),
         kp("DOT"),
         kp("DOT"),
-    ),
-    wait_ms=0,
-    tap_ms=0,
+    ],
+    waitMs=0,
+    tapMs=0,
 )
 
 
@@ -291,10 +291,10 @@ for meta in FINGERS:
     finger = meta.finger
     hold_name = f"&HRM_{hand}_{finger}_hold_v1B_TKZ"
     tap_name = f"&HRM_{hand}_{finger}_tap_v1B_TKZ"
-    MACRO_DEFS[hold_name] = MacroSpec(
+    MACRO_DEFS[hold_name] = Macro(
         name=hold_name,
         description=_hold_description(hand, finger),
-        bindings=(
+        bindings=[
             call("&macro_press"),
             call("&macro_param_1to1"),
             kp("A"),
@@ -304,15 +304,15 @@ for meta in FINGERS:
             call("&macro_param_1to1"),
             kp("A"),
             ks("&mo", layer_param(meta.layer)),
-        ),
-        params=("code",),
-        wait_ms=0,
-        tap_ms=0,
+        ],
+        params=["code"],
+        waitMs=0,
+        tapMs=0,
     )
-    MACRO_DEFS[tap_name] = MacroSpec(
+    MACRO_DEFS[tap_name] = Macro(
         name=tap_name,
         description=f"HRM_{hand}_{finger}_tap - incl. QWERTY alpha character - TailorKey",
-        bindings=(
+        bindings=[
             call("&macro_release"),
             *MOD_CLEAR_SEQUENCE,
             call("&macro_tap"),
@@ -320,10 +320,10 @@ for meta in FINGERS:
             call("&macro_tap"),
             call("&macro_param_1to1"),
             kp("A"),
-        ),
-        params=("code",),
-        wait_ms=0,
-        tap_ms=0,
+        ],
+        params=["code"],
+        waitMs=0,
+        tapMs=0,
     )
 
 
@@ -446,12 +446,12 @@ MACRO_ORDER = {
 }
 
 
-MACRO_OVERRIDES: dict[str, dict[str, MacroSpec]] = {
+MACRO_OVERRIDES: dict[str, dict[str, Macro]] = {
     "bilateral_windows": {
-        "&mod_tab_chord_v2_TKZ": MacroSpec(
+        "&mod_tab_chord_v2_TKZ": Macro(
             name="&mod_tab_chord_v2_TKZ",
             description="mod_tab_switcher_chord -  TailorKey",
-            bindings=(
+            bindings=[
                 call("&macro_press"),
                 call("&macro_param_2to1"),
                 ks("&mo", "MACRO_PLACEHOLDER"),
@@ -465,10 +465,10 @@ MACRO_OVERRIDES: dict[str, dict[str, MacroSpec]] = {
                 call("&macro_release"),
                 call("&macro_param_2to1"),
                 ks("&mo", "MACRO_PLACEHOLDER"),
-            ),
-            params=("code", "layer"),
-            wait_ms=0,
-            tap_ms=0,
+            ],
+            params=["code", "layer"],
+            waitMs=0,
+            tapMs=0,
         ),
     },
 }

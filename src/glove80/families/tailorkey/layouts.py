@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from glove80.layouts import LayoutBuilder
+from glove80.layouts.schema import HoldTap, Macro
 from glove80.layouts.components import LayoutFeatureComponents
 from glove80.layouts.family import REGISTRY, LayoutFamily
 from glove80.specs.primitives import materialize_named_sequence, materialize_sequence
@@ -34,13 +35,13 @@ def _get_variant_section(sections: Mapping[str, Sequence[Any]], variant: str, la
         raise KeyError(msg) from exc
 
 
-def _build_macros(variant: str) -> list[dict[str, Any]]:
+def _build_macros(variant: str) -> list[Macro]:
     order = _get_variant_section(MACRO_ORDER, variant, "macro order")
     overrides = MACRO_OVERRIDES.get(variant)
     return materialize_named_sequence(MACRO_DEFS, order, overrides)
 
 
-def _build_hold_taps(variant: str) -> list[dict[str, Any]]:
+def _build_hold_taps(variant: str) -> list[HoldTap]:
     order = _get_variant_section(HOLD_TAP_ORDER, variant, "hold-tap order")
     return materialize_named_sequence(HOLD_TAP_DEFS, order)
 
