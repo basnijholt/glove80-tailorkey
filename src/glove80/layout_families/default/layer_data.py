@@ -6,70 +6,75 @@ from glove80.layouts.layers import rows_to_layer_spec, transparent_layer
 
 # --- Base layers ---------------------------------------------------------
 
+
+FUNC_ROW = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10")
+NUMBER_ROW = ("EQUAL", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9")
+BOTTOM_ROW_STANDARD = ("DEL", "LALT", "RALT", "RET", "SPACE", "UP", "DOWN", "LBKT", "RBKT", "PG_DN")
+
 BASE_WINDOWS_ROWS = [
-    ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"),
-    ("EQUAL", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"),
+    FUNC_ROW,
+    NUMBER_ROW,
     ("N0", "MINUS", "TAB", "Q", "W", "E", "R", "T", "Y", "U"),
     ("I", "O", "P", "BSLH", "ESC", "A", "S", "D", "F", "G"),
     ("H", "J", "K", "L", "SEMI", "SQT", "GRAVE", "Z", "X", "C"),
     ("V", "B", "LSHFT", "LCTRL", "&lower", "LGUI", "RCTRL", "RSHFT", "N", "M"),
     ("COMMA", "DOT", "FSLH", "PG_UP", "&magic", "HOME", "END", "LEFT", "RIGHT", "BSPC"),
-    ("DEL", "LALT", "RALT", "RET", "SPACE", "UP", "DOWN", "LBKT", "RBKT", "PG_DN"),
+    BOTTOM_ROW_STANDARD,
 ]
 
 BASE_MAC_ROWS = [
-    ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"),
-    ("EQUAL", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"),
+    FUNC_ROW,
+    NUMBER_ROW,
     ("N0", "MINUS", "TAB", "Q", "W", "E", "R", "T", "Y", "U"),
     ("I", "O", "P", "BSLH", "ESC", "A", "S", "D", "F", "G"),
     ("H", "J", "K", "L", "SEMI", "SQT", "GRAVE", "Z", "X", "C"),
     ("V", "B", "LSHFT", "LGUI", "&lower", "LCTRL", "RGUI", "RSHFT", "N", "M"),
     ("COMMA", "DOT", "FSLH", "PG_UP", "&magic", "HOME", "END", "LEFT", "RIGHT", "BSPC"),
-    ("DEL", "LALT", "RALT", "RET", "SPACE", "UP", "DOWN", "LBKT", "RBKT", "PG_DN"),
+    BOTTOM_ROW_STANDARD,
 ]
 
 BASE_COLEMAK_ROWS = [
-    ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"),
-    ("EQUAL", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"),
+    FUNC_ROW,
+    NUMBER_ROW,
     ("N0", "MINUS", "TAB", "Q", "W", "F", "P", "G", "J", "L"),
     ("U", "Y", "SEMI", "BSLH", "ESC", "A", "R", "S", "T", "D"),
     ("H", "N", "E", "I", "O", "SQT", "GRAVE", "Z", "X", "C"),
     ("V", "B", "LSHFT", "LCTRL", "&lower", "LGUI", "RCTRL", "RSHFT", "K", "M"),
     ("COMMA", "DOT", "FSLH", "PG_UP", "&magic", "HOME", "END", "LEFT", "RIGHT", "BSPC"),
-    ("DEL", "LALT", "RALT", "RET", "SPACE", "UP", "DOWN", "LBKT", "RBKT", "PG_DN"),
+    BOTTOM_ROW_STANDARD,
 ]
 
 BASE_COLEMAK_DH_ROWS = [
-    ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"),
-    ("EQUAL", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"),
+    FUNC_ROW,
+    NUMBER_ROW,
     ("N0", "MINUS", "TAB", "Q", "W", "F", "P", "B", "J", "L"),
     ("U", "Y", "SEMI", "BSLH", "ESC", "A", "R", "S", "T", "G"),
     ("M", "N", "E", "I", "O", "SQT", "GRAVE", "Z", "X", "C"),
     ("D", "V", "LSHFT", "LCTRL", "&lower", "LGUI", "RCTRL", "RSHFT", "K", "H"),
     ("COMMA", "DOT", "FSLH", "PG_UP", "&magic", "HOME", "END", "LEFT", "RIGHT", "BSPC"),
-    ("DEL", "LALT", "RALT", "RET", "SPACE", "UP", "DOWN", "LBKT", "RBKT", "PG_DN"),
+    BOTTOM_ROW_STANDARD,
 ]
 
 BASE_DVORAK_ROWS = [
-    ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"),
-    ("EQUAL", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"),
+    FUNC_ROW,
+    NUMBER_ROW,
     ("N0", "MINUS", "TAB", "SQT", "COMMA", "DOT", "P", "Y", "F", "G"),
     ("C", "R", "L", "SLASH", "ESC", "A", "O", "E", "U", "I"),
     ("D", "H", "T", "N", "S", "BSLH", "GRAVE", "SEMI", "Q", "J"),
     ("K", "X", "LSHFT", "LCTRL", "&lower", "LGUI", "RCTRL", "RSHFT", "B", "M"),
     ("W", "V", "Z", "PG_UP", "&magic", "HOME", "END", "LEFT", "RIGHT", "BSPC"),
-    ("DEL", "LALT", "RALT", "RET", "SPACE", "UP", "DOWN", "LBKT", "RBKT", "PG_DN"),
+    BOTTOM_ROW_STANDARD,
 ]
 
 BASE_WORKMAN_ROWS = [
-    ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"),
-    ("EQUAL", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9"),
+    FUNC_ROW,
+    NUMBER_ROW,
     ("N0", "MINUS", "TAB", "Q", "D", "R", "W", "B", "J", "F"),
     ("U", "P", "SEMI", "BSLH", "ESC", "A", "S", "H", "T", "G"),
     ("Y", "N", "E", "O", "I", "SQT", "GRAVE", "Z", "X", "M"),
     ("C", "V", "LSHFT", "LCTRL", "&lower", "LGUI", "RCTRL", "RSHFT", "K", "L"),
     ("COMMA", "DOT", "FSLH", "PG_UP", "&magic", "HOME", "END", "LEFT", "RIGHT", "BSPC"),
-    ("DEL", "LALT", "RALT", "RET", "SPACE", "UP", "DOWN", "LBKT", "RBKT", "PG_DN"),
+    BOTTOM_ROW_STANDARD,
 ]
 
 BASE_KINESIS_ROWS = [
