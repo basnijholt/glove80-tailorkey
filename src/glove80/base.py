@@ -3,26 +3,42 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import dataclass
 from typing import Any, Dict, List, Sequence
+
+from pydantic import ConfigDict, TypeAdapter, ValidationError, field_validator
+from pydantic.dataclasses import dataclass as pydantic_dataclass
+
+from .keycodes import KnownKeyName
+
+_KEY_NAME_ADAPTER: TypeAdapter[KnownKeyName] = TypeAdapter(KnownKeyName)
 
 Layer = List[Dict[str, Any]]
 LayerMap = Dict[str, Layer]
 
 
-@dataclass(frozen=True)
+@pydantic_dataclass(config=ConfigDict(frozen=True))
 class LayerRef:
     """Reference to a layer by name (resolved at layout build time)."""
 
     name: str
 
 
-@dataclass(frozen=True)
+@pydantic_dataclass(config=ConfigDict(frozen=True))
 class KeySpec:
     """Declarative spec for a single key in a layer."""
 
     value: Any
     params: Sequence[Any] = ()
+
+    @field_validator("value")
+    @classmethod
+    def _validate_value(cls, value: Any) -> Any:
+        if isinstance(value, str) and not value.startswith("&"):
+            try:
+                _KEY_NAME_ADAPTER.validate_python(value)
+            except ValidationError as exc:
+                raise ValueError(f"Unknown key name '{value}'") from exc
+        return value
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -31,7 +47,7 @@ class KeySpec:
         }
 
 
-@dataclass(frozen=True)
+@pydantic_dataclass(config=ConfigDict(frozen=True))
 class LayerSpec:
     """Sparse layer representation."""
 
