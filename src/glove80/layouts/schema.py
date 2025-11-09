@@ -7,9 +7,15 @@ changes reviewable and tests green between commits.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
+
+# Avoid circular import at runtime; used for type checking only
+try:  # pragma: no cover
+    from glove80.base import LayerRef  # type: ignore
+except Exception:  # pragma: no cover
+    LayerRef = object  # type: ignore
 
 
 class Macro(BaseModel):
@@ -46,3 +52,19 @@ class HoldTap(BaseModel):
 
 
 __all__ = ["Macro", "HoldTap"]
+
+
+class Combo(BaseModel):
+    """Combo section entry."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    name: str
+    description: Optional[str] = None
+    binding: Dict
+    keyPositions: List[int]
+    layers: List[Union[int, "LayerRef"]]
+    timeoutMs: Optional[int] = None
+
+
+__all__.append("Combo")
