@@ -200,11 +200,10 @@ __all__.append("CommonFields")
 
 
 class LayoutPayload(BaseModel):
-    """Top-level layout payload shape (validated, still serialized as dict).
+    """Top-level layout payload shape.
 
-    We intentionally accept plain dicts for sections (macros, holdTaps, etc.)
-    to keep the emission path lightweight while still validating presence and
-    basic structure. Unknown extra keys are allowed for forward compatibility.
+    Sections are fully typed (Macro/HoldTap/Combo/InputListener). We still
+    serialize with aliases for byte-identical JSON artifacts.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -222,10 +221,10 @@ class LayoutPayload(BaseModel):
 
     # Sections
     layer_names: List[str]
-    macros: List[Dict[str, Any]]
-    holdTaps: List[Dict[str, Any]]
-    combos: List[Dict[str, Any]]
-    inputListeners: List[Dict[str, Any]]
+    macros: List[Union[Macro, Dict[str, Any]]]
+    holdTaps: List[Union[HoldTap, Dict[str, Any]]]
+    combos: List[Union[Combo, Dict[str, Any]]]
+    inputListeners: List[Union[InputListener, Dict[str, Any]]]
     layers: List[List[Dict[str, Any]]]
 
     # Attached metadata (optional)
