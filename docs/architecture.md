@@ -10,7 +10,7 @@ This project keeps every part of the Glove80 layout toolchain in version control
 - **Metadata (`src/glove80/families/<family>/metadata.json`)** stores the immutable release information checked in by the original layout authors (UUIDs, parent UUIDs, titles, tags, notes, and the relative output path). Packaging the metadata keeps CLI invocations and library imports perfectly aligned.
 
 ## Generation Flow
-1. `python -m glove80 generate` loads the metadata for each registered layout family via `glove80.metadata`.
+1. `glove80 generate` loads the metadata for each registered layout family via `glove80.metadata`.
 2. `glove80.layouts.family` registers every family at import time; `glove80.layouts.generator` iterates that registry, builds the layouts, augments them with metadata, and writes the JSON into `layouts/<family>/releases`.
 3. Re-running the command is idempotent: if the serialized JSON already matches the generated payload, the file is left untouched.
 

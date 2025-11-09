@@ -6,7 +6,7 @@ Every release JSON under `layouts/*/releases` can be regenerated deterministical
 ## Highlights
 - The default, TailorKey, QuantumTouch, and Glorious Engrammer families live under `src/glove80/families/` with typed specs, factories, and regression tests.
 - Metadata travels with the package (`src/glove80/families/*/metadata.json`), so the CLI and library always agree on UUIDs, release notes, and output paths.
-- A Typer-powered CLI (`python -m glove80 generate …`) replaces ad-hoc scripts and keeps the regeneration workflow uniform across layouts.
+- A Typer-powered CLI (`glove80 generate …`) replaces ad-hoc scripts and keeps the regeneration workflow uniform across layouts.
 - Release artifacts are grouped under `layouts/<layout>/releases`, keeping the repo root clean while preserving the published JSON verbatim.
 
 ## Quick Start
@@ -24,7 +24,7 @@ Every release JSON under `layouts/*/releases` can be regenerated deterministical
    ```
 4. Need a single variant? Use the CLI directly:
    ```bash
-   python -m glove80 generate --layout tailorkey --variant mac
+   glove80 generate --layout tailorkey --variant mac
    ```
 
 `just --list` shows the available helper tasks.
