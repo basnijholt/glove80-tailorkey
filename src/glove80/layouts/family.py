@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, Any
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -17,7 +17,7 @@ class LayoutFamily(Protocol):
     def variants(self) -> Iterable[str]:
         """Return the iterable of supported variant identifiers."""
 
-    def build(self, variant: str) -> dict:
+    def build(self, variant: str) -> dict[str, Any]:
         """Build the layout payload for the requested variant."""
 
     def metadata_key(self) -> str:
@@ -60,7 +60,7 @@ def list_families() -> list[str]:
     return [registered.name for registered in REGISTRY.families()]
 
 
-def build_layout(family: str, variant: str) -> dict:
+def build_layout(family: str, variant: str) -> dict[str, Any]:
     return get_family(family).build(variant)
 
 

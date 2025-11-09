@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from glove80.base import KeySpec, LayerRef
 from glove80.layouts.schema import (
@@ -69,7 +69,7 @@ class HoldTapSpec:
     description: str
     bindings: Sequence[str]
     tapping_term_ms: int | None = None
-    flavor: str | None = None
+    flavor: Literal["balanced", "tap-preferred", "hold-preferred"] | None = None
     quick_tap_ms: int | None = None
     require_prior_idle_ms: int | None = None
     hold_trigger_on_release: bool | None = None

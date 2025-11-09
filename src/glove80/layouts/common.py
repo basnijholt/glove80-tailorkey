@@ -39,9 +39,7 @@ def build_layout_payload(
     """Create a baseline layout payload from shared metadata and sections."""
     # Validate/normalize common fields via Pydantic, then dump to a plain dict
     # so downstream output remains identical.
-    layout: dict[str, Any] = deepcopy(
-        CommonFieldsModel(**dict(common_fields)).model_dump(by_alias=True)  # type: ignore[arg-type]
-    )
+    layout: dict[str, Any] = deepcopy(CommonFieldsModel(**dict(common_fields)).model_dump(by_alias=True))
     layout["layer_names"] = list(layer_names)
     layout["macros"] = list(macros or [])
     layout["holdTaps"] = list(hold_taps or [])
@@ -110,7 +108,7 @@ def _build_common_fields(
 
 
 def _resolve_referenced_fields(
-    layout: dict,
+    layout: dict[str, Any],
     *,
     layer_names: Sequence[str],
     fields: Iterable[str] = DEFAULT_REF_FIELDS,
@@ -133,7 +131,7 @@ def _assemble_layers(layer_names: Sequence[str], generated_layers: LayerMap, *, 
     return ordered
 
 
-def _attach_variant_metadata(layout: dict, *, variant: str, layout_key: str) -> None:
+def _attach_variant_metadata(layout: dict[str, Any], *, variant: str, layout_key: str) -> None:
     """Inject metadata fields into the layout payload."""
     meta = get_variant_metadata(variant, layout=layout_key)
     for field in META_FIELDS:

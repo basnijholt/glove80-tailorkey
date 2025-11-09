@@ -49,6 +49,14 @@ dev = [
 mypy_path = "src"
 packages = ["glove80"]
 
+[[tool.mypy.overrides]]
+module = ["glove80.layouts.*", "glove80.specs.*"]
+disallow_any_generics = true
+no_implicit_optional = true
+warn_return_any = true
+warn_unused_ignores = true
+check_untyped_defs = true
+
 [tool.ruff]
 line-length = 120
 

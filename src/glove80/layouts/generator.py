@@ -62,7 +62,7 @@ def _iter_variants(
         raise KeyError(msg) from exc
 
 
-def _write_layout(data: dict, destination: Path) -> bool:
+def _write_layout(data: dict[str, Any], destination: Path) -> bool:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
         current = json.loads(destination.read_text(encoding="utf-8"))
@@ -72,7 +72,7 @@ def _write_layout(data: dict, destination: Path) -> bool:
     return True
 
 
-def _augment_layout_with_metadata(layout: dict, meta: VariantMetadata) -> None:
+def _augment_layout_with_metadata(layout: dict[str, Any], meta: VariantMetadata) -> None:
     meta_dict = cast("dict[str, Any]", meta)
     for field in META_FIELDS:
         if field in meta_dict:

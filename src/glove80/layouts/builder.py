@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from .common import compose_layout
 
@@ -315,20 +315,20 @@ def _as_plain_dict(obj: Any) -> dict[str, Any]:
     """
     if hasattr(obj, "model_dump"):
         try:
-            return obj.model_dump(by_alias=True, exclude_none=True)  # type: ignore[no-any-return]
+            return cast("dict[str, Any]", obj.model_dump(by_alias=True, exclude_none=True))
         except Exception:  # pragma: no cover - best effort
             pass
     if hasattr(obj, "dict") and callable(getattr(obj, "dict")):
         # Fallback for pydantic v1 style, just in case
-        return obj.dict()  # type: ignore[no-any-return]
+        return cast("dict[str, Any]", obj.dict())
     if isinstance(obj, dict):
         return obj
     # Mapping but not dict (e.g., OrderedDict or custom mapping)
     try:
         from collections.abc import Mapping as _Mapping
 
-        if isinstance(obj, _Mapping):  # type: ignore[arg-type]
-            return dict(obj)  # type: ignore[no-any-return]
+        if isinstance(obj, _Mapping):
+            return cast("dict[str, Any]", dict(obj))
     except Exception:  # pragma: no cover
         pass
     raise TypeError(f"Unsupported section item type: {type(obj)!r}")
@@ -340,7 +340,13 @@ def _macro_name(macro: Any) -> str:
         name = getattr(macro, "name")
     else:
         try:
-            name = macro["name"]  # type: ignore[index]
+            from collections.abc import Mapping as _Mapping
+
+            if isinstance(macro, _Mapping):
+                name = cast("Mapping[str, Any]", macro)["name"]
+            else:
+                # Last resort: hope it behaves like a dict
+                name = cast("Any", macro)["name"]
         except Exception as exc:  # pragma: no cover - enforced via tests
             msg = "Macro definitions must include a 'name'"
             raise KeyError(msg) from exc
