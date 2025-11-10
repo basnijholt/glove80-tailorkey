@@ -5,21 +5,8 @@ from glove80.layouts.common import build_common_fields
 
 COMMON_FIELDS = build_common_fields(creator="moosy")
 
-MOUSE_STACK = ["Mouse", "MouseSlow", "MouseFast", "MouseWarp"]
-BILATERAL_FINGER_LAYERS = [
-    "LeftIndex",
-    "LeftMiddy",
-    "LeftRingy",
-    "LeftPinky",
-    "RightIndex",
-    "RightMiddy",
-    "RightRingy",
-    "RightPinky",
-]
-
-
-def _windows_layers() -> list[str]:
-    return [
+LAYER_NAME_MAP = {
+    "windows": [
         "HRM_WinLinx",
         "Typing",
         "Autoshift",
@@ -27,19 +14,27 @@ def _windows_layers() -> list[str]:
         "Symbol",
         "Gaming",
         "Lower",
-        *MOUSE_STACK,
+        "Mouse",
+        "MouseSlow",
+        "MouseFast",
+        "MouseWarp",
         "Magic",
-    ]
-
-
-def _mac_layers() -> list[str]:
-    layers = _windows_layers()
-    layers[0] = "HRM_macOS"
-    return layers
-
-
-def _dual_layers() -> list[str]:
-    return [
+    ],
+    "mac": [
+        "HRM_macOS",
+        "Typing",
+        "Autoshift",
+        "Cursor",
+        "Symbol",
+        "Gaming",
+        "Lower",
+        "Mouse",
+        "MouseSlow",
+        "MouseFast",
+        "MouseWarp",
+        "Magic",
+    ],
+    "dual": [
         "HRM_macOS",
         "HRM_WinLinx",
         "Typing",
@@ -47,34 +42,58 @@ def _dual_layers() -> list[str]:
         "Cursor_macOS",
         "Cursor",
         "Symbol",
-        *MOUSE_STACK,
+        "Mouse",
+        "MouseSlow",
+        "MouseFast",
+        "MouseWarp",
         "Gaming",
         "Lower",
         "Magic",
-    ]
-
-
-def _bilateral_layers(hrm: str) -> list[str]:
-    return [
-        hrm,
+    ],
+    "bilateral_windows": [
+        "HRM_WinLinx",
         "Typing",
         "Autoshift",
         "Cursor",
         "Symbol",
         "Gaming",
         "Lower",
-        *BILATERAL_FINGER_LAYERS,
-        *MOUSE_STACK,
+        "LeftIndex",
+        "LeftMiddy",
+        "LeftRingy",
+        "LeftPinky",
+        "RightIndex",
+        "RightMiddy",
+        "RightRingy",
+        "RightPinky",
+        "Mouse",
+        "MouseSlow",
+        "MouseFast",
+        "MouseWarp",
         "Magic",
-    ]
-
-
-LAYER_NAME_MAP = {
-    "windows": _windows_layers(),
-    "mac": _mac_layers(),
-    "dual": _dual_layers(),
-    "bilateral_windows": _bilateral_layers("HRM_WinLinx"),
-    "bilateral_mac": _bilateral_layers("HRM_macOS"),
+    ],
+    "bilateral_mac": [
+        "HRM_macOS",
+        "Typing",
+        "Autoshift",
+        "Cursor",
+        "Symbol",
+        "Gaming",
+        "Lower",
+        "LeftIndex",
+        "LeftMiddy",
+        "LeftRingy",
+        "LeftPinky",
+        "RightIndex",
+        "RightMiddy",
+        "RightRingy",
+        "RightPinky",
+        "Mouse",
+        "MouseSlow",
+        "MouseFast",
+        "MouseWarp",
+        "Magic",
+    ],
 }
 
 for variant in TAILORKEY_VARIANTS:
