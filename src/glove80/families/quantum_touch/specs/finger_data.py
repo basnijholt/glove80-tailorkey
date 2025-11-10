@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict
 
+from glove80.families.shared_finger_specs import (
+    FINGER_DEFAULTS,
+    LEFT_CANONICAL_HOLD_POSITIONS,
+    RIGHT_CANONICAL_HOLD_POSITIONS,
+)
+
 
 class FingerMeta(BaseModel):
     model_config = ConfigDict(frozen=True)
@@ -18,192 +24,33 @@ class FingerMeta(BaseModel):
     hold_trigger_positions: tuple[int, ...]
 
 
-def _mirror(pos: int) -> int:
-    # Glove80 indices are 0..79; mirroring across the center maps i -> 79 - i
-    return 79 - pos
+_HAND_CODES = {"left": "L", "right": "R"}
+_LAYER_SUFFIXES = {
+    "pinky": "Pinky",
+    "ring": "Ring",
+    "middle": "Middle",
+    "index": "Index",
+}
 
 
-# Single authoritative sequence for left hand; right-hand positions are mirrored.
-_LEFT_POSITIONS: tuple[int, ...] = (
-    57,
-    56,
-    55,
-    72,
-    73,
-    74,
-    5,
-    6,
-    7,
-    8,
-    16,
-    17,
-    18,
-    19,
-    20,
-    28,
-    29,
-    30,
-    31,
-    32,
-    40,
-    41,
-    42,
-    43,
-    44,
-    58,
-    59,
-    60,
-    61,
-    62,
-    75,
-    76,
-    77,
-    78,
-    9,
-    21,
-    33,
-    45,
-    63,
-    79,
-    52,
-    53,
-    54,
-    70,
-    71,
-    69,
-)
-
-_RIGHT_POSITIONS: tuple[int, ...] = (
-    0,
-    10,
-    22,
-    34,
-    46,
-    64,
-    65,
-    47,
-    35,
-    23,
-    1,
-    2,
-    12,
-    11,
-    24,
-    36,
-    48,
-    66,
-    67,
-    49,
-    37,
-    25,
-    13,
-    3,
-    4,
-    14,
-    15,
-    27,
-    26,
-    38,
-    39,
-    51,
-    50,
-    68,
-    52,
-    53,
-    54,
-    71,
-    70,
-    69,
-    55,
-    56,
-    57,
-    74,
-    73,
-    72,
-)
+def _layer_name(hand: str, finger: str) -> str:
+    return ("Left" if hand == "left" else "Right") + _LAYER_SUFFIXES[finger]
 
 
-FINGERS: tuple[FingerMeta, ...] = (
+FINGERS: tuple[FingerMeta, ...] = tuple(
     FingerMeta(
-        hand="L",
-        name="Pinky",
-        layer="LeftPinky",
-        tap_key="A",
-        tapping_term_ms=280,
-        quick_tap_ms=300,
-        require_prior_idle_ms=150,
-        hold_trigger_positions=_LEFT_POSITIONS,
-    ),
-    FingerMeta(
-        hand="L",
-        name="Ring",
-        layer="LeftRing",
-        tap_key="S",
-        tapping_term_ms=240,
-        quick_tap_ms=300,
-        require_prior_idle_ms=150,
-        hold_trigger_positions=_LEFT_POSITIONS,
-    ),
-    FingerMeta(
-        hand="L",
-        name="Middle",
-        layer="LeftMiddle",
-        tap_key="D",
-        tapping_term_ms=210,
-        quick_tap_ms=300,
-        require_prior_idle_ms=150,
-        hold_trigger_positions=_LEFT_POSITIONS,
-    ),
-    FingerMeta(
-        hand="L",
-        name="Index",
-        layer="LeftIndex",
-        tap_key="F",
-        tapping_term_ms=190,
-        quick_tap_ms=300,
-        require_prior_idle_ms=100,
-        hold_trigger_positions=_LEFT_POSITIONS,
-    ),
-    FingerMeta(
-        hand="R",
-        name="Index",
-        layer="RightIndex",
-        tap_key="J",
-        tapping_term_ms=190,
-        quick_tap_ms=300,
-        require_prior_idle_ms=100,
-        hold_trigger_positions=_RIGHT_POSITIONS,
-    ),
-    FingerMeta(
-        hand="R",
-        name="Middle",
-        layer="RightMiddle",
-        tap_key="K",
-        tapping_term_ms=210,
-        quick_tap_ms=300,
-        require_prior_idle_ms=150,
-        hold_trigger_positions=_RIGHT_POSITIONS,
-    ),
-    FingerMeta(
-        hand="R",
-        name="Ring",
-        layer="RightRing",
-        tap_key="L",
-        tapping_term_ms=240,
-        quick_tap_ms=300,
-        require_prior_idle_ms=150,
-        hold_trigger_positions=_RIGHT_POSITIONS,
-    ),
-    FingerMeta(
-        hand="R",
-        name="Pinky",
-        layer="RightPinky",
-        tap_key="SEMI",
-        tapping_term_ms=280,
-        quick_tap_ms=300,
-        require_prior_idle_ms=150,
-        hold_trigger_positions=_RIGHT_POSITIONS,
-    ),
+        hand=_HAND_CODES[defaults.hand],
+        name=_LAYER_SUFFIXES[defaults.finger],
+        layer=_layer_name(defaults.hand, defaults.finger),
+        tap_key=defaults.tap_key,
+        tapping_term_ms=defaults.tapping_term_ms,
+        quick_tap_ms=defaults.quick_tap_ms,
+        require_prior_idle_ms=defaults.require_prior_idle_ms,
+        hold_trigger_positions=(
+            LEFT_CANONICAL_HOLD_POSITIONS if defaults.hand == "left" else RIGHT_CANONICAL_HOLD_POSITIONS
+        ),
+    )
+    for defaults in FINGER_DEFAULTS
 )
 
 
