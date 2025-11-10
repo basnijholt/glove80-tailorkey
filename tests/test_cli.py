@@ -122,6 +122,38 @@ def test_cli_generate_out_writes_to_custom_path(tmp_path: Path) -> None:
     assert dest.exists()
 
 
+def test_cli_generate_out_overrides_metadata_destination(tmp_path: Path) -> None:
+    # Prepare a custom metadata file pointing elsewhere, but provide --out
+
+    # reuse TailorKey metadata as base
+    import json
+
+    metadata_path = TAILORKEY_METADATA
+    meta = json.loads(metadata_path.read_text())
+    entry = dict(meta["windows"])  # copy
+    entry["output"] = str(tmp_path / "should-not-be-used.json")
+    custom_meta = tmp_path / "metadata.json"
+    custom_meta.write_text(json.dumps({"windows": entry}))
+
+    dest = tmp_path / "dest.json"
+    result = RUNNER.invoke(
+        app,
+        [
+            "generate",
+            "--layout",
+            "tailorkey",
+            "--variant",
+            "windows",
+            "--metadata",
+            str(custom_meta),
+            "--out",
+            str(dest),
+        ],
+    )
+    assert result.exit_code == 0
+    assert dest.exists()
+
+
 def test_cli_generate_out_requires_single_target(tmp_path: Path) -> None:
     # Missing --variant should error when --out is provided
     dest = tmp_path / "out.json"
