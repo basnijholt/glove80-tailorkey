@@ -60,6 +60,15 @@ def merge_components(layout: dict[str, Any], components: LayoutFeatureComponents
         _set_macro(macro)
     for macro in components.macro_overrides.values():
         _set_macro(macro)
+    if components.macros_by_name:
+        for name, macro in components.macros_by_name.items():
+            # Ensure name coherence even if caller omitted 'name' inside dict
+            macro_dict = _to_dict(macro)
+            if isinstance(macro_dict, dict):
+                macro_dict.setdefault("name", name)
+            macros_by_name[name] = macro_dict  # override wins
+            if name not in macro_order:
+                macro_order.append(name)
 
     layout["macros"] = [macros_by_name[name] for name in macro_order]
 
