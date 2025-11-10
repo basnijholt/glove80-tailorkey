@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from glove80.base import LayerMap, build_layer_from_spec
-from glove80.layouts import LayoutBuilder
+from glove80.layouts.common import compose_layout
 from glove80.layouts.family import REGISTRY, LayoutFamily
 
 from .specs import VARIANT_SPECS, VariantSpec
@@ -29,16 +29,15 @@ class Family(LayoutFamily):
             msg = f"Unknown default layout '{variant}'. Available: {sorted(VARIANT_SPECS)}"
             raise KeyError(msg) from exc
 
-        layers = _build_layers_map(spec)
-        builder = LayoutBuilder(
+        generated_layers = _build_layers_map(spec)
+        return compose_layout(
+            spec.common_fields,
+            layer_names=spec.layer_names,
+            generated_layers=generated_layers,
             metadata_key=self.metadata_key(),
             variant=variant,
-            common_fields=spec.common_fields,
-            layer_names=spec.layer_names,
+            input_listeners=list(spec.input_listeners),
         )
-        builder.add_layers(layers)
-        builder.add_input_listeners(list(spec.input_listeners))
-        return builder.build()
 
 
 REGISTRY.register(Family())
