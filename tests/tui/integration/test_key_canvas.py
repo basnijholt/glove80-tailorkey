@@ -10,12 +10,11 @@ from glove80.tui.widgets.key_canvas import KeyCanvas
 
 
 def _sample_payload() -> dict[str, object]:
+    slots_a = [{"value": "&kp", "params": [{"value": "A", "params": []}]} for _ in range(80)]
+    slots_b = [{"value": "&kp", "params": [{"value": "B", "params": []}]} for _ in range(80)]
     return {
         "layer_names": ["Base", "Lower"],
-        "layers": [
-            [{"value": "&kp A", "params": []} for _ in range(80)],
-            [{"value": "&kp B", "params": []} for _ in range(80)],
-        ],
+        "layers": [slots_a, slots_b],
         "combos": [],
         "inputListeners": [],
     }
@@ -50,12 +49,16 @@ def test_edit_key_value_round_trip() -> None:
             inspector = pilot.app.query_one(KeyInspector)
             await pilot.pause()
 
-            inspector.apply_value_for_test("&kp TAB", [])
+            inspector.apply_value_for_test("&kp", ["TAB"])
             await pilot.pause()
-            assert pilot.app.store.state.layers[0].slots[0]["value"] == "&kp TAB"
+            slot = pilot.app.store.state.layers[0].slots[0]
+            assert slot["value"] == "&kp"
+            assert slot["params"] == [{"value": "TAB", "params": []}]
 
             await pilot.press("ctrl+z")
             await pilot.pause()
-            assert pilot.app.store.state.layers[0].slots[0]["value"] == "&kp A"
+            slot = pilot.app.store.state.layers[0].slots[0]
+            assert slot["value"] == "&kp"
+            assert slot["params"] == [{"value": "A", "params": []}]
 
     asyncio.run(_run())

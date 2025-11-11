@@ -327,8 +327,19 @@ def _rewrite_layer_refs(data: Any, rename_map: Mapping[str, str]) -> Any:
 
 
 # Convenience payload for bootstrapping the app
-def _sample_layer_slots(value: str) -> List[Dict[str, Any]]:
-    return [{"value": value, "params": []} for _ in range(80)]
+def _sample_layer_slots(binding: str) -> List[Dict[str, Any]]:
+    tokens = binding.split()
+    if tokens and tokens[0].startswith("&") and len(tokens) > 1:
+        value = tokens[0]
+        param_template = [{"value": tokens[1], "params": []}]
+    else:
+        value = binding
+        param_template = []
+
+    slots: List[Dict[str, Any]] = []
+    for _ in range(80):
+        slots.append({"value": value, "params": list(param_template)})
+    return slots
 
 
 DEFAULT_SAMPLE_LAYOUT: Dict[str, Any] = {
