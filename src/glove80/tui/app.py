@@ -19,7 +19,53 @@ class Glove80TuiApp(App[None]):
     """Entry point for the forthcoming Glove80 Textual editor."""
 
     TITLE = "Glove80 Layout Editor"
-    CSS_PATH: list[str] = []
+    CSS = """
+    Screen {
+        layout: vertical;
+        background: $background;
+        color: $text;
+    }
+
+    #editor-workspace {
+        layout: horizontal;
+        height: 1fr;
+    }
+
+    .project-ribbon {
+        padding: 1 2;
+        background: $boost;
+        color: $text;
+    }
+
+    .layer-sidebar {
+        width: 28;
+        border: heavy $surface 10%;
+        padding: 0 1;
+    }
+
+    .key-canvas {
+        border: solid $surface 10%;
+        padding: 1;
+        min-height: 20;
+    }
+
+    .inspector-panel {
+        width: 34;
+        border: solid $surface 10%;
+        padding: 1;
+    }
+
+    .features-tab {
+        border-top: solid $surface 20%;
+        margin-top: 1;
+        padding-top: 1;
+    }
+
+    .footer-bar {
+        padding: 0 2;
+        background: $surface 10%;
+    }
+    """
     BINDINGS = [
         Binding("ctrl+s", "save", "Save", show=False),
         Binding("ctrl+shift+s", "save_as", "Save As", show=False),
@@ -38,7 +84,7 @@ class Glove80TuiApp(App[None]):
         enable_devtools: bool = False,
         payload: Optional[Mapping[str, Any]] = None,
     ) -> None:
-        super().__init__()
+        super().__init__(css_path=None)
         self._initial_layout = initial_layout
         self._initial_variant = initial_variant
         base_payload = copy.deepcopy(payload) if payload is not None else copy.deepcopy(DEFAULT_SAMPLE_LAYOUT)
