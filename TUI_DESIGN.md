@@ -2,6 +2,8 @@
 
 This document is the single source of truth for the upcoming Textual (Python) TUI that edits Glove80 layouts. Every requirement below is derived from the checked-in Python toolchain (`src/glove80`), the exported JSON schema at `docs/layout_payload.schema.json`, and the existing CLI workflows (`uv run glove80 …`, `just regen`, `just ci`).
 
+> **Instructions for agents**: Before making changes, read this file end-to-end, follow its requirements, and record any new decisions, deviations, or discoveries back into this document (append brief dated notes in the relevant section). Treat it as a living blueprint.
+
 ## 1. Source-of-Truth Context & Guarantees
 
 | Concern | Canonical Location | TUI Obligation |
