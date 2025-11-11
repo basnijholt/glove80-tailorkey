@@ -26,4 +26,12 @@ class InspectorFocusRequested(Message):
         self.key_index = key_index
 
 
-__all__ = ["StoreUpdated", "SelectionChanged", "InspectorFocusRequested"]
+class FooterMessage(Message):
+    """Informational footer update (status line)."""
+
+    def __init__(self, text: str) -> None:
+        super().__init__()
+        self.text = text
+
+
+__all__ = ["StoreUpdated", "SelectionChanged", "InspectorFocusRequested", "FooterMessage"]

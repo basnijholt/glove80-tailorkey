@@ -224,6 +224,49 @@ class LayoutStore:
         )
         return self._selection
 
+    def copy_key_to_layer(
+        self,
+        *,
+        source_layer_index: int,
+        target_layer_index: int,
+        key_index: int,
+    ) -> bool:
+        """Copy the key binding from one layer to another.
+
+        Returns True if a mutation occurred.
+        """
+
+        if not self._state.layers:
+            raise ValueError("No layers available")
+
+        source_layer_index = self._validate_layer_index(source_layer_index)
+        target_layer_index = self._validate_layer_index(target_layer_index)
+        if source_layer_index == target_layer_index:
+            return False
+
+        source_key_index = self._validate_key_index(source_layer_index, key_index)
+        target_key_index = self._validate_key_index(target_layer_index, key_index)
+
+        source_slot = self._state.layers[source_layer_index].slots[source_key_index]
+        target_slot = self._state.layers[target_layer_index].slots[target_key_index]
+        if source_slot == target_slot:
+            return False
+
+        self._record_snapshot()
+        layers = list(self._state.layers)
+        target_layer = layers[target_layer_index]
+        slots = list(target_layer.slots)
+        slots[target_key_index] = deepcopy(source_slot)
+        layers[target_layer_index] = replace(target_layer, slots=tuple(slots))
+        self._state = LayoutState(
+            layer_names=self._state.layer_names,
+            layers=tuple(layers),
+            combos=self._state.combos,
+            listeners=self._state.listeners,
+        )
+        self._redo_stack.clear()
+        return True
+
     def get_key(self, *, layer_index: Optional[int] = None, key_index: Optional[int] = None) -> Dict[str, Any]:
         if not self._state.layers:
             raise ValueError("No layers available")

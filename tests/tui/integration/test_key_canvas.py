@@ -62,3 +62,62 @@ def test_edit_key_value_round_trip() -> None:
             assert slot["params"] == [{"value": "A", "params": []}]
 
     asyncio.run(_run())
+
+
+def test_layer_switch_shortcuts_wrap() -> None:
+    async def _run() -> None:
+        app = Glove80TuiApp(payload=_sample_payload())
+        async with app.run_test() as pilot:
+            canvas = pilot.app.query_one(KeyCanvas)
+            canvas.focus()
+            await pilot.pause()
+
+            assert pilot.app.store.selection.layer_index == 0
+
+            canvas.action_next_layer()
+            await pilot.pause()
+            assert pilot.app.store.selection.layer_index == 1
+
+            canvas.action_next_layer()
+            await pilot.pause()
+            assert pilot.app.store.selection.layer_index == 0
+
+            canvas.action_prev_layer()
+            await pilot.pause()
+            assert pilot.app.store.selection.layer_index == 1
+
+    asyncio.run(_run())
+
+
+def test_copy_shortcut_copies_between_layers() -> None:
+    async def _run() -> None:
+        app = Glove80TuiApp(payload=_sample_payload())
+        async with app.run_test() as pilot:
+            canvas = pilot.app.query_one(KeyCanvas)
+            canvas.focus()
+            await pilot.pause()
+
+            # ensure Lower slot differs from Base
+            assert (
+                pilot.app.store.state.layers[1].slots[0]["params"][0]["value"]
+                == "B"
+            )
+
+            # switch to Lower (records previous Base selection)
+            canvas.action_next_layer()
+            await pilot.pause()
+            assert pilot.app.store.selection.layer_index == 1
+
+            canvas.action_copy_key()
+            await pilot.pause()
+
+            slot = pilot.app.store.state.layers[1].slots[0]
+            assert slot["params"][0]["value"] == "A"
+
+            await pilot.press("ctrl+z")
+            await pilot.pause()
+
+            slot = pilot.app.store.state.layers[1].slots[0]
+            assert slot["params"][0]["value"] == "B"
+
+    asyncio.run(_run())

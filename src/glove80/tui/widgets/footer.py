@@ -5,7 +5,7 @@ from __future__ import annotations
 from textual import on
 from textual.widgets import Static
 
-from ..messages import SelectionChanged, StoreUpdated
+from ..messages import FooterMessage, SelectionChanged, StoreUpdated
 
 
 class FooterBar(Static):
@@ -16,6 +16,7 @@ class FooterBar(Static):
         self._layer_name = "—"
         self._key_index: int | None = None
         self._dirty = False
+        self._message = ""
 
     def on_mount(self) -> None:
         self._render_status()
@@ -23,7 +24,10 @@ class FooterBar(Static):
     def _render_status(self) -> None:
         key_fragment = "--" if self._key_index is None else f"#{self._key_index:02d}"
         dirty_fragment = "yes" if self._dirty else "no"
-        self.update(f"Layer: {self._layer_name} · Key: {key_fragment} · dirty={dirty_fragment}")
+        message_fragment = f" · {self._message}" if self._message else ""
+        self.update(
+            f"Layer: {self._layer_name} · Key: {key_fragment} · dirty={dirty_fragment}{message_fragment}"
+        )
 
     @on(SelectionChanged)
     def _handle_selection(self, event: SelectionChanged) -> None:
@@ -34,4 +38,9 @@ class FooterBar(Static):
     @on(StoreUpdated)
     def _handle_store_update(self, _: StoreUpdated) -> None:
         self._dirty = True
+        self._render_status()
+
+    @on(FooterMessage)
+    def _handle_footer_message(self, event: FooterMessage) -> None:
+        self._message = event.text
         self._render_status()

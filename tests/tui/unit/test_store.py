@@ -85,6 +85,48 @@ def test_pickup_drop_moves_layer(sample_payload: dict[str, object]) -> None:
     assert store.layer_names == ("Base", "Lower", "Raise")
 
 
+def test_copy_key_to_layer_updates_target(sample_payload: dict[str, object]) -> None:
+    store = LayoutStore.from_payload(sample_payload)
+    assert store.state.layers[1].slots[0]["value"] == "&kp B"
+
+    changed = store.copy_key_to_layer(
+        source_layer_index=0,
+        target_layer_index=1,
+        key_index=0,
+    )
+
+    assert changed is True
+    assert store.state.layers[1].slots[0]["value"] == "&kp A"
+
+    store.undo()
+    assert store.state.layers[1].slots[0]["value"] == "&kp B"
+
+
+def test_copy_key_to_layer_same_layer_is_noop(sample_payload: dict[str, object]) -> None:
+    store = LayoutStore.from_payload(sample_payload)
+    changed = store.copy_key_to_layer(
+        source_layer_index=0,
+        target_layer_index=0,
+        key_index=5,
+    )
+
+    assert changed is False
+    assert store.state.layers[0].slots[5]["value"] == "&kp A"
+
+
+def test_copy_key_to_layer_invalid_indices(sample_payload: dict[str, object]) -> None:
+    store = LayoutStore.from_payload(sample_payload)
+
+    with pytest.raises(IndexError):
+        store.copy_key_to_layer(source_layer_index=10, target_layer_index=1, key_index=0)
+
+    with pytest.raises(IndexError):
+        store.copy_key_to_layer(source_layer_index=0, target_layer_index=99, key_index=0)
+
+    with pytest.raises(IndexError):
+        store.copy_key_to_layer(source_layer_index=0, target_layer_index=1, key_index=999)
+
+
 def test_selection_defaults_and_updates(sample_payload: dict[str, object]) -> None:
     store = LayoutStore.from_payload(sample_payload)
 
