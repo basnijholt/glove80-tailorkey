@@ -6,5 +6,24 @@ from textual.message import Message
 class StoreUpdated(Message):
     """Broadcast when the layout store mutates."""
 
-    pass
 
+class SelectionChanged(Message):
+    """Published when a layer/key selection mutation occurs."""
+
+    def __init__(self, *, layer_index: int, layer_name: str | None, key_index: int) -> None:
+        super().__init__()
+        self.layer_index = layer_index
+        self.layer_name = layer_name
+        self.key_index = key_index
+
+
+class InspectorFocusRequested(Message):
+    """Signal that the Inspector should focus the key editor."""
+
+    def __init__(self, *, layer_index: int, key_index: int) -> None:
+        super().__init__()
+        self.layer_index = layer_index
+        self.key_index = key_index
+
+
+__all__ = ["StoreUpdated", "SelectionChanged", "InspectorFocusRequested"]

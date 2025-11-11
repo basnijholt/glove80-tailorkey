@@ -45,6 +45,14 @@ class LayoutState:
         )
 
 
+@dataclass(frozen=True)
+class SelectionState:
+    """Tracks the active layer/key pair for the UI."""
+
+    layer_index: int
+    key_index: int
+
+
 class LayoutStore:
     """Mutable state container with undo/redo support."""
 
@@ -53,6 +61,7 @@ class LayoutStore:
         self._undo_stack: List[LayoutState] = []
         self._redo_stack: List[LayoutState] = []
         self._clipboard: Optional[LayerRecord] = None
+        self._selection = SelectionState(layer_index=0 if state.layers else -1, key_index=0 if state.layers else -1)
 
     @classmethod
     def from_payload(cls, payload: Mapping[str, Any]) -> LayoutStore:
@@ -67,6 +76,18 @@ class LayoutStore:
     @property
     def layer_names(self) -> Tuple[str, ...]:
         return self._state.layer_names
+
+    @property
+    def selection(self) -> SelectionState:
+        return self._selection
+
+    @property
+    def selected_layer_name(self) -> Optional[str]:
+        if self._selection.layer_index < 0:
+            return None
+        if self._selection.layer_index >= len(self._state.layer_names):
+            return None
+        return self._state.layer_names[self._selection.layer_index]
 
     # ------------------------------------------------------------------
     # Public API
@@ -173,6 +194,83 @@ class LayoutStore:
         self._redo_stack.clear()
 
     # ------------------------------------------------------------------
+    # Selection helpers
+    def set_selection(self, *, layer_index: int, key_index: int) -> SelectionState:
+        self._selection = SelectionState(
+            layer_index=self._validate_layer_index(layer_index),
+            key_index=self._validate_key_index(layer_index, key_index),
+        )
+        return self._selection
+
+    def set_active_layer(self, layer_index: int) -> SelectionState:
+        if not self._state.layers:
+            self._selection = SelectionState(layer_index=-1, key_index=-1)
+            return self._selection
+        valid_layer = self._validate_layer_index(layer_index)
+        key_index = self._selection.key_index if self._selection.layer_index >= 0 else 0
+        key_index = self._validate_key_index(valid_layer, key_index)
+        self._selection = SelectionState(layer_index=valid_layer, key_index=key_index)
+        return self._selection
+
+    def set_selected_key(self, key_index: int) -> SelectionState:
+        if not self._state.layers:
+            self._selection = SelectionState(layer_index=-1, key_index=-1)
+            return self._selection
+        layer_index = self._selection.layer_index if self._selection.layer_index >= 0 else 0
+        layer_index = self._validate_layer_index(layer_index)
+        self._selection = SelectionState(
+            layer_index=layer_index,
+            key_index=self._validate_key_index(layer_index, key_index),
+        )
+        return self._selection
+
+    def get_key(self, *, layer_index: Optional[int] = None, key_index: Optional[int] = None) -> Dict[str, Any]:
+        if not self._state.layers:
+            raise ValueError("No layers available")
+        resolved_layer = layer_index if layer_index is not None else self._selection.layer_index
+        resolved_key = key_index if key_index is not None else self._selection.key_index
+        resolved_layer = self._validate_layer_index(resolved_layer)
+        resolved_key = self._validate_key_index(resolved_layer, resolved_key)
+        slot = self._state.layers[resolved_layer].slots[resolved_key]
+        return deepcopy(slot)
+
+    def update_key(
+        self,
+        *,
+        layer_index: int,
+        key_index: int,
+        value: str,
+        params: Sequence[Any],
+    ) -> None:
+        if not value:
+            raise ValueError("Key value cannot be empty")
+        layer_index = self._validate_layer_index(layer_index)
+        key_index = self._validate_key_index(layer_index, key_index)
+        self._record_snapshot()
+        layers = list(self._state.layers)
+        target = layers[layer_index]
+        slots = list(target.slots)
+        slots[key_index] = {"value": value, "params": list(params)}
+        layers[layer_index] = replace(target, slots=tuple(deepcopy(slot) for slot in slots))
+        self._state = LayoutState(
+            layer_names=self._state.layer_names,
+            layers=tuple(layers),
+            combos=self._state.combos,
+            listeners=self._state.listeners,
+        )
+        self._redo_stack.clear()
+
+    def update_selected_key(self, *, value: str, params: Sequence[Any]) -> None:
+        if self._selection.layer_index < 0 or self._selection.key_index < 0:
+            raise ValueError("No key selected")
+        self.update_key(
+            layer_index=self._selection.layer_index,
+            key_index=self._selection.key_index,
+            value=value,
+            params=params,
+        )
+
+    # ------------------------------------------------------------------
     # Undo / Redo
     def undo(self) -> None:
         if not self._undo_stack:
@@ -189,6 +287,17 @@ class LayoutStore:
     # ------------------------------------------------------------------
     def _record_snapshot(self) -> None:
         self._undo_stack.append(self._state)
+
+    def _validate_layer_index(self, layer_index: int) -> int:
+        if not (0 <= layer_index < len(self._state.layers)):
+            raise IndexError("Layer index out of range")
+        return layer_index
+
+    def _validate_key_index(self, layer_index: int, key_index: int) -> int:
+        slot_count = len(self._state.layers[layer_index].slots)
+        if not (0 <= key_index < slot_count):
+            raise IndexError("Key index out of range")
+        return key_index
 
 
 def _increment_name(base: str, existing: Iterable[str]) -> str:

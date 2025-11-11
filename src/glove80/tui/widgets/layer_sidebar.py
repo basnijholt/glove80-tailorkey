@@ -9,7 +9,7 @@ from textual.binding import Binding
 from textual.widgets import Label, ListItem, ListView
 
 from ..state import LayoutStore
-from ..messages import StoreUpdated
+from ..messages import SelectionChanged, StoreUpdated
 from .rename_modal import RenameLayerModal
 
 
@@ -32,6 +32,8 @@ class LayerSidebar(ListView):
         if self.children:
             self.index = 0
             self.focus()
+            self.store.set_active_layer(0)
+            self._emit_selection()
 
     # ------------------------------------------------------------------
     def _refresh(self, *, preferred: Optional[str] = None) -> None:
@@ -55,6 +57,16 @@ class LayerSidebar(ListView):
         if self.index >= len(self.store.layer_names):
             return None
         return self.store.layer_names[self.index]
+
+    def _emit_selection(self) -> None:
+        selection = self.store.selection
+        self.post_message(
+            SelectionChanged(
+                layer_index=selection.layer_index,
+                layer_name=self.store.selected_layer_name,
+                key_index=selection.key_index,
+            )
+        )
 
     # Actions -----------------------------------------------------------
     def action_rename_layer(self) -> None:
@@ -81,6 +93,7 @@ class LayerSidebar(ListView):
         self.store.duplicate_layer(source_name=current)
         self._refresh(preferred=current)
         self.post_message(StoreUpdated())
+        self._emit_selection()
 
     def action_move_up(self) -> None:
         if self.index is None or self.index == 0:
@@ -89,6 +102,8 @@ class LayerSidebar(ListView):
         self.index -= 1
         self._refresh()
         self.post_message(StoreUpdated())
+        self.store.set_active_layer(self.index)
+        self._emit_selection()
 
     def action_move_down(self) -> None:
         if self.index is None or self.index >= len(self.store.layer_names) - 1:
@@ -97,6 +112,8 @@ class LayerSidebar(ListView):
         self.index += 1
         self._refresh()
         self.post_message(StoreUpdated())
+        self.store.set_active_layer(self.index)
+        self._emit_selection()
 
     def action_pick_up(self) -> None:
         current = self._selected_name()
@@ -110,6 +127,17 @@ class LayerSidebar(ListView):
         self.store.drop_layer(target_index=self.index)
         self._refresh()
         self.post_message(StoreUpdated())
+        self.store.set_active_layer(min(self.index, len(self.store.layer_names) - 1))
+        self._emit_selection()
+
+    @on(ListView.Highlighted)
+    def _handle_highlighted(self, event: ListView.Highlighted) -> None:
+        if event.list_view is not self:
+            return
+        if self.index is None:
+            return
+        self.store.set_active_layer(self.index)
+        self._emit_selection()
 
     # ------------------------------------------------------------------
     @on(StoreUpdated)
@@ -120,3 +148,6 @@ class LayerSidebar(ListView):
         self.store.rename_layer(old_name=current, new_name=new_name)
         self._refresh(preferred=new_name)
         self.post_message(StoreUpdated())
+        if self.index is not None:
+            self.store.set_active_layer(self.index)
+        self._emit_selection()
