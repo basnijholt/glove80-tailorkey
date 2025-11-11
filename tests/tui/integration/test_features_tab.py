@@ -2,39 +2,25 @@ from __future__ import annotations
 
 import asyncio
 
-from textual.pilot import Pilot
+from textual.widgets import Button, Static
 
 from glove80.tui.app import Glove80TuiApp
-from glove80.tui.widgets.inspector import FeaturesTab
-
-
-def _payload() -> dict[str, object]:
-    slots = [{"value": "&kp", "params": [{"value": "A", "params": []}]} for _ in range(80)]
-    return {
-        "layer_names": ["Base"],
-        "layers": [slots],
-        "macros": [],
-        "holdTaps": [],
-        "combos": [],
-        "inputListeners": [],
-    }
 
 
 def test_features_tab_preview_and_apply() -> None:
     async def _run() -> None:
-        app = Glove80TuiApp(payload=_payload(), initial_variant="windows")
-        async with app.run_test() as pilot:  # type: Pilot
-            features = pilot.app.query_one(FeaturesTab)
-
-            features._preview_hrm()
+        app = Glove80TuiApp()
+        async with app.run_test() as pilot:
+            preview_button = pilot.app.query_one("#preview-hrm", Button)
+            preview_button.press()
             await pilot.pause()
 
-            summary_text = features.current_summary
-            assert "HRM →" in summary_text
+            summary = pilot.app.query_one("#feature-summary", Static)
+            assert "HRM →" in str(summary.render())
 
-            features._apply_hrm()
+            apply_button = pilot.app.query_one("#apply-hrm", Button)
+            apply_button.press()
             await pilot.pause()
-
             assert "HRM_WinLinx" in pilot.app.store.layer_names
 
             await pilot.press("ctrl+z")
