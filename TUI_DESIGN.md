@@ -1,188 +1,105 @@
-# Keymap Studio – Textual TUI Layout Editor Design Plan
+# Glove80 Textual TUI Layout Editor Design (Repo-Aligned)
 
-## 1. Context & Intent
-- The current repo hosts a React/Vite prototype (`apps/keymap-studio`) plus reusable TypeScript packages (`packages/schema`, `packages/data`, `packages/core`) and a production bundle of the legacy web app in the repo root. These assets encode the full UX surface: multi-source import (demo/GitHub/local/clipboard), rich layer and behavior editing, combos/macros/sensors, validation, theming, and persistence flows.
-- Goal: deliver a Python **Textual** (https://textual.textualize.io) TUI that preserves the feature set, data semantics, and user expectations of the browser-based Keymap Studio while optimizing for keyboard-centric workflows.
-- Deliverable: a first-class architectural plan enumerating every feature, how it maps onto Textual primitives, and how the Python stack mirrors the TypeScript data models so parity work stays deterministic.
+This plan targets the Python-first Glove80 toolchain that lives under `src/glove80`. Every interaction in the TUI is grounded in the same data the Typer CLI (`uv run glove80 generate …`) and release generator use today. All runtime edits eventually serialize back into the canonical `LayoutPayload` contract whose schema is exported at `docs/layout_payload.schema.json`.
 
-## 2. Grounding in the Existing Codebase
-| Area | Source Artifacts | Key Takeaways for the TUI |
+## 1. Source Context & Guarantees
+- **Authoritative inputs**: declarative specs and helpers in `src/glove80/families/*/specs`, feature bundles in `src/glove80/features`, and layer composition via `glove80.layouts.LayoutBuilder`.
+- **Builder orchestration**: `glove80.layouts.builder.LayoutBuilder` merges layers, macros, hold taps, combos, and input listeners before `glove80.layouts.generator` writes JSON to `layouts/<family>/releases`. The TUI consumes/produces this exact `LayoutPayload` struct so the CLI and tests (`tests/<family>/`) remain deterministic.
+- **Metadata**: `src/glove80/families/<family>/metadata.json` supplies UUIDs, titles, and release notes. The TUI must respect these fields (read-only unless author edits metadata via CLI).
+- **Schema export**: `scripts/export_layout_schema.py` regenerates `docs/layout_payload.schema.json`. The TUI ships with that schema for validation and auto-complete of behaviors, device-tree additions, and advanced config.
+
+## 2. Data Model Bridge
+
+| LayoutPayload Section | Repo Source | TUI Responsibilities |
 | --- | --- | --- |
-| Data & schema | `packages/schema/src/index.ts` | Behaviors, bindings, layers, combos, macros, sensors, warnings, keymaps defined via Zod. TUI must mirror these structures (e.g., Python `pydantic` models) to keep serialization/validation lossless. |
-| Demo content | `packages/data/src/index.ts` | `DemoKeyboard` shape (keys array + `KeyGeometry`) and `Keymap` composition supply default canvases. TUI needs identical demo bootstrapping for offline-first experience. |
-| Core helpers | `packages/core/src` | `summarizeLayers` + theming utilities show how UI derives summaries from keymap data. TUI will port the layer summarization logic and add terminal-friendly theme persistence. |
-| App shell | `apps/keymap-studio/src` | Sidebar of layers, top bar with source picker/theme toggle, canvas showing key grid, binding inspector, React Query powered source API mock. These interactions define the minimum parity surface for the TUI interface architecture. |
-| Legacy bundle | `main.*.js`, chunked feature files, `REVERSE_ENGINEERING.md` | Confirms advanced features (conditional layers, combos, macros, sensors, warnings tab, multiple source adapters). All of these must have corresponding TUI affordances even if implemented iteratively. |
+| `layer_names` + `layers[80]` | `LayoutBuilder.add_layers`, `LayerSpec` | Layer switcher, canvas rendering, reordering/moving/picking layers, renaming (updates `layer_names`, enforces 1:1 with `layers`). |
+| `macros[]` | `tailorkey/specs.py::MACRO_DEFS`, `MacroSpec` | Macro editor: create, clone, reorder, bind to keys, preview steps; ensures `name` uniqueness and references align with keys referencing `&macro`. |
+| `holdTaps[]` | `HOLD_TAP_DEFS` | Hold-tap composer forms: fields for term, flavor, idle, trigger positions. Auto-wire to keys via inspector; highlight conflicts. |
+| `combos[]` | `COMBO_DATA` | Combo builder with key picker, layer scoping, timeout editing. Prevent overlapping `keyPositions`. |
+| `inputListeners[]` | `INPUT_LISTENER_DATA`, `features/listeners.py` | Manage sensor + listener graph (tilt, encoders, HRM). Visualize nodes, allow adding custom processors referencing `custom_defined_behaviors`. |
+| `custom_defined_behaviors`, `custom_devicetree`, `config_parameters`, `layout_parameters` | `COMMON_FIELDS` + metadata | Advanced configuration editors: text editor with schema-backed snippets for custom behaviors/device tree overlays, structured form for config/layout parameters. |
 
-## 3. Design Pillars
-1. **Parity-first** – Every feature from the legacy/web versions must map to a TUI affordance, even if staged. No feature is “web-only”.
-2. **Observable state** – Reflect web Redux/query stores via explicit, inspectable Python state containers so power users can debug their layout changes.
-3. **Asynchronous friendliness** – GitHub/file-system/clipboard adapters run in background workers with progress streaming into the TUI status bar.
-4. **Keyboard-native UX** – All commands exposed via shortcuts, command palette, contextual quick actions; pointing device optional.
-5. **Extensibility** – New tabs or editors should drop in as Textual `Screen`/`Dock` components without reshaping the whole app.
+## 3. Design Pillars (Repo-Aware)
+1. **Schema parity first** – The TUI reads/writes `LayoutPayload` objects and validates against `docs/layout_payload.schema.json` before persisting via `glove80.layouts.generator` logic.
+2. **Spec introspection** – Surfaces the same helpers the families use (home-row mods, cursor, mouse, HRM layers) so the TUI can stitch features exactly like `LayoutBuilder.add_home_row_mods/add_mouse_layers`.
+3. **Full behavior coverage** – Clicking any key exposes its behavior type (`&kp`, `&mt`, HRM macros, etc.), underlying params, and references to macros/combos/listeners.
+4. **Layer manipulation fidelity** – Users can reorder, duplicate, rename, or move layers while keeping `layer_names` synced and layer indices updated across combos/listeners referencing `LayerRef`.
+5. **Advanced power tools** – Device tree editing, custom behavior definitions, hold taps, combos, macros, mouse emulation, custom behaviors, and metadata toggles live in dedicated panes with schema-aware validation.
 
-## 4. Target Stack & High-Level Architecture
-- **Runtime:** Python 3.12+, Textual ≥0.59 for CSS-like layout, data tables, and background tasks.
-- **Data models:** Pydantic v2 models mirroring the Zod schemas (Behavior, Binding, Layer, Combo, Macro, Sensor, Warning, Keymap). Provide JSON serialization adapters to stay compatible with the data already stored under `keyboard-data` and `locales`.
-- **Persistence/adapters:**
-  - Demo data sourced from the existing TypeScript `packages/data` JSON (convert via script or expose through generated JSON artifacts).
-  - GitHub adapter built with `httpx` + GitHub REST API v3 (token optional); supports repo browse, branch pick, file fetch.
-  - Local FS adapter reads `.keymap/.dtsi` files via `pathlib`; File System Access parity delivered via Textual file picker widget.
-  - Clipboard adapter uses `pyperclip` (macOS/Linux/Windows) with fallback instructions.
-- **Core services:**
-  - `KeymapStore` (observable state tree) handling undo/redo, selection, dirty flags, validation snapshots.
-  - `SourceService`, `ParserService`, `SerializerService`, `ValidationService` mirroring responsibilities from the web version.
+## 4. High-Level Architecture
+
+- **Runtime:** Python 3.11+, Textual >= 0.59, sharing virtualenv with existing `uv` workflow.
+- **Data ingestion:**
+  - Load layout via `glove80.build_layout(family, variant)` or by parsing existing release JSON under `layouts/<family>/releases`.
+  - Validate against `LayoutPayload` Pydantic model. On save/export, re-run validation, then hand result to CLI/regenerator.
+- **Core modules:**
+  - `tui/models.py` – wrappers around `LayoutPayload`, providing selectors for layers, macros, combos, hold taps, listeners.
+  - `tui/state/store.py` – event log + undo/redo referencing repo actions (e.g., `AddCombo`, `SetLayerKeyBehavior`).
+  - `tui/services/builder_bridge.py` – convenience layer to call `LayoutBuilder` for feature insertion (mouse layer stack, home-row mods, cursor). Ensures parity with existing helpers in `src/glove80/layouts` and `src/glove80/features`.
+  - `tui/services/schema.py` – loads `docs/layout_payload.schema.json`, builds JSON Pointer index to drive forms and auto-complete.
+  - `tui/io/adapters.py` – open/save: in-place edit of release JSON, export to custom path, integrate with `glove80 generate --layout … --variant … --out …` for deterministic re-gen.
 - **UI composition:**
-  - Root `KeymapStudioApp` extends `textual.app.App` with CSS layout: left dock (sources/layers), center stage (canvas/inspectors), right dock (detail panes), bottom status/log bar, modal stack.
-  - Each web “tab” (Layers, Conditional Layers, Combos, Macros, Behaviors, Warnings) becomes either a dedicated `Screen` or a `TabbedContent` widget inside the main stage.
-- **Task orchestration:** use `textual.worker` for background operations (GitHub fetches, parsing, serialization). Results dispatched as messages to the UI components.
+  - **Source ribbon** (top): pick family/variant (Default/TailorKey/QuantumTouch/Glorious Engrammer) or load arbitrary JSON path.
+  - **Layer sidebar** (left dock): list of `layer_names`, status badges (custom features, home-row, mouse, cursor). Supports reordering via drag or shortcuts, renaming, duplicating, toggling visibility. “Pick up layer” uses selection to reorder.
+  - **Key canvas** (center): visual grid of 80 positions; clicking shows inspector, displays behavior type, macros, hold/shift combos, mouse layers, etc. Multi-layer view to “pick up” entire layer states and drop onto other variants.
+  - **Inspector tabs** (right): `Key`, `Macro`, `Hold Tap`, `Combo`, `Listener`, `Mouse/Device tree`, `Metadata`. Each tab surfaces relevant forms with validation from schema.
+  - **Bottom status/log**: background tasks (validation, regen), warnings, dirty flag, active layer/layer order cues.
 
-### Component/Module Map
-| Module | Responsibility |
-| --- | --- |
-| `models/` | Pydantic models + dataclasses representing behaviors, bindings, etc. |
-| `services/source_adapters/` | Demo, GitHub, Local, Clipboard adapters producing `KeymapDocument` objects (same shape as `src/api/types.ts`). |
-| `services/parser.py` | Wraps existing ZMK parser (initially stubbed like `parseKeymap` in schema package) with pluggable implementations. |
-| `services/serializer.py` | Outputs `.keymap` text; parity with `serializeKeymap`. |
-| `services/validator.py` | Applies schema validation + domain checks (duplicate combos, conflicting layers). |
-| `state/store.py` | Central event bus, undo stack, derived selectors (port of `summarizeLayers`). |
-| `ui/screens/` | Textual screens: `DashboardScreen`, `LayerEditorScreen`, `ComboScreen`, `MacroScreen`, `BehaviorsScreen`, `WarningsScreen`, `SourceWizardScreen`. |
-| `ui/widgets/` | Reusable widgets: Layer list, key grid, inspector sheet, sensor dial, status/log, notification toaster. |
-| `commands/` | Command palette definitions, key bindings, macros for automation. |
+## 5. Core Interaction Flows
 
-### Data & Message Flow (ASCII)
-```
-[User Action]→[UI Widget]→(Message)→[KeymapStore]→(event)
-     ↓                                          ↑
- [Background Worker]←(Task request)—[Service]←--+
-     ↓
- [Result]→[UI Notification/Store update]→[Render]
-```
+### 5.1 Key & Layer Editing
+- Click/keyboard-select key → inspector shows:
+  - Behavior primitive (`value` field) and nested params; type-aware rendering (`&kp`, `&HRM_*`, `&mt`, macros, combos, custom behaviors).
+  - Buttons: “Jump to macro”, “Jump to hold tap”, “Entry in combos”, “Show mouse layer context”.
+- Layer toolbar actions: rename (updates `layer_names` + references), duplicate (copies 80-key arrays + dependent macros if chosen), reorder (drag/drop). “Pick up layer” stores selected layer order and drop location to match user request.
+- Layer switcher uses `LayerRef` resolver to keep combos/listeners updated after rename/reorder.
 
-## 5. Layout & Navigation Concept
-```
-┌───────────────────────────────────────────────────────────────┐
-│ Source Bar │ Layer Stack │             Stage Tabs            │
-│            │             │  [Layers] [Combos] [Macros] ...   │
-├────────────┼─────────────┼───────────────────────────────────┤
-│ Picker     │ Active list │  Canvas / Grid / Table            │
-│ history    │ Layer meta  │                                   │
-│ + filters  │ + commands  │                                   │
-├────────────┴─────────────┼───────────────┬───────────────────┤
-│ Inspector / Behavior form│ Sensor pane   │ Validation feed   │
-├──────────────────────────┴───────────────┴───────────────────┤
-│ Status line (mode, GitHub, dirty flag, background jobs)      │
-└───────────────────────────────────────────────────────────────┘
-```
-- Dock arrangement adjustable via shortcut (switch to focus-only canvas, show/hide inspector, etc.).
-- Command palette (`Ctrl+P`) lists all actions (import, navigate to screen, run validation, export, etc.).
-- Breadcrumbs show `Source ▶ Keyboard ▶ Layer` to mirror the Topbar context in the React app.
+### 5.2 Macro Studio
+- Table listing `macros` with names, wait/tap timings, binding previews.
+- Detail editor replicates `MacroSpec` semantics: sequences of bindings, ability to insert `&kp`, `&text`, delays. Supports creation of macros referenced by keys or combos, ensuring names start with `&`.
 
-## 6. Core Workflow Specifications
+### 5.3 Hold Tap & Combo Editors
+- Hold Tap tab enumerates `holdTaps`. UI supplies typed fields for tapping term, flavor, idle requirement, quick tap, hold trigger pos; integrally cross-links to keys using that hold tap.
+- Combo builder: pick key positions from canvas, define binding behavior (macro, `&kp`, layer toggle). Provide layer scoping by referencing names or `LayerRef`. Validate positions unique and within 0–79.
 
-### 6.1 Source Onboarding (parity with `SourcePickerDialog` + legacy pickers)
-1. **Step 1 – Select source kind** via carousel/list (Demo, GitHub, Local, Clipboard). Mirrors the two-step dialog in the web app.
-2. **Step 2 – Configure** using contextual forms:
-   - Demo: pick from `listKeyboards()` (converted to JSON). Show preview metadata.
-   - GitHub: repo (`owner/name`), branch/tag, path to `keymap.dtsi`. Supports PAT input + caching.
-   - Local: file picker (Textual `FileTree`) + MRU list.
-   - Clipboard: paste area with syntax-highlight preview.
-3. **Step 3 – Import** triggers background fetch + parse pipeline, streaming progress to status bar. Result populates `KeymapStore`, updates `layers` view via `summarizeLayers` equivalent.
-4. **Document management** – track `KeymapDocument` metadata (id, sourceId, updatedAt) for display + persistence, matching `/src/api/types.ts` semantics.
+### 5.4 Mouse Emulation & Feature Bundles
+- Dedicated pane exposing `add_mouse_layers`, `add_cursor_layer`, `add_home_row_mods` flows from `LayoutBuilder`.
+- Provide toggles to re-run builder helpers based on selected variant. For instance, enabling mouse emulation inserts the standard mouse layers set for the variant; customizing HRM layers adds appropriate macros/combos produced by `LayoutFeatureComponents`.
 
-### 6.2 Layer Editing & Canvas (parity with `Canvas.tsx` + LayerEditor chunks)
-- Render keyboard geometry using Textual `Canvas` widget or custom grid. Align `KeyGeometry` using `row`, `col`, `width`, `rotation`. Provide optional ASCII fallback for simple terminals.
-- Selection model: arrow keys cycle keys; `Enter` opens inspector, `Space` toggles multi-select, `Shift+{Arrow}` extends selection.
-- Visual states mimic web colors (base, layer toggle, holds). Provide legend widget just like the React card footnote.
-- Tab list replicates `Tabs/TabsTrigger` behavior: `Layers`, `Conditional`, `Combos`, `Macros`, `Behaviors`, `Warnings`. Focus switching uses `Ctrl+Tab`.
-- Quick actions: `a` adds layer, `d` duplicates, `r` renames, `g` go-to layer by index.
+### 5.5 Custom Behaviors & Device Tree
+- `custom_defined_behaviors` editor with syntax-highlight text area, snippet insertion for frequently used definitions (HRM, thumb arcs, etc.).
+- `custom_devicetree` editor surfaces overlay nodes; includes validation hooks that parse device-tree (e.g., via tree-sitter or dtc) to catch structural issues before writing.
+- `config_parameters`/`layout_parameters` shown as editable tables; add/del entries with type detection (string/int/bool/JSON) according to schema.
 
-### 6.3 Binding Inspector (parity with `BindingInspector.tsx`)
-- Appears as right-docked sheet. Shows key legend, behavior code, parameters table.
-- Editing flows: inline editing of override display, selecting behavior templates (via list filtered by locale), editing params with validation.
-- Actions: apply to selection, apply to entire row/column, revert to keyboard default, mark as macro trigger.
+### 5.6 Advanced Configuration
+- Support custom-defined behaviors referencing macros, combos, hold taps.
+- Input listener graph view shows `inputListeners` and `ListenerNode` relationships; clicking nodes reveals sensors/encoders, allows editing `inputProcessors` and `layers` list.
+- Provide “Add behavior from snippet” palette referencing `src/glove80/features` so TUI uses canonical definitions.
 
-### 6.4 Behavior/Macro/Combo/Conditional Editors
-- **Behaviors Tab**: tabular view derived from `BehaviorEditorTab.*` chunk. Supports filtering by kind, editing parameters, duplication detection.
-- **Combos Tab**: multi-row table showing source keys, output behavior, notes. Provide combination builder widget (select keys from grid, confirm). Validations highlight overlaps.
-- **Conditional Layers Tab**: manager for activation rules (e.g., sensors, positional combos). Provide detail form for condition type (hold tap, sensor threshold, custom behaviors) to match original feature chunk.
-- **Macros Tab**: step editor (tap/text/delay), preview, and playback simulation.
-- Each editor integrates with `Warnings Tab` aggregator which surfaces issues (missing definitions, duplicates) just like the React warnings dashboard.
+### 5.7 Validation & Regen Integration
+- Continuous validation pipeline: (1) Pydantic check, (2) schema check via exported JSON schema, (3) semantic checks (duplicate macros, orphan combos, missing layers). Errors bubble into warnings panel tied to `Warnings` tab.
+- `Regen Preview` runs `uv run glove80 generate --layout … --variant … --dry-run` to compare TUI state with canonical generator output, showing diff per section before writing JSON.
 
-### 6.5 Sensors & Encoders
-- Dedicated pane showing left/right encoder bindings, tilt sensors, RGB controls. Use dial widgets to convey rotation degrees. Behavior selection shares the binding inspector foundation.
-- Support per-sensor overrides plus global defaults.
+## 6. Feature Coverage Checklist (per requirements)
+- ✅ Click keys to show behavior type and settings.
+- ✅ Create/edit macros, hold taps, combos, mouse/cursor/home-row feature layers, thumb behaviors, HRM macros.
+- ✅ Manage custom-defined behaviors, custom device-tree overlays, config/layout parameters.
+- ✅ Build hold-tap layers, combos, mouse emulation, HRM, macros referencing real repo helpers.
+- ✅ Switch layers, reorder/pick up/duplicate/rename layers; move layers across variants.
+- ✅ Support advanced features: custom behaviors referencing devicetree, advanced config editors, input listeners, sensors.
 
-### 6.6 Validation & Warnings
-- Background validation runs on significant mutations (debounced). Collect warnings (info/warn/error) with location references (layer/key/macro). Display summary count in status line and detail view replicating `WarningsTab.*` chunk.
-- Provide quick-fix shortcuts (jump to offending binding, auto-deduplicate combos, etc.).
+## 7. Implementation Roadmap (Textual)
+1. **Foundation**: load `LayoutPayload` via CLI, validate with Pydantic + schema, stub state store, render layer list + base canvas.
+2. **Inspector & Layer Ops**: implement key inspector, layer rename/reorder/move UI, integrate undo/redo.
+3. **Macro/Hold Tap/Combo Editors**: build dedicated screens, cross-link to keys, ensure schema validation.
+4. **Feature Bundles & Mouse Emulation**: integrate builder helpers, provide toggles, diff preview.
+5. **Custom Behavior + Device Tree Editors**: add schema-backed text editors, referencing `custom_defined_behaviors` and `custom_devicetree`.
+6. **Validation + Regen**: background validation, run `scripts/export_layout_schema.py` in CI to keep schema current, connect to `glove80 generate --dry-run` for parity.
+7. **Polish**: command palette, theming, multi-layout tabs, Git-friendly export status, autop-run tests via `just ci`.
 
-### 6.7 Persistence & Export
-- Support saving back to original source via adapter contract:
-  - Demo: read-only (warn user).
-  - GitHub: create commit via REST (optionally open PR) – stage as future enhancement but plan API contract now.
-  - Local: write file or export to target path.
-  - Clipboard: copy serialized `.keymap` text.
-- Always show dirty indicator and prompt before exit.
+## 8. Deliverables & Handoff
+- Updated `docs/layout_payload.schema.json` via `scripts/export_layout_schema.py`.
+- This design doc (`TUI_DESIGN.md`) describing repo-aware plan.
+- Prompt (see separate section) for another AI referencing this doc and schema to flesh out UI implementation.
 
-### 6.8 Localization & Keycode Catalog
-- Mirror `locales/*.js` by bundling JSON; allow user to switch locale, altering available keycodes in behavior picker. Provide preview popover inside inspector.
-
-## 7. State Management & Data Integrity
-- `KeymapStore` uses an event-sourced pattern: actions (e.g., `SelectLayer`, `UpdateBinding`, `AddCombo`) logged with timestamps and undo metadata.
-- Derived selectors: `get_active_layer()`, `get_binding(key_id)`, `list_layers()` (port of `summarizeLayers`), `list_warnings()`, etc.
-- Snapshot persistence for autosave (YAML/JSON) stored in `~/.keymap-studio-tui/projects/{sourceId}.json`.
-- Validation pipeline: structural validation (Pydantic) → semantic validation (duplicate detection) → adapter warnings (e.g., GitHub auth failure). All results normalized into `Warning` objects identical to schema package.
-
-## 8. Interaction & Commands
-- Global keymap:
-  - `Ctrl+P` open command palette; `:` toggles quick command mode (like Vim) for actions `:export`, `:reload`, `:goto layer base`.
-  - `F1` toggles help overlay summarizing shortcuts (replaces Topbar tagline from React app).
-  - `Ctrl+S` save via active source adapter; `Ctrl+Shift+S` “Save As” (local export or new branch).
-  - `Alt+[` / `Alt+]` cycle tabs; `Ctrl+/` toggles log pane.
-- Notifications appear as toasts near bottom-right (mirrors web modals) with actions (undo, open log).
-- Mouse support optional (Textual supports), but all operations reachable via keyboard sequences.
-
-## 9. Background Tasks & Networking
-- Wrap long-running adapters in `textual.worker` to avoid blocking UI. Provide cancellable progress modals with logs.
-- Use `asyncio` + `httpx.AsyncClient` for GitHub operations; implement rate-limit handling and offline fallback (cached responses).
-- File watcher: when editing local source, optional `watchdog` monitors file for external changes and prompts reload (parity with browser auto-refresh expectation).
-
-## 10. Theming & Accessibility
-- Terminal color themes: `light`, `dark`, `high-contrast`. Persist preference in `~/.config/keymap-studio-tui/settings.json`, analogous to `saveTheme` logic in `packages/core/src/theme.ts`.
-- Respect system theme via `darkdetect` on macOS/Linux or Windows registry query.
-- Provide monospace font fallback detection; degrade gracefully on limited color terminals (using ASCII-style keycaps if necessary).
-- Ensure screen-reader compatibility by exposing textual descriptions (Textual’s accessibility APIs) for selected key, layer, warning.
-
-## 11. Testing & Tooling
-- **Unit tests:** Pydantic models, selector logic, adapters with mocked IO.
-- **Golden tests:** serialization/deserialization parity vs. existing TypeScript schemas using shared fixture JSON.
-- **TUI integration tests:** use `textual-dev`’s pilot to simulate keypresses (load demo, edit binding, export) for regression coverage.
-- **Adapter contract tests:** record/replay HTTP interactions for GitHub operations via `pytest-httpx` to ensure deterministic runs.
-- **Performance budgets:** ensure rendering 70+ keys + combos stays under 50ms per frame; measure with Textual instrumentation.
-
-## 12. Implementation Roadmap
-1. **Foundation (Parity scaffolding)**
-   - Port schemas to Pydantic, implement storage, load demo keyboard.
-   - Build `KeymapStore` + selectors, autosave scaffolding.
-   - Render base layout (source bar, layer list, canvas with key selection) using demo data.
-2. **Source integrations**
-   - Implement Source Wizard with demo + clipboard first, then local FS, finally GitHub (read-only, later write-back).
-3. **Editors & inspectors**
-   - Binding inspector + key legend editing.
-   - Combos/macros/sensor screens and associated state reducers.
-4. **Validation & warnings**
-   - Semantic validators, warnings tab, inline badges, quick fixes.
-5. **Persistence & export**
-   - Serialize to `.keymap`, clipboard export, file save, GitHub save (branch or PR creation as stretch).
-6. **Polish**
-   - Command palette, theming, help overlay, logging panel, plugin hooks.
-
-Each phase should end with recorded demo GIFs (Textual capture) and docs updates referencing parity checkpoints.
-
-## 13. Documentation & Handoff
-- Maintain this plan plus incremental notes (`docs/tui/decisions/*.md`).
-- Update `PLAN.md` milestones to reflect TUI direction once implementation starts.
-- Provide onboarding runbook covering environment setup (`uv`/`poetry`), dev commands (`textual run keymap_studio/app.py`), and troubleshooting (terminal config, GitHub tokens).
-
-This design keeps the spirit and power features of Keymap Studio while embracing a Textual-first experience, ensuring that every capability present in the existing React/web artifacts has a clearly defined home in the terminal UI.
+With these pieces the downstream AI designer can work directly against the canonical schema and code concepts, ensuring the Textual TUI mirrors the Glove80 generation pipeline instead of the unrelated legacy web app.
