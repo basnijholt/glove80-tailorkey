@@ -336,6 +336,147 @@ class LayoutStore:
             params=params,
         )
 
+    # ------------------------------------------------------------------
+    # Macro management API
+    def list_macros(self) -> Tuple[MacroPayload, ...]:
+        """Return a deep copy of the current macro payloads."""
+
+        return tuple(deepcopy(macro) for macro in self._state.macros)
+
+    def find_macro_references(self, name: str) -> Dict[str, Tuple[Dict[str, Any], ...]]:
+        """Locate every reference to *name* across the layout."""
+
+        references: Dict[str, List[Dict[str, Any]]] = {
+            "keys": [],
+            "hold_taps": [],
+            "combos": [],
+            "listeners": [],
+            "macros": [],
+        }
+
+        for layer_index, record in enumerate(self._state.layers):
+            for key_index, slot in enumerate(record.slots):
+                if slot.get("value") == name:
+                    references["keys"].append(
+                        {
+                            "layer_index": layer_index,
+                            "layer_name": record.name,
+                            "key_index": key_index,
+                        }
+                    )
+
+        for index, hold in enumerate(self._state.hold_taps):
+            if _contains_string(hold, name):
+                references["hold_taps"].append({"index": index, "name": hold.get("name")})
+
+        for index, combo in enumerate(self._state.combos):
+            binding = combo.get("binding")
+            if _contains_string(binding, name):
+                references["combos"].append({"index": index, "name": combo.get("name")})
+
+        for index, listener in enumerate(self._state.listeners):
+            if _contains_string(listener, name):
+                references["listeners"].append({"index": index, "code": listener.get("code")})
+
+        for index, macro in enumerate(self._state.macros):
+            if macro.get("name") == name:
+                continue
+            if _contains_string(macro, name):
+                references["macros"].append({"index": index, "name": macro.get("name")})
+
+        return {key: tuple(entries) for key, entries in references.items()}
+
+    def add_macro(self, macro: Mapping[str, Any]) -> None:
+        normalized = _normalize_macro_payload(macro)
+        name = normalized["name"]
+        self._ensure_macro_name_available(name)
+        self._record_snapshot()
+        macros = list(self._state.macros)
+        macros.append(normalized)
+        self._state = replace(self._state, macros=tuple(macros))
+        self._redo_stack.clear()
+
+    def update_macro(self, *, name: str, payload: Mapping[str, Any]) -> None:
+        index = self._macro_index(name)
+        normalized = _normalize_macro_payload(payload)
+        new_name = normalized["name"]
+        rename_map: Dict[str, str] = {}
+        if new_name != name:
+            self._ensure_macro_name_available(new_name)
+            rename_map = {name: new_name}
+
+        self._record_snapshot()
+        macros = list(self._state.macros)
+        macros[index] = normalized
+        if rename_map:
+            macros = [
+                normalized if idx == index else _replace_strings(macro, rename_map)
+                for idx, macro in enumerate(macros)
+            ]
+        layers = self._rewrite_layers_with_macros(rename_map) if rename_map else self._state.layers
+        combos = (
+            self._rewrite_sequence_with_macros(self._state.combos, rename_map)
+            if rename_map
+            else self._state.combos
+        )
+        hold_taps = (
+            self._rewrite_sequence_with_macros(self._state.hold_taps, rename_map)
+            if rename_map
+            else self._state.hold_taps
+        )
+        listeners = (
+            self._rewrite_sequence_with_macros(self._state.listeners, rename_map)
+            if rename_map
+            else self._state.listeners
+        )
+        self._state = LayoutState(
+            layer_names=self._state.layer_names,
+            layers=layers,
+            macros=tuple(macros),
+            hold_taps=hold_taps,
+            combos=combos,
+            listeners=listeners,
+        )
+        self._redo_stack.clear()
+
+    def delete_macro(self, *, name: str, force: bool = False) -> None:
+        index = self._macro_index(name)
+        references = self.find_macro_references(name)
+        has_refs = any(
+            references[key] for key in ("keys", "hold_taps", "combos", "listeners", "macros")
+        )
+        if has_refs and not force:
+            raise ValueError(f"Macro '{name}' is referenced and cannot be deleted")
+
+        self._record_snapshot()
+        macros = list(self._state.macros)
+        macros.pop(index)
+        if has_refs:
+            cleanup_map = {name: ""}
+            layers = self._rewrite_layers_with_macros(cleanup_map)
+            combos = self._rewrite_sequence_with_macros(self._state.combos, cleanup_map)
+            hold_taps = self._rewrite_sequence_with_macros(self._state.hold_taps, cleanup_map)
+            listeners = self._rewrite_sequence_with_macros(self._state.listeners, cleanup_map)
+            macros = [
+                _replace_strings(macro, cleanup_map) if macro.get("name") != name else macro
+                for macro in macros
+            ]
+        else:
+            layers = self._state.layers
+            combos = self._state.combos
+            hold_taps = self._state.hold_taps
+            listeners = self._state.listeners
+
+        self._state = LayoutState(
+            layer_names=self._state.layer_names,
+            layers=layers,
+            macros=tuple(macros),
+            hold_taps=hold_taps,
+            combos=combos,
+            listeners=listeners,
+        )
+        self._redo_stack.clear()
+
     def export_payload(self) -> Dict[str, Any]:
         """Return a deep-copied payload representing the current state."""
 
@@ -401,6 +542,34 @@ class LayoutStore:
             key_index = 0
         self._selection = SelectionState(layer_index=layer_index, key_index=key_index)
 
+    def _ensure_macro_name_available(self, name: str) -> None:
+        if any(macro.get("name") == name for macro in self._state.macros):
+            raise ValueError(f"Macro '{name}' already exists")
+
+    def _macro_index(self, name: str) -> int:
+        for index, macro in enumerate(self._state.macros):
+            if macro.get("name") == name:
+                return index
+        raise ValueError(f"Macro '{name}' not found")
+
+    def _rewrite_layers_with_macros(self, rename_map: Mapping[str, str]) -> Tuple[LayerRecord, ...]:
+        if not rename_map:
+            return self._state.layers
+        records: List[LayerRecord] = []
+        for record in self._state.layers:
+            slots = tuple(_replace_strings(slot, rename_map) for slot in record.slots)
+            records.append(replace(record, slots=slots))
+        return tuple(records)
+
+    def _rewrite_sequence_with_macros(
+        self,
+        items: Tuple[Dict[str, Any], ...],
+        rename_map: Mapping[str, str],
+    ) -> Tuple[Dict[str, Any], ...]:
+        if not rename_map:
+            return items
+        return tuple(_replace_strings(item, rename_map) for item in items)
+
 
 def _increment_name(base: str, existing: Iterable[str]) -> str:
     counter = 2
@@ -425,6 +594,45 @@ def _rewrite_layer_refs(data: Any, rename_map: Mapping[str, str]) -> Any:
         return [_rewrite_layer_refs(item, rename_map) for item in data]
     if isinstance(data, tuple):
         return tuple(_rewrite_layer_refs(item, rename_map) for item in data)
+    return data
+
+
+def _normalize_macro_payload(macro: Mapping[str, Any]) -> MacroPayload:
+    if "name" not in macro:
+        raise ValueError("Macro payload must include 'name'")
+    name = str(macro["name"]).strip()
+    if not name:
+        raise ValueError("Macro name cannot be empty")
+    if not name.startswith("&"):
+        raise ValueError("Macro name must start with '&'")
+    normalized: Dict[str, Any] = deepcopy(dict(macro))
+    normalized["name"] = name
+    normalized.setdefault("bindings", [])
+    normalized.setdefault("params", [])
+    return normalized
+
+
+def _contains_string(data: Any, target: str) -> bool:
+    if isinstance(data, str):
+        return data == target
+    if isinstance(data, Mapping):
+        return any(_contains_string(value, target) for value in data.values())
+    if isinstance(data, (list, tuple)):
+        return any(_contains_string(item, target) for item in data)
+    return False
+
+
+def _replace_strings(data: Any, replacements: Mapping[str, str]) -> Any:
+    if not replacements:
+        return data
+    if isinstance(data, str):
+        return replacements.get(data, data)
+    if isinstance(data, Mapping):
+        return {k: _replace_strings(v, replacements) for k, v in data.items()}
+    if isinstance(data, list):
+        return [_replace_strings(item, replacements) for item in data]
+    if isinstance(data, tuple):
+        return tuple(_replace_strings(item, replacements) for item in data)
     return data
 
 
