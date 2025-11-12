@@ -6,9 +6,9 @@ import json
 from typing import Any, Dict, Optional, Sequence
 
 from textual import on
-from textual.containers import Vertical
+from textual.containers import Vertical, VerticalScroll
 from textual.suggester import Suggester
-from textual.widgets import Button, Input, Label, ListItem, ListView, Static
+from textual.widgets import Button, Input, Label, ListItem, ListView, Static, TabbedContent, TabPane
 
 from ..messages import FooterMessage, SelectionChanged, StoreUpdated
 from ..state import (
@@ -38,12 +38,25 @@ class InspectorPanel(Vertical):
 
     def compose(self):  # type: ignore[override]
         yield Static("Inspector", classes="inspector-heading")
-        yield self.key_inspector
-        yield self.macro_tab
-        yield self.hold_tap_tab
-        yield self.combo_tab
-        yield self.listener_tab
-        yield self.features_tab
+        with TabbedContent(initial="tab-key", id="inspector-tabs"):
+            with TabPane("Key", id="tab-key"):
+                with VerticalScroll(classes="inspector-scroll"):
+                    yield self.key_inspector
+            with TabPane("Macros", id="tab-macros"):
+                with VerticalScroll(classes="inspector-scroll"):
+                    yield self.macro_tab
+            with TabPane("Hold Taps", id="tab-holdtaps"):
+                with VerticalScroll(classes="inspector-scroll"):
+                    yield self.hold_tap_tab
+            with TabPane("Combos", id="tab-combos"):
+                with VerticalScroll(classes="inspector-scroll"):
+                    yield self.combo_tab
+            with TabPane("Listeners", id="tab-listeners"):
+                with VerticalScroll(classes="inspector-scroll"):
+                    yield self.listener_tab
+            with TabPane("Features", id="tab-features"):
+                with VerticalScroll(classes="inspector-scroll"):
+                    yield self.features_tab
 
 
 class KeyInspector(Vertical):
@@ -184,7 +197,6 @@ class KeyInspector(Vertical):
         self.post_message(StoreUpdated())
         self._load_from_store()
 
-
     # ------------------------------------------------------------------
     # Test helper -------------------------------------------------------
     def apply_value_for_test(self, value: str, params: Sequence[str] | None = None) -> None:
@@ -279,11 +291,7 @@ class FeaturesTab(Vertical):
         self._pending_request = (target, "after")
         self._set_summary(f"HRM → {target}: {diff.summary()}")
         has_changes = bool(
-            diff.layers_added
-            or diff.macros_added
-            or diff.hold_taps_added
-            or diff.combos_added
-            or diff.listeners_added
+            diff.layers_added or diff.macros_added or diff.hold_taps_added or diff.combos_added or diff.listeners_added
         )
         self._has_pending_changes = has_changes
         self.apply_button.disabled = not has_changes
@@ -966,8 +974,12 @@ class HoldTapTab(Vertical):
         self.tapping_input = Input(placeholder="tappingTermMs", id="holdtap-tapping-input", value="200")
         self.quick_input = Input(placeholder="quickTapMs", id="holdtap-quick-input", value="0")
         self.idle_input = Input(placeholder="requirePriorIdleMs", id="holdtap-idle-input", value="0")
-        self.trigger_positions_input = Input(placeholder="holdTriggerKeyPositions (e.g. 0, 5)", id="holdtap-trigger-input")
-        self.trigger_release_input = Input(placeholder="holdTriggerOnRelease (true/false)", id="holdtap-onrelease-input")
+        self.trigger_positions_input = Input(
+            placeholder="holdTriggerKeyPositions (e.g. 0, 5)", id="holdtap-trigger-input"
+        )
+        self.trigger_release_input = Input(
+            placeholder="holdTriggerOnRelease (true/false)", id="holdtap-onrelease-input"
+        )
         self.ref_label = Static("", classes="macro-refs", id="holdtap-ref-summary")
         self.add_button = Button("Add", id="holdtap-add")
         self.apply_button = Button("Apply", id="holdtap-apply", disabled=True)
@@ -1169,7 +1181,6 @@ class HoldTapTab(Vertical):
         elif on_release in {"false", "0", "no", "off"}:
             payload["holdTriggerOnRelease"] = False
         return payload
-
 
 
 # ---------------------------------------------------------------------------

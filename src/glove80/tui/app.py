@@ -6,7 +6,7 @@ import copy
 from typing import Any, Mapping, Optional
 
 from textual import on
-from textual.app import App, ComposeResult
+from textual.app import App
 from textual.binding import Binding
 from textual.message import Message
 
@@ -51,9 +51,34 @@ class Glove80TuiApp(App[None]):
     }
 
     .inspector-panel {
-        width: 34;
+        width: 42;
+        min-width: 36;
+        max-width: 52;
+        height: 1fr;
         border: solid $surface 10%;
         padding: 1;
+        overflow: hidden;
+    }
+
+    .inspector-panel Input {
+        width: 38;
+        min-width: 32;
+        max-width: 48;
+    }
+
+    #inspector-tabs {
+        height: 1fr;
+    }
+
+    #inspector-tabs TabPane {
+        height: 1fr;
+        padding: 0;
+    }
+
+    .inspector-scroll {
+        height: 1fr;
+        overflow-y: auto;
+        padding-right: 1;
     }
 
     .macro-tab {

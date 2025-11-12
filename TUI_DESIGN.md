@@ -35,7 +35,7 @@ IMPORTANT: Also make sure to commit often and run the tests with `uv run pytest`
    - **Layer Sidebar** (left) – Renders `layer_names[]`, supports drag/drop reorder, duplicate, rename, hide/show, “pick up & drop” interactions, and badges showing feature provenance (HRM/mouse/cursor/custom). Layer actions update references (`LayerRef`) everywhere.
    - **Key Canvas** (center) – 80-key grid per layer (tailored to Glove80 geometry). Click or navigate via keyboard to inspect/modify key behaviors; multi-layer split view available for copy/drop operations.
   - **Inspector Tabs** (right) – Context-aware forms: Key, Macro, Hold Tap, Combo, Listener, Features (builder toggles), Advanced (custom behaviors/device tree/config/layout parameters), Metadata.
-  - _Note (2025-11-12): Key/Macro/HoldTap/Combo/Listener tabs are feature-complete with unit + pilot coverage and continue to honor the copy contract documented in `docs/STORE_API_COPY_KEY.md`. Features tab currently exposes only HRM preview/apply (cursor/mouse bundles + provenance UX pending); Advanced/Metadata remain TODO._
+  - _Note (2025-11-12): Key/Macro/HoldTap/Combo/Listener tabs are feature-complete with unit + pilot coverage and continue to honor the copy contract documented in `docs/STORE_API_COPY_KEY.md`. The inspector now uses Textual `TabbedContent`, so only one studio is visible at a time and the right rail stays compact. Features tab currently exposes only HRM preview/apply (cursor/mouse bundles + provenance UX pending); Advanced/Metadata remain TODO._
 3. **Status & Logs (Footer)** – Shows dirty flag, active layer, validation counts, background task progress (e.g., regen, CLI validation), and streaming logs.
 
 ### 3.2 Secondary Surfaces
