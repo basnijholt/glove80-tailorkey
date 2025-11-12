@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Mapping, Optional, Sequence, Literal
 
 from textual import on
 from textual.containers import Vertical, VerticalScroll
@@ -1207,7 +1207,7 @@ def _display_tokens(slot: dict[str, object]) -> tuple[str, list[str]]:
     return raw_value, tokens
 
 
-def _reference_count(refs: Dict[str, Sequence[Dict[str, Any]]]) -> int:
+def _reference_count(refs: Mapping[str, Sequence[Dict[str, Any]]]) -> int:
     return sum(len(entries) for entries in refs.values())
 
 

@@ -6,7 +6,7 @@ from textual.widgets import Button, Input
 
 from glove80.tui.app import Glove80TuiApp
 from glove80.tui.messages import StoreUpdated
-from glove80.tui.widgets.inspector import HoldTapTab, KeyInspector
+from glove80.tui.widgets.inspector import HoldTapTab
 
 
 def test_hold_tap_tab_create_rename_delete() -> None:
@@ -28,7 +28,6 @@ def test_hold_tap_tab_create_rename_delete() -> None:
 
             assert any(ht["name"] == "&hold_test" for ht in pilot.app.store.list_hold_taps())
 
-            inspector = pilot.app.screen.query_one(KeyInspector)
             pilot.app.store.set_selection(layer_index=0, key_index=0)
             pilot.app.store.update_selected_key(value="&hold_test", params=[])
             pilot.app.post_message(StoreUpdated())

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Dict, Iterable, Literal, Mapping, Sequence
+from typing import Dict, Iterable, Literal, Mapping, Sequence, Tuple, cast
 
 from glove80.families.tailorkey.layers.hrm import build_hrm_layers
 from glove80.layouts.components import LayoutFeatureComponents
@@ -91,7 +91,7 @@ class BuilderBridge:
     # Internals
     def _apply_home_row_mods(
         self,
-        payload: Mapping[str, object],
+        payload: Dict[str, object],
         *,
         target_layer: str,
         position: Literal["before", "after"],
@@ -105,7 +105,8 @@ class BuilderBridge:
         layout = deepcopy(payload)
         merge_components(layout, components)
 
-        component_names = list(components.layers.keys())
+        layer_map = cast(Mapping[str, object], components.layers)
+        component_names = list(layer_map.keys())
         self._reorder_layers(layout, component_names, target_layer=target_layer, position=position)
 
         diff = self._build_diff(payload, layout, component_names, target_layer=target_layer)
@@ -123,7 +124,7 @@ class BuilderBridge:
         target_layer: str,
         position: Literal["before", "after"],
     ) -> None:
-        layer_names = list(layout.get("layer_names", []))
+        layer_names = list(_string_sequence(layout.get("layer_names")))
         if target_layer not in layer_names:
             raise ValueError(f"Unknown target layer '{target_layer}'")
 
@@ -134,7 +135,8 @@ class BuilderBridge:
         anchor_index = sanitized.index(target_layer)
         insert_index = anchor_index + (1 if position == "after" else 0)
         updated_order = sanitized[:insert_index] + list(component_names) + sanitized[insert_index:]
-        layers_by_name = dict(zip(layer_names, layout.get("layers", []), strict=False))
+        layer_entries = list(cast(Sequence[object], layout.get("layers", [])))
+        layers_by_name = dict(zip(layer_names, layer_entries, strict=False))
         layout["layer_names"] = updated_order
         layout["layers"] = [layers_by_name[name] for name in updated_order]
 
@@ -146,36 +148,53 @@ class BuilderBridge:
         *,
         target_layer: str,
     ) -> FeatureDiff:
-        orig_macro_names = _names(original.get("macros", []))
-        new_macro_names = _names(mutated.get("macros", []))
-        orig_hold_names = _names(original.get("holdTaps", []))
-        new_hold_names = _names(mutated.get("holdTaps", []))
+        orig_macro_names = _names(_sequence_of_mappings(original.get("macros")))
+        new_macro_names = _names(_sequence_of_mappings(mutated.get("macros")))
+        orig_hold_names = _names(_sequence_of_mappings(original.get("holdTaps")))
+        new_hold_names = _names(_sequence_of_mappings(mutated.get("holdTaps")))
 
-        orig_combos = len(original.get("combos", []) or [])
-        new_combos = len(mutated.get("combos", []) or [])
-        orig_listeners = len(original.get("inputListeners", []) or [])
-        new_listeners = len(mutated.get("inputListeners", []) or [])
+        orig_combos = len(_sequence_of_mappings(original.get("combos")))
+        new_combos = len(_sequence_of_mappings(mutated.get("combos")))
+        orig_listeners = len(_sequence_of_mappings(original.get("inputListeners")))
+        new_listeners = len(_sequence_of_mappings(mutated.get("inputListeners")))
 
         return FeatureDiff(
             feature="hrm",
             target_layer=target_layer,
-            layers_added=tuple(name for name in component_names if name not in original.get("layer_names", [])),
+            layers_added=tuple(
+                name for name in component_names if name not in _string_sequence(original.get("layer_names"))
+            ),
             macros_added=tuple(name for name in new_macro_names if name not in orig_macro_names),
             hold_taps_added=tuple(name for name in new_hold_names if name not in orig_hold_names),
             combos_added=new_combos - orig_combos,
             listeners_added=new_listeners - orig_listeners,
-            layer_order=tuple(mutated.get("layer_names", [])),
+            layer_order=_string_sequence(mutated.get("layer_names")),
         )
 
 
-def _names(items: Iterable[object]) -> set[str]:
+def _names(items: Iterable[Mapping[str, object]]) -> set[str]:
     names: set[str] = set()
     for item in items:
-        if isinstance(item, Mapping):
-            value = item.get("name")
-            if isinstance(value, str):
-                names.add(value)
+        value = item.get("name")
+        if isinstance(value, str):
+            names.add(value)
     return names
+
+
+def _sequence_of_mappings(value: object | None) -> Tuple[Mapping[str, object], ...]:
+    if isinstance(value, Sequence):
+        collected: list[Mapping[str, object]] = []
+        for entry in value:
+            if isinstance(entry, Mapping):
+                collected.append(entry)
+        return tuple(collected)
+    return ()
+
+
+def _string_sequence(value: object | None) -> Tuple[str, ...]:
+    if isinstance(value, Sequence):
+        return tuple(entry for entry in value if isinstance(entry, str))
+    return ()
 
 
 __all__ = ["BuilderBridge", "FeatureDiff"]

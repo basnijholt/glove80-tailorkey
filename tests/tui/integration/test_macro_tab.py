@@ -6,7 +6,7 @@ from textual.widgets import Button, Input
 
 from glove80.tui.app import Glove80TuiApp
 from glove80.tui.messages import StoreUpdated
-from glove80.tui.widgets.inspector import KeyInspector, MacroTab
+from glove80.tui.widgets.inspector import MacroTab
 
 
 def test_macro_tab_create_rename_and_undo() -> None:
@@ -28,7 +28,6 @@ def test_macro_tab_create_rename_and_undo() -> None:
 
             assert any(macro["name"] == "&macro_test" for macro in pilot.app.store.list_macros())
 
-            inspector = pilot.app.screen.query_one(KeyInspector)
             pilot.app.store.update_selected_key(value="&macro_test", params=[])
             pilot.app.post_message(StoreUpdated())
             await pilot.pause()

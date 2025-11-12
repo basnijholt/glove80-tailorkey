@@ -1227,7 +1227,10 @@ def _normalize_combo_payload(payload: Mapping[str, Any]) -> ComboPayload:
 
     timeout = payload.get("timeoutMs")
     if timeout not in (None, ""):
-        timeout_int = int(timeout)
+        try:
+            timeout_int = int(str(timeout))
+        except (TypeError, ValueError) as exc:  # pragma: no cover - defensive
+            raise ValueError("timeoutMs must be an integer") from exc
         if timeout_int < 0:
             raise ValueError("timeoutMs must be ≥ 0")
         normalized["timeoutMs"] = timeout_int
