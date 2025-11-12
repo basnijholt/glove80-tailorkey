@@ -235,7 +235,7 @@ class KeyCanvas(Widget):
         clean = " ".join(label.split()) or "--"
         if len(clean) > self.MAX_LABEL_CHARS:
             clean = f"{clean[: self.MAX_LABEL_CHARS - 1]}…"
-        return clean.upper().center(self.MAX_LABEL_CHARS)
+        return clean.upper()
 
     def _request_inspector_focus(self) -> None:
         if self._selection.layer_index < 0 or self._selection.key_index < 0:
