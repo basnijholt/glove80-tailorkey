@@ -6,6 +6,8 @@ This document is the single source of truth for the upcoming Textual (Python) TU
 
 > **Progress note (2025-11-12)**: Milestones 1–3 are live in `tui/` (LayerSidebar, KeyCanvas navigation/copy, validated Key Inspector). Macro, HoldTap, Combo, and Listener studios (all landed 2025‑11‑12) now ship with full CRUD, undo/redo, and Textual pilot coverage, and the Features tab previews/applies HRM bundles via the BuilderBridge service. Remaining surfaces: extend Features with cursor/mouse bundles + provenance UX, deliver Command Palette/Search, wire Validation/Regen/Save, and finish the polish/accessibility pass. Keep `docs/TUI_CHECKLIST.md` and `docs/TUI_IMPL_PLAN.md` in sync with any changes captured here.
 
+> **Bootstrap note (2025-11-12)**: `Glove80TuiApp` now hydrates layouts in this order: (1) explicit payloads passed to the app, (2) `families/default` variant `factory_default` via the layout family registry (imported lazily so startup stays cheap), and (3) the legacy `DEFAULT_SAMPLE_LAYOUT` if the registry build fails. Tests that still depend on the sample payload must request it explicitly to avoid coupling to the new default.
+
 IMPORTANT: Also make sure to commit often and run the tests with `uv run pytest`!
 
 ## 1. Source-of-Truth Context & Guarantees

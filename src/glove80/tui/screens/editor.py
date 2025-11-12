@@ -30,7 +30,7 @@ class EditorScreen(Screen[None]):
         super().__init__()
         self.store = store
         self._initial_layout = initial_layout or "default"
-        self._initial_variant = initial_variant or "windows"
+        self._initial_variant = initial_variant or "factory_default"
         self._canvas: KeyCanvas | None = None
         self._inspector: InspectorDrawer | None = None
         self._layers: LayerStrip | None = None

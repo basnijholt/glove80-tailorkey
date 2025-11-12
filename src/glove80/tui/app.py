@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import logging
 from typing import Any, Mapping, Optional
 
 from textual import on
@@ -13,6 +14,32 @@ from textual.message import Message
 from .messages import StoreUpdated
 from .screens.editor import EditorScreen
 from .state import DEFAULT_SAMPLE_LAYOUT, LayoutStore
+
+
+_LOGGER = logging.getLogger(__name__)
+_DEFAULT_FAMILY = "default"
+_DEFAULT_VARIANT = "factory_default"
+
+
+def _load_default_family_payload() -> Mapping[str, Any]:
+    from glove80.layouts.family import build_layout
+
+    return build_layout(_DEFAULT_FAMILY, _DEFAULT_VARIANT)
+
+
+def _resolve_initial_payload(payload: Optional[Mapping[str, Any]]) -> Mapping[str, Any]:
+    if payload is not None:
+        return payload
+    try:
+        return _load_default_family_payload()
+    except Exception as exc:  # pragma: no cover - defensive fallback path
+        _LOGGER.warning(
+            "Falling back to sample layout after failing to load %s/%s: %s",
+            _DEFAULT_FAMILY,
+            _DEFAULT_VARIANT,
+            exc,
+        )
+        return DEFAULT_SAMPLE_LAYOUT
 
 
 class Glove80TuiApp(App[None]):
@@ -152,9 +179,9 @@ class Glove80TuiApp(App[None]):
         payload: Optional[Mapping[str, Any]] = None,
     ) -> None:
         super().__init__(css_path=None)
-        self._initial_layout = initial_layout
-        self._initial_variant = initial_variant
-        base_payload = copy.deepcopy(payload) if payload is not None else copy.deepcopy(DEFAULT_SAMPLE_LAYOUT)
+        self._initial_layout = initial_layout or _DEFAULT_FAMILY
+        self._initial_variant = initial_variant or _DEFAULT_VARIANT
+        base_payload = copy.deepcopy(_resolve_initial_payload(payload))
         self.store = LayoutStore.from_payload(base_payload)
 
     def on_mount(self) -> None:
