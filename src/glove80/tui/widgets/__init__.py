@@ -6,6 +6,7 @@ from .inspector import (
     FeaturesTab,
     InspectorPanel,
     KeyInspector,
+    ListenerTab,
     MacroTab,
     HoldTapTab,
 )
@@ -18,6 +19,7 @@ __all__ = [
     "FooterBar",
     "FeaturesTab",
     "ComboTab",
+    "ListenerTab",
     "InspectorPanel",
     "KeyInspector",
     "MacroTab",

@@ -764,6 +764,150 @@ class LayoutStore:
         )
         self._redo_stack.clear()
 
+    # ------------------------------------------------------------------
+    # Listener management API
+    def list_listeners(self) -> Tuple[ListenerPayload, ...]:
+        return tuple(deepcopy(listener) for listener in self._state.listeners)
+
+    def find_listener_references(self, code: str) -> Dict[str, Tuple[Dict[str, Any], ...]]:
+        references: Dict[str, List[Dict[str, Any]]] = {
+            "keys": [],
+            "macros": [],
+            "hold_taps": [],
+            "combos": [],
+            "listeners": [],
+        }
+
+        for layer_index, record in enumerate(self._state.layers):
+            for key_index, slot in enumerate(record.slots):
+                if slot.get("value") == code:
+                    references["keys"].append(
+                        {
+                            "layer_index": layer_index,
+                            "layer_name": record.name,
+                            "key_index": key_index,
+                        }
+                    )
+
+        for index, macro in enumerate(self._state.macros):
+            if _contains_string(macro, code):
+                references["macros"].append({"index": index, "name": macro.get("name")})
+
+        for index, hold in enumerate(self._state.hold_taps):
+            if _contains_string(hold, code):
+                references["hold_taps"].append({"index": index, "name": hold.get("name")})
+
+        for index, combo in enumerate(self._state.combos):
+            if _contains_string(combo, code):
+                references["combos"].append({"index": index, "name": combo.get("name")})
+
+        for index, listener in enumerate(self._state.listeners):
+            listener_code = str(listener.get("code", ""))
+            if listener_code == code:
+                continue
+            if _contains_string(listener, code):
+                references["listeners"].append({"index": index, "code": listener_code})
+
+        return {key: tuple(entries) for key, entries in references.items()}
+
+    def add_listener(self, payload: Mapping[str, Any]) -> None:
+        normalized = _normalize_listener_payload(payload)
+        self._assert_listener_layers_valid(normalized)
+        code = normalized["code"]
+        self._ensure_listener_code_available(code)
+        self._record_snapshot()
+        listeners = list(self._state.listeners)
+        listeners.append(normalized)
+        self._state = replace(self._state, listeners=tuple(listeners))
+        self._redo_stack.clear()
+
+    def update_listener(self, *, code: str, payload: Mapping[str, Any]) -> None:
+        index = self._listener_index(code)
+        normalized = _normalize_listener_payload(payload)
+        self._assert_listener_layers_valid(normalized)
+        new_code = normalized["code"]
+        rename_map: Dict[str, str] = {}
+        if new_code != code:
+            self._ensure_listener_code_available(new_code)
+            rename_map = {code: new_code}
+
+        self._record_snapshot()
+        listeners = list(self._state.listeners)
+        listeners[index] = normalized
+        if rename_map:
+            listeners = [
+                normalized if idx == index else _replace_strings(listener, rename_map)
+                for idx, listener in enumerate(listeners)
+            ]
+
+        layers = self._rewrite_layers_with_macros(rename_map) if rename_map else self._state.layers
+        macros = (
+            self._rewrite_sequence_with_macros(self._state.macros, rename_map)
+            if rename_map
+            else self._state.macros
+        )
+        hold_taps = (
+            self._rewrite_sequence_with_macros(self._state.hold_taps, rename_map)
+            if rename_map
+            else self._state.hold_taps
+        )
+        combos = (
+            self._rewrite_sequence_with_macros(self._state.combos, rename_map)
+            if rename_map
+            else self._state.combos
+        )
+
+        self._state = LayoutState(
+            layer_names=self._state.layer_names,
+            layers=layers,
+            macros=macros,
+            hold_taps=hold_taps,
+            combos=combos,
+            listeners=tuple(listeners),
+        )
+        self._redo_stack.clear()
+
+    def rename_listener(self, *, old_code: str, new_code: str) -> None:
+        listener = deepcopy(self._state.listeners[self._listener_index(old_code)])
+        listener["code"] = str(new_code).strip()
+        self.update_listener(code=old_code, payload=listener)
+
+    def delete_listener(self, *, code: str, force: bool = False) -> None:
+        index = self._listener_index(code)
+        references = self.find_listener_references(code)
+        has_refs = any(references[key] for key in references)
+        if has_refs and not force:
+            raise ValueError(f"Listener '{code}' is referenced and cannot be deleted")
+
+        self._record_snapshot()
+        listeners = list(self._state.listeners)
+        listeners.pop(index)
+        if has_refs:
+            cleanup_map = {code: ""}
+            layers = self._rewrite_layers_with_macros(cleanup_map)
+            macros = self._rewrite_sequence_with_macros(self._state.macros, cleanup_map)
+            hold_taps = self._rewrite_sequence_with_macros(self._state.hold_taps, cleanup_map)
+            combos = self._rewrite_sequence_with_macros(self._state.combos, cleanup_map)
+            listeners = [
+                _replace_strings(listener, cleanup_map)
+                for listener in listeners
+            ]
+        else:
+            layers = self._state.layers
+            macros = self._state.macros
+            hold_taps = self._state.hold_taps
+            combos = self._state.combos
+
+        self._state = LayoutState(
+            layer_names=self._state.layer_names,
+            layers=layers,
+            macros=macros,
+            hold_taps=hold_taps,
+            combos=combos,
+            listeners=tuple(listeners),
+        )
+        self._redo_stack.clear()
+
     def export_payload(self) -> Dict[str, Any]:
         """Return a deep-copied payload representing the current state."""
 
@@ -898,6 +1042,64 @@ class LayoutStore:
                     raise ValueError(f"Layer index {entry} out of range")
             else:
                 raise ValueError("Combo layers must be layer names or indices")
+
+    def _ensure_listener_code_available(self, code: str) -> None:
+        normalized = self._normalize_listener_code(code)
+        for listener in self._state.listeners:
+            existing = self._normalize_listener_code(listener.get("code", ""))
+            if existing and existing == normalized:
+                raise ValueError(f"Listener '{code}' already exists")
+
+    def _listener_index(self, code: str) -> int:
+        literal = str(code).strip()
+        normalized = self._normalize_listener_code(literal)
+        for index, listener in enumerate(self._state.listeners):
+            current = str(listener.get("code", ""))
+            if current == literal or self._normalize_listener_code(current) == normalized:
+                return index
+        target = literal or normalized
+        raise ValueError(f"Listener '{target}' not found")
+
+    @staticmethod
+    def _normalize_listener_code(code: Any) -> str:
+        return str(code).strip()
+
+    def _assert_listener_layers_valid(self, listener: Mapping[str, Any]) -> None:
+        total_layers = len(self._state.layer_names)
+        if total_layers == 0:
+            if listener.get("layers") or any(node.get("layers") for node in listener.get("nodes", [])):
+                raise ValueError("No layers defined for listener assignment")
+            return
+        valid_names = set(self._state.layer_names)
+
+        def _check_layers(layers: Any) -> None:
+            if not layers:
+                return
+            for entry in layers:
+                if isinstance(entry, Mapping):
+                    if "name" in entry:
+                        ref = str(entry["name"])
+                        if ref not in valid_names:
+                            raise ValueError(f"Unknown layer '{ref}' referenced by listener")
+                    elif "index" in entry:
+                        idx = int(entry["index"])
+                        if not (0 <= idx < total_layers):
+                            raise ValueError(f"Layer index {idx} out of range")
+                    else:
+                        raise ValueError("Listener layer mapping must include 'name' or 'index'")
+                elif isinstance(entry, int):
+                    if not (0 <= entry < total_layers):
+                        raise ValueError(f"Layer index {entry} out of range")
+                elif isinstance(entry, str):
+                    if entry not in valid_names:
+                        raise ValueError(f"Unknown layer '{entry}' referenced by listener")
+                else:
+                    raise ValueError("Listener layers must be layer names or indices")
+
+        if "layers" in listener:
+            _check_layers(listener.get("layers"))
+        for node in listener.get("nodes", []):
+            _check_layers(node.get("layers"))
 
     def _rewrite_layers_with_macros(self, rename_map: Mapping[str, str]) -> Tuple[LayerRecord, ...]:
         if not rename_map:
@@ -1099,6 +1301,100 @@ def _normalize_combo_layers(value: Any) -> List[Any]:
     else:
         raise ValueError("layers must be iterable or comma-delimited string")
     return layers
+
+
+def _normalize_listener_payload(payload: Mapping[str, Any]) -> ListenerPayload:
+    normalized: Dict[str, Any] = dict(payload)
+    code = str(payload.get("code", "")).strip()
+    if not code:
+        raise ValueError("Listener code cannot be empty")
+    normalized["code"] = code
+    normalized["inputProcessors"] = _normalize_listener_processors(payload.get("inputProcessors", []))
+    normalized["nodes"] = _normalize_listener_nodes(payload.get("nodes", []))
+    if "layers" in normalized:
+        normalized["layers"] = _normalize_listener_layers(normalized["layers"])
+    return normalized
+
+
+def _normalize_listener_processors(value: Any) -> List[Dict[str, Any]]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise ValueError("Listener processors must be provided as a list")
+    processors: List[Dict[str, Any]] = []
+    for entry in value:
+        if not isinstance(entry, Mapping):
+            raise ValueError("Each listener processor must be an object")
+        code = str(entry.get("code", "")).strip()
+        if not code:
+            raise ValueError("Listener processor requires a 'code'")
+        processor = dict(entry)
+        processor["code"] = code
+        params = entry.get("params", [])
+        if params in (None, ""):
+            processor["params"] = []
+        elif isinstance(params, Sequence) and not isinstance(params, (str, bytes)):
+            processor["params"] = list(params)
+        else:
+            raise ValueError("Listener processor 'params' must be a list")
+        processors.append(processor)
+    return processors
+
+
+def _normalize_listener_nodes(value: Any) -> List[Dict[str, Any]]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise ValueError("Listener nodes must be provided as a list")
+    nodes: List[Dict[str, Any]] = []
+    for entry in value:
+        if not isinstance(entry, Mapping):
+            raise ValueError("Each listener node must be an object")
+        code = str(entry.get("code", "")).strip()
+        if not code:
+            raise ValueError("Listener node requires a 'code'")
+        node = dict(entry)
+        node["code"] = code
+        node["inputProcessors"] = _normalize_listener_processors(entry.get("inputProcessors", []))
+        if "layers" in node:
+            node["layers"] = _normalize_listener_layers(node["layers"])
+        nodes.append(node)
+    return nodes
+
+
+def _normalize_listener_layers(value: Any) -> List[Any]:
+    if value in (None, ""):
+        return []
+    layers: List[Any] = []
+    if isinstance(value, str):
+        tokens = [token.strip() for token in value.split(",") if token.strip()]
+        for token in tokens:
+            layers.append(_normalize_single_layer_reference(token))
+        return layers
+    if not isinstance(value, Iterable) or isinstance(value, (str, bytes)):
+        raise ValueError("Listener layers must be iterable or comma-delimited string")
+    for entry in value:
+        layers.append(_normalize_single_layer_reference(entry))
+    return layers
+
+
+def _normalize_single_layer_reference(entry: Any) -> Any:
+    if isinstance(entry, Mapping):
+        if "name" in entry:
+            return {"name": str(entry["name"])}
+        if "index" in entry:
+            return {"index": int(entry["index"])}
+        raise ValueError("Layer mapping must include 'name' or 'index'")
+    if isinstance(entry, int):
+        return entry
+    if isinstance(entry, str):
+        token = entry.strip()
+        if not token:
+            raise ValueError("Layer reference cannot be empty")
+        if token.isdigit():
+            return int(token)
+        return {"name": token}
+    raise ValueError("Unsupported layer reference type")
 
 
 def _contains_string(data: Any, target: str) -> bool:
