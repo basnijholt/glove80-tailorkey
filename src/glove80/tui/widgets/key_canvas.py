@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Any, Sequence
 
 from rich.text import Text
 from textual import on
+from textual.events import Leave, MouseEvent, MouseMove, MouseUp
 from textual.binding import Binding
 from textual.widget import Widget
 
@@ -33,11 +34,15 @@ class KeyCanvas(Widget):
         Binding(".", "copy_key", "Copy Key"),
     ]
 
+    MAX_LABEL_CHARS = 5
+    CELL_COL_WIDTH = MAX_LABEL_CHARS + 3  # brackets + space padding
+
     def __init__(self, *, store: LayoutStore) -> None:
         super().__init__(classes="key-canvas")
         self.store = store
         self._selection = self.store.selection
         self._previous_selection: SelectionState | None = None
+        self._hover_index: int | None = None
 
     # ------------------------------------------------------------------
     # Textual lifecycle
@@ -53,11 +58,20 @@ class KeyCanvas(Widget):
                 legend = self._slot_legend(slots, idx)
                 if self._selection.key_index == idx:
                     style = "bold white on dark_cyan"
+                elif self._hover_index == idx:
+                    style = "bold dark_cyan"
                 else:
                     style = "grey70"
-                text.append(f"[{legend:^4}]", style=style)
+                text.append(f"[{legend}]", style=style)
                 text.append(" ")
             text.append("\n")
+
+        detail_lines = self._detail_lines(slots)
+        if detail_lines:
+            text.append("\n")
+            for line in detail_lines:
+                text.append(line, style="bold grey70")
+                text.append("\n")
         return text
 
     # ------------------------------------------------------------------
@@ -75,14 +89,7 @@ class KeyCanvas(Widget):
         self._move("down")
 
     def action_inspect(self) -> None:
-        if self._selection.layer_index < 0:
-            return
-        self.post_message(
-            InspectorFocusRequested(
-                layer_index=self._selection.layer_index,
-                key_index=self._selection.key_index,
-            )
-        )
+        self._request_inspector_focus()
 
     def action_prev_layer(self) -> None:
         self._switch_layer(-1)
@@ -149,17 +156,18 @@ class KeyCanvas(Widget):
             slot = slots[index]
         except (IndexError, TypeError):
             return "--"
-        value = slot.get("value", "") if isinstance(slot, dict) else ""
-        if not value:
+        label = self._slot_label(slot)
+        return self._truncate_label(label)
+
+    def _slot_label(self, slot: dict[str, object] | None) -> str:
+        if not isinstance(slot, dict):
             return "--"
-        value_str = str(value)
-        if value_str.startswith("&kp "):
-            parts = value_str.split(" ", 1)
-            if len(parts) > 1:
-                return parts[1][:3].upper()
-        if value_str.startswith("&"):
-            return value_str[1:4].upper()
-        return value_str[:4].upper()
+        value = str(slot.get("value", ""))
+        if value == "&kp":
+            param_value = self._first_param_value(slot.get("params"))
+            if param_value:
+                return param_value
+        return self._raw_label_for_value(value)
 
     def _broadcast_selection(self) -> None:
         self.post_message(
@@ -182,10 +190,148 @@ class KeyCanvas(Widget):
         self._selection = SelectionState(layer_index=event.layer_index, key_index=event.key_index)
         self.refresh()
 
+    def on_mouse_move(self, event: MouseMove) -> None:  # pragma: no cover - UI interaction
+        index = self._index_from_event(event)
+        if index is None:
+            return
+        if self._hover_index != index:
+            self._hover_index = index
+            self.refresh()
+
+    def on_mouse_up(self, event: MouseUp) -> None:  # pragma: no cover - UI interaction
+        if event.button != 1:
+            return
+        index = self._index_from_event(event)
+        if index is None:
+            return
+        self._selection = self.store.set_selected_key(index)
+        self._broadcast_selection()
+        self._request_inspector_focus()
+        self.refresh()
+
+    def on_leave(self, _: Leave) -> None:  # pragma: no cover - UI interaction
+        if self._hover_index is not None:
+            self._hover_index = None
+            self.refresh()
+
     # ------------------------------------------------------------------
     # Test helpers ------------------------------------------------------
     def selected_index_for_test(self) -> int:
         return self._selection.key_index
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    def _truncate_label(self, label: str) -> str:
+        clean = " ".join(label.split()) or "--"
+        if len(clean) > self.MAX_LABEL_CHARS:
+            clean = f"{clean[: self.MAX_LABEL_CHARS - 1]}…"
+        return clean.upper().center(self.MAX_LABEL_CHARS)
+
+    def _request_inspector_focus(self) -> None:
+        if self._selection.layer_index < 0 or self._selection.key_index < 0:
+            return
+        self.post_message(
+            InspectorFocusRequested(
+                layer_index=self._selection.layer_index,
+                key_index=self._selection.key_index,
+            )
+        )
+
+    def _raw_label_for_value(self, value: str) -> str:
+        if not value:
+            return "--"
+        if value.startswith("&"):
+            return value[1:]
+        return value
+
+    def _first_param_value(self, params: Any) -> str:
+        if not params:
+            return ""
+        if isinstance(params, (list, tuple)):
+            for item in params:
+                candidate = self._first_param_value(item)
+                if candidate:
+                    return candidate
+            return ""
+        if isinstance(params, dict):
+            value = params.get("value") or params.get("name")
+            if isinstance(value, str):
+                return value
+            if value is not None:
+                return str(value)
+            nested = params.get("params")
+            return self._first_param_value(nested)
+        return str(params)
+
+    def _detail_lines(self, slots: Sequence[dict[str, object]]) -> list[str]:
+        lines: list[str] = []
+        if self._hover_index is not None:
+            lines.append(self._detail_text(slots, self._hover_index, prefix="Hover"))
+        if self._selection.key_index >= 0:
+            prefix = "Focus" if self.has_focus else "Selected"
+            lines.append(self._detail_text(slots, self._selection.key_index, prefix=prefix))
+        return lines
+
+    def _detail_text(self, slots: Sequence[dict[str, object]], index: int, *, prefix: str) -> str:
+        try:
+            slot = slots[index]
+        except (IndexError, TypeError):
+            return f"{prefix}: Key #{index:02d} (empty)"
+        if not isinstance(slot, dict):
+            return f"{prefix}: Key #{index:02d} (empty)"
+        detail = self._slot_detail(slot)
+        return f"{prefix}: Key #{index:02d} {detail}"
+
+    def _slot_detail(self, slot: dict[str, object]) -> str:
+        value = str(slot.get("value", "")) or "(empty)"
+        params = slot.get("params")
+        return f"{value}{self._format_params(params)}"
+
+    def _format_params(self, params: Any) -> str:
+        if not params:
+            return ""
+        if isinstance(params, (list, tuple)):
+            rendered = ", ".join(self._format_param_item(item) for item in params)
+        else:
+            rendered = self._format_param_item(params)
+        return f" params=[{rendered}]"
+
+    def _format_param_item(self, item: Any) -> str:
+        if isinstance(item, dict):
+            value = item.get("value") or item.get("name")
+            nested = item.get("params")
+            base = str(value) if value is not None else str(item)
+            if nested:
+                nested_values = ", ".join(self._format_param_item(sub) for sub in self._ensure_iterable(nested))
+                return f"{base}({nested_values})"
+            return base
+        if isinstance(item, (list, tuple)):
+            return ", ".join(self._format_param_item(sub_item) for sub_item in item)
+        return str(item)
+
+    def _ensure_iterable(self, value: Any) -> list[Any]:
+        if isinstance(value, list):
+            return value
+        if isinstance(value, tuple):
+            return list(value)
+        return [value]
+
+    def _index_from_coordinates(self, x: int, y: int) -> int | None:
+        if x < 0 or y < 0:
+            return None
+        row_count = len(KEY_GRID_ROWS)
+        if y >= row_count:
+            return None
+        col = x // self.CELL_COL_WIDTH
+        if col >= len(KEY_GRID_ROWS[0]):
+            return None
+        return KEY_GRID_ROWS[y][col]
+
+    def _index_from_event(self, event: MouseEvent) -> int | None:
+        offset = event.get_content_offset(self)
+        if offset is None:
+            return None
+        return self._index_from_coordinates(offset.x, offset.y)
 
     def _switch_layer(self, delta: int) -> None:
         layer_names = self.store.layer_names
