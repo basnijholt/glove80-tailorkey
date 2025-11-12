@@ -5,10 +5,15 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import time
 from pathlib import Path
+from typing import Any
 
 from glove80.tui.app import Glove80TuiApp
-from glove80.tui.testing import capture_snapshot, save_snapshot
+from glove80.tui.screens.editor import EditorScreen
+from glove80.tui.testing import capture_snapshot
+from glove80.tui.widgets.layer_strip import LayerStrip
+from glove80.tui.widgets.ribbon import ProjectRibbon
 
 
 async def _demo(output_dir: Path, width: int, height: int) -> None:
@@ -16,10 +21,9 @@ async def _demo(output_dir: Path, width: int, height: int) -> None:
 
     async with app.run_test() as pilot:
         await pilot.resize_terminal(width=width, height=height)
-        await pilot.pause()
+        await _wait_for_editor_ready(app, pilot, width, height)
 
-        before = capture_snapshot(app)
-        save_snapshot(app, output_dir / "before.txt")
+        before = await _capture_snapshot_with_chrome(app, pilot, output_dir / "before.txt")
 
         # Try an obvious action: click the Key Inspector "Apply" button
         try:
@@ -27,15 +31,76 @@ async def _demo(output_dir: Path, width: int, height: int) -> None:
         except Exception:
             # If the selector fails (e.g., layout changed), fall back to a harmless key press
             await pilot.press("tab")
-        await pilot.pause()
+        await _wait_for_editor_ready(app, pilot, width, height)
 
-        after = capture_snapshot(app)
-        save_snapshot(app, output_dir / "after.txt")
+        after = await _capture_snapshot_with_chrome(app, pilot, output_dir / "after.txt")
 
         print("\n=== BEFORE SNAPSHOT ===\n")
         print(before)
         print("\n=== AFTER SNAPSHOT ===\n")
         print(after)
+
+
+async def _wait_for_editor_ready(
+    app: Glove80TuiApp,
+    pilot: Any,
+    width: int,
+    height: int,
+    timeout: float = 1.5,
+) -> None:
+    """Pause until the EditorScreen, ribbon, and layer strip are mounted."""
+
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        screen = getattr(app, "screen", None)
+        size = getattr(app, "size", None)
+
+        screen_ready = isinstance(screen, EditorScreen)
+        size_ready = bool(size) and size.width == width and size.height == height
+
+        ribbon_ready = layer_ready = False
+        if screen_ready:
+            try:
+                screen.query_one(ProjectRibbon)
+                ribbon_ready = True
+            except Exception:
+                ribbon_ready = False
+            try:
+                screen.query_one(LayerStrip)
+                layer_ready = True
+            except Exception:
+                layer_ready = False
+
+        if screen_ready and size_ready and ribbon_ready and layer_ready:
+            # Give Textual one more frame to settle layout.
+            await pilot.pause()
+            return
+
+        await pilot.pause()
+
+    raise RuntimeError("Timed out waiting for Editor UI to settle")
+
+
+async def _capture_snapshot_with_chrome(
+    app: Glove80TuiApp,
+    pilot: Any,
+    output_path: Path,
+    attempts: int = 3,
+) -> str:
+    """Capture a snapshot, retrying until the ribbon/layer strip appear."""
+
+    for remaining in range(attempts, 0, -1):
+        snapshot = capture_snapshot(app)
+        if _snapshot_has_chrome(snapshot) or remaining == 1:
+            output_path.write_text(snapshot)
+            return snapshot
+        await pilot.pause()
+
+    return snapshot  # pragma: no cover - defensive
+
+
+def _snapshot_has_chrome(snapshot: str) -> bool:
+    return "Glove80" in snapshot and "+ Layer" in snapshot
 
 
 def main() -> None:
