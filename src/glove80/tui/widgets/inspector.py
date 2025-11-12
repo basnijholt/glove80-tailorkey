@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 import json
-from typing import Literal, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from textual import on
 from textual.containers import Vertical
 from textual.suggester import Suggester
-from textual.widgets import Button, Input, Label, Static
+from textual.widgets import Button, Input, Label, ListItem, ListView, Static
 
 from ..messages import FooterMessage, SelectionChanged, StoreUpdated
-from ..state import LayoutStore, SelectionState
+from ..state import LayoutStore, SelectionState, MacroPayload
 from ..services import BuilderBridge, FeatureDiff, ValidationIssue, ValidationResult, ValidationService
 
 
@@ -23,11 +23,13 @@ class InspectorPanel(Vertical):
         self.store = store
         self._variant = variant
         self.key_inspector = KeyInspector(store=store)
+        self.macro_tab = MacroTab(store=store)
         self.features_tab = FeaturesTab(store=store, variant=variant)
 
     def compose(self):  # type: ignore[override]
         yield Static("Inspector", classes="inspector-heading")
         yield self.key_inspector
+        yield self.macro_tab
         yield self.features_tab
 
 
@@ -309,6 +311,215 @@ class FeaturesTab(Vertical):
             return self.store.layer_names[0]
         return None
 
+
+class MacroTab(Vertical):
+    """Macro list and detail editor."""
+
+    def __init__(self, *, store: LayoutStore) -> None:
+        super().__init__(classes="macro-tab", id="macro-tab")
+        self.store = store
+        self._selected_name: Optional[str] = None
+        self._list = ListView(id="macro-list")
+        self.name_input = Input(placeholder="&macro_name", id="macro-name-input")
+        self.desc_input = Input(placeholder="Description", id="macro-desc-input")
+        self.bindings_input = Input(placeholder="Bindings JSON", id="macro-bindings-input")
+        self.params_input = Input(placeholder="Params JSON", id="macro-params-input")
+        self.wait_ms_input = Input(placeholder="waitMs", id="macro-wait-input", value="0")
+        self.tap_ms_input = Input(placeholder="tapMs", id="macro-tap-input", value="0")
+        self.add_button = Button("Add", id="macro-add")
+        self.apply_button = Button("Apply", id="macro-apply", disabled=True)
+        self.delete_button = Button("Delete", id="macro-delete", disabled=True)
+        self.ref_label = Static("", classes="macro-refs", id="macro-ref-summary")
+
+    def compose(self):  # type: ignore[override]
+        yield Static("Macros", classes="macro-heading")
+        yield self._list
+        yield Label("Name")
+        yield self.name_input
+        yield Label("Description")
+        yield self.desc_input
+        yield Label("Bindings (JSON array)")
+        yield self.bindings_input
+        yield Label("Params (JSON array)")
+        yield self.params_input
+        yield Label("Wait (ms)")
+        yield self.wait_ms_input
+        yield Label("Tap (ms)")
+        yield self.tap_ms_input
+        yield self.ref_label
+        yield self.add_button
+        yield self.apply_button
+        yield self.delete_button
+
+    def on_mount(self) -> None:
+        self._refresh_list()
+
+    @on(StoreUpdated)
+    def _handle_store_updated(self, _: StoreUpdated) -> None:
+        self._refresh_list(preferred=self._selected_name)
+
+    @on(ListView.Selected)
+    def _handle_list_selected(self, event: ListView.Selected) -> None:
+        if event.list_view is not self._list:
+            return
+        item = event.item
+        if not isinstance(item, _MacroListItem):
+            return
+        self._load_macro(item.macro)
+        event.stop()
+
+    @on(Button.Pressed)
+    def _handle_buttons(self, event: Button.Pressed) -> None:
+        if event.button.id == "macro-add":
+            self._create_macro()
+        elif event.button.id == "macro-apply":
+            self._apply_macro()
+        elif event.button.id == "macro-delete":
+            self._delete_macro()
+
+    def _refresh_list(self, *, preferred: Optional[str] = None) -> None:
+        self.call_after_refresh(self._rebuild_list, preferred)
+
+    async def _rebuild_list(self, preferred: Optional[str]) -> None:
+        await self._list.clear()
+        macros = list(self.store.list_macros())
+        names = [str(macro.get("name", "")) for macro in macros]
+        target_name = preferred if preferred in names else (names[0] if names else None)
+        items: list[ListItem] = []
+        for macro in macros:
+            refs = self.store.find_macro_references(macro.get("name", ""))
+            items.append(_MacroListItem(macro, _reference_count(refs)))
+        if items:
+            await self._list.mount(*items)
+            index = 0
+            if target_name:
+                for idx, macro_name in enumerate(names):
+                    if macro_name == target_name:
+                        index = idx
+                        break
+            self._list.index = index
+            selected_item = items[index]
+            if isinstance(selected_item, _MacroListItem):
+                self._load_macro(selected_item.macro)
+            else:
+                self._clear_form()
+        else:
+            await self._list.mount(ListItem(Static("(no macros)", classes="macro-item")))
+            self._clear_form()
+
+    def _load_macro(self, macro: Optional[MacroPayload]) -> None:
+        if not macro:
+            self._clear_form()
+            return
+        self._selected_name = str(macro.get("name", ""))
+        self.name_input.value = self._selected_name
+        self.desc_input.value = str(macro.get("description", ""))
+        self.bindings_input.value = json.dumps(macro.get("bindings", []))
+        self.params_input.value = json.dumps(macro.get("params", []))
+        self.wait_ms_input.value = str(macro.get("waitMs", 0))
+        self.tap_ms_input.value = str(macro.get("tapMs", 0))
+        refs = self.store.find_macro_references(self._selected_name)
+        count = _reference_count(refs)
+        if count:
+            self.ref_label.update(f"Referenced {count} time(s)")
+        else:
+            self.ref_label.update("No references")
+        self._toggle_form(True)
+        self.delete_button.disabled = bool(count)
+
+    def _clear_form(self) -> None:
+        self._selected_name = None
+        self.name_input.value = ""
+        self.desc_input.value = ""
+        self.bindings_input.value = ""
+        self.params_input.value = ""
+        self.wait_ms_input.value = "0"
+        self.tap_ms_input.value = "0"
+        self.ref_label.update("")
+        self._toggle_form(False)
+
+    def _toggle_form(self, enabled: bool) -> None:
+        self.apply_button.disabled = not enabled
+        self.delete_button.disabled = not enabled
+
+    def _create_macro(self) -> None:
+        payload = self._build_payload_from_inputs()
+        if payload is None:
+            return
+        name = payload["name"]
+        try:
+            self.store.add_macro(payload)
+        except ValueError as exc:
+            self.post_message(FooterMessage(str(exc)))
+            return
+        self.post_message(StoreUpdated())
+        self.post_message(FooterMessage(f"Added macro {name}"))
+        self._refresh_list(preferred=name)
+
+    def _apply_macro(self) -> None:
+        if self._selected_name is None:
+            return
+        payload = self._build_payload_from_inputs()
+        if payload is None:
+            return
+        try:
+            self.store.update_macro(name=self._selected_name, payload=payload)
+        except ValueError as exc:
+            self.post_message(FooterMessage(str(exc)))
+            return
+        self.post_message(StoreUpdated())
+        self.post_message(FooterMessage(f"Updated macro {payload['name']}"))
+        self._selected_name = payload["name"]
+        self._refresh_list(preferred=self._selected_name)
+
+    def _delete_macro(self) -> None:
+        if self._selected_name is None:
+            return
+        refs = self.store.find_macro_references(self._selected_name)
+        if _reference_count(refs):
+            self.post_message(FooterMessage("Cannot delete macro with references"))
+            return
+        try:
+            self.store.delete_macro(name=self._selected_name)
+        except ValueError as exc:
+            self.post_message(FooterMessage(str(exc)))
+            return
+        self.post_message(StoreUpdated())
+        self.post_message(FooterMessage(f"Deleted macro {self._selected_name}"))
+        self._clear_form()
+        self._refresh_list()
+
+    def _build_payload_from_inputs(self) -> Optional[Dict[str, Any]]:
+        name = self.name_input.value.strip()
+        if not name:
+            self.post_message(FooterMessage("Name is required"))
+            return None
+        try:
+            bindings = json.loads(self.bindings_input.value or "[]")
+            params = json.loads(self.params_input.value or "[]")
+            wait_ms = int(self.wait_ms_input.value or "0")
+            tap_ms = int(self.tap_ms_input.value or "0")
+        except (json.JSONDecodeError, ValueError) as exc:
+            self.post_message(FooterMessage(f"Invalid macro data: {exc}"))
+            return None
+        payload: Dict[str, Any] = {
+            "name": name,
+            "description": self.desc_input.value.strip(),
+            "bindings": bindings,
+            "params": params,
+            "waitMs": wait_ms,
+            "tapMs": tap_ms,
+        }
+        return payload
+
+
+class _MacroListItem(ListItem):
+    def __init__(self, macro: MacroPayload, ref_count: int) -> None:
+        name = str(macro.get("name", "?"))
+        label = f"{name} [{ref_count}]"
+        super().__init__(Static(label, classes="macro-item"))
+        self.macro = macro
+
     def _set_summary(self, text: str) -> None:
         self._summary_text = text
         self.summary.update(text)
@@ -336,6 +547,10 @@ def _display_tokens(slot: dict[str, object]) -> tuple[str, list[str]]:
             else:
                 tokens.append(str(entry))
     return raw_value, tokens
+
+
+def _reference_count(refs: Dict[str, Sequence[Dict[str, Any]]]) -> int:
+    return sum(len(entries) for entries in refs.values())
 
 
 class _BehaviorSuggester(Suggester):

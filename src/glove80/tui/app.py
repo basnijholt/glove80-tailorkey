@@ -56,6 +56,33 @@ class Glove80TuiApp(App[None]):
         padding: 1;
     }
 
+    .macro-tab {
+        border-top: solid $surface 20%;
+        margin-top: 1;
+        padding-top: 1;
+    }
+
+    #macro-list {
+        height: 8;
+        border: solid $surface 10%;
+        margin-bottom: 1;
+    }
+
+    .macro-heading {
+        color: $accent;
+        text-style: bold;
+        margin-bottom: 1;
+    }
+
+    .macro-item {
+        padding: 0 1;
+    }
+
+    .macro-refs {
+        margin: 1 0;
+        color: $warning;
+    }
+
     .features-tab {
         border-top: solid $surface 20%;
         margin-top: 1;
