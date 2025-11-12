@@ -4,7 +4,7 @@ This document is the single source of truth for the upcoming Textual (Python) TU
 
 > **Instructions for agents**: Before making changes, read this file end-to-end, follow its requirements, and record any new decisions, deviations, or discoveries back into this document (append brief dated notes in the relevant section). Treat it as a living blueprint.
 
-> **Progress note (2025-11-11)**: Milestones 1–3 are live in `tui/` (LayerSidebar, KeyCanvas navigation/copy, validated Key Inspector) and the first slice of the Features tab now drives Home Row Mods via the new BuilderBridge service.
+> **Progress note (2025-11-12)**: Milestones 1–3 are live in `tui/` (LayerSidebar, KeyCanvas navigation/copy, validated Key Inspector). Macro Studio shipped with full CRUD, undo/redo, and Textual pilot coverage, and the Features tab previews/applies HRM bundles via the BuilderBridge service. HoldTap/Combo/Listener studios plus Command Palette/Search are next.
 
 IMPORTANT: Also make sure to commit often and run the tests with `uv run pytest`!
 
@@ -35,7 +35,7 @@ IMPORTANT: Also make sure to commit often and run the tests with `uv run pytest`
    - **Layer Sidebar** (left) – Renders `layer_names[]`, supports drag/drop reorder, duplicate, rename, hide/show, “pick up & drop” interactions, and badges showing feature provenance (HRM/mouse/cursor/custom). Layer actions update references (`LayerRef`) everywhere.
    - **Key Canvas** (center) – 80-key grid per layer (tailored to Glove80 geometry). Click or navigate via keyboard to inspect/modify key behaviors; multi-layer split view available for copy/drop operations.
    - **Inspector Tabs** (right) – Context-aware forms: Key, Macro, Hold Tap, Combo, Listener, Features (builder toggles), Advanced (custom behaviors/device tree/config/layout parameters), Metadata.
-     - _Note (2025-11-11): Key tab + validation/autocomplete are implemented, and a minimal Features tab now previews/applies HRM bundles via BuilderBridge; the remaining tabs are still stubs._
+     - _Note (2025-11-12): Key tab + validation/autocomplete are implemented, MacroTab is feature-complete (list/detail editor + pilot tests), and a minimal Features tab previews/applies HRM bundles via BuilderBridge; HoldTap/Combo/Listener/Advanced/Metadata tabs remain TODO._
 3. **Status & Logs (Footer)** – Shows dirty flag, active layer, validation counts, background task progress (e.g., regen, CLI validation), and streaming logs.
 
 ### 3.2 Secondary Surfaces
@@ -136,10 +136,12 @@ The TUI operates on `LayoutPayload` (see `glove80.layouts.schema`). The JSON Sch
 4. Apply → Store logs `SetLayerKeyBehavior`; validators run; status bar reflects dirty flag.
 5. Quick links (“Jump to macro”, “Jump to hold tap”, “Highlight combos using this key”) help trace dependencies.
 
-### 7.2 Create & Bind a Macro
+### 7.2 Create & Bind a Macro _(delivered 2025-11-12)_
 1. Macro tab → “New” → provide `name` (must start with `&`), optional `description`, add `bindings[]`, `params[]`, `waitMs`, `tapMs`.
-2. Save macro → store enforces uniqueness.
+2. Save macro → store enforces uniqueness, snapshots for undo, and records the action for the command log.
 3. Return to Key tab → set behavior `value` to macro name (auto-complete ensures it exists).
+4. **CRUD guarantees**: `LayoutStore.add_macro/update_macro/delete_macro/list_macros/find_macro_references` (see `src/glove80/tui/state/store.py`) always snapshot before mutation, rename rewrites every reference (`layers`, `macros`, `holdTaps`, `combos`, `inputListeners`), delete is blocked while references exist (unless forced cleanup), and undo/redo restores the previous payload byte-for-byte.
+5. Integration pilot (`tests/tui/integration/test_macro_tab.py`) covers create → bind → rename → undo; use it as reference for future studios.
 
 ### 7.3 Compose a Hold Tap
 1. Hold Tap tab → “New” → enter `name`, `bindings[]`, pick `flavor` (enum), fill timing fields, optionally choose `holdTriggerKeyPositions[]` via key picker.
@@ -164,6 +166,21 @@ The TUI operates on `LayoutPayload` (see `glove80.layouts.schema`). The JSON Sch
 - Reorder: drag/drop or shortcuts (`Alt+↑/↓`), rewriting both arrays; diff preview optional.
 - Duplicate: clones layer content and optional dependent macros; prompts for new name.
 - Pick up / Drop: `P` picks up current layer contents, `D` drops onto target layer; undoable transaction.
+- Navigation wrap-around: canvas layer navigation (`[`/`]`) and sidebar arrow keys wrap at boundaries (Raise → Base and vice versa) so keyboard-only users can keep moving without reversing direction.
+
+### 7.8 Studio & Command Surfaces Roadmap _(updated 2025-11-12)_
+- **HoldTap Studio**
+  - Store API mirrors macro CRUD (`list_hold_taps`, `add_hold_tap`, `update_hold_tap`, `rename_hold_tap`, `delete_hold_tap`, `find_hold_tap_references`), enforces `&`-prefixed unique names, rewrites references on rename, and blocks delete while referenced unless forced cleanup. Timing fields (`tappingTermMs`, `quickTapMs`, `requirePriorIdleMs`) must be ≥ 0; `holdTriggerKeyPositions[]` validated to 0–79 and de-duped. Undo/redo wraps every mutation.
+  - UI = MacroTab parity: list with reference counts + detail editor (name/description/bindings/timings/flavor/key picker). Inline validation and footer messaging before commits. Pilot test must create → bind → rename → delete/undo.
+- **Combo Studio**
+  - CRUD ensures combo names unique, trigger key positions unique per layout, `layers[]` resolve via `LayerRef`, and rename propagates to all dependent sections. Delete blocked when combos referenced by macros/other systems unless forced. Reference finder exposes key/layer contexts for warnings.
+  - UI includes chord picker (multi-key capture on KeyCanvas), layer scope selector, binding editor, timeout entry, and conflict badges when triggers overlap with hold taps or combos. Unit + pilot coverage required.
+- **Listener Studio**
+  - Store adds `add_listener/update_listener/delete_listener/list_listeners/find_listener_references`, validating unique `code`, required processors/nodes, and resolving all layer names. Delete is prohibited while bindings reference the listener; rename updates bindings and listener graphs.
+  - UI tab: left list of listeners with type badges (mouse/cursor/custom), right pane showing processors + per-layer nodes, plus modal editor for CRUD. Reference summary links back to offending layers. Events emit `StoreUpdated` and `FooterMessage` for every mutation.
+- **Command Palette & Search Panel**
+  - Command registry (Ctrl/Cmd+K) exposes at least: layer add/rename/delete, jump to Macro/HoldTap/Combo/Listener, toggle bundles, run validation, open Search/Jump, undo/redo. Commands respect `enabled()` predicates (e.g., delete disabled when only one layer remains) and integrate with StoreUpdated/Footer logs when actions succeed/fail.
+  - Search/Jump panel lets users type `k 42`, `layer typing`, `macro &HRM_left_index`, etc., and moves focus accordingly. Palette/search interactions must be testable via Textual pilot: open palette, run `Add Layer`, verify store mutation/log entries.
 
 ## 8. Validation & Regeneration Flow
 

@@ -2,7 +2,7 @@
 
 Single source of truth for implementing `TUI_DESIGN.md`. Each section groups explicit and implicit requirements plus measurable acceptance criteria. Revisit this checklist before coding and update it whenever the design doc evolves.
 
-_Progress snapshot (2025-11-11): Milestones 1–3 are live (Layer Sidebar, KeyCanvas navigation/copy, validated Key Inspector). BuilderBridge + Features tab currently ship the HRM preview/apply path; the remaining checklist items (cursor/mouse bundles, macro/hold-tap/combo studios, regen/saving flows, palette/search, accessibility polish) are still outstanding._
+_Progress snapshot (2025-11-12): Milestones 1–3 are live (Layer Sidebar, KeyCanvas navigation/copy, validated Key Inspector). Macro Studio + HRM preview/apply are shipped with unit + pilot coverage; HoldTap/Combo/Listener studios, regen/saving flows, and palette/search remain outstanding._
 
 ## Source-of-Truth Guarantees
 
@@ -36,7 +36,7 @@ _Progress snapshot (2025-11-11): Milestones 1–3 are live (Layer Sidebar, Key
   - Acceptance criteria:
     - Sidebar mutations rewrite `layer_names`, `layers`, and any `LayerRef` usage deterministically.
     - Canvas enforces layer length == 80 and highlights active selection across split view.
-  - _Status 2025-11-11: Sidebar + Key Canvas + Key tab are implemented (incl. selection + HRM copy gestures). Macro/HoldTap/Combo/Listener/Advanced/Metadata tabs remain TODO; Features tab currently exposes only HRM preview/apply._
+  - _Status 2025-11-12: Sidebar + Key Canvas + Key tab are implemented (incl. selection + HRM copy gestures). MacroTab is live (list/detail editor + CRUD tests). HoldTap/Combo/Listener/Advanced/Metadata tabs remain TODO; Features tab currently exposes only HRM preview/apply._
 - **Status & Logs Footer** — Dirty flag, active layer, validation counts, async task progress/log stream.
   - Acceptance criteria:
     - Background workers report progress + cancellation states without freezing the UI.
@@ -57,6 +57,9 @@ _Progress snapshot (2025-11-11): Milestones 1–3 are live (Layer Sidebar, Key
 - **Command log & undo/redo**.
   - Acceptance criteria:
     - Store tracks named actions (`AddCombo`, `ApplyFeatureBundle`, etc.) and exposes undo/redo stacks with titles for palette usage.
+- **Layer navigation wrap-around**.
+  - Acceptance criteria:
+    - `[ ]` hotkeys and sidebar arrow keys wrap from first↔last layer so keyboard-only navigation never dead-ends.
 
 ## Theming & Accessibility
 
@@ -92,9 +95,31 @@ _Progress snapshot (2025-11-11): Milestones 1–3 are live (Layer Sidebar, Key
   - Acceptance criteria:
     - Autocomplete sources layer names, macros, hold taps, combos, keycodes, HRM bindings.
     - Raw JSON editor validates incremental changes and can be diffed per key.
-- **Macro studio** (`macros[]`).
+- **Macro studio** (`macros[]`) – ✅ delivered 2025-11-12.
+  - Acceptance criteria (met):
+    - Enforces `name` uniqueness + `&` prefix; rename rewrites every reference (`layers`, `macros`, `holdTaps`, `combos`, `listeners`).
+    - Delete blocked while referenced unless forced cleanup; undo/redo snapshots wrap every mutation.
+    - Textual pilot `tests/tui/integration/test_macro_tab.py` exercises create → bind → rename → undo.
+- **Hold Tap studio** (`holdTaps[]`).
   - Acceptance criteria:
-    - Enforces `name` uniqueness, `&` prefix, editing of `bindings[]`, `params[]`, `waitMs`, `tapMs`.
+    - Store exposes `list/add/update/rename/delete/find` APIs with same snapshot/undo behavior as macros; rename rewrites references; delete blocked while referenced unless forced cleanup.
+    - Timings (`tappingTermMs`, `quickTapMs`, `requirePriorIdleMs`) validated ≥ 0; `holdTriggerKeyPositions[]` limited to 0–79 and deduped.
+    - Inspector tab mirrors MacroTab UX (list + detail editor, key picker) with inline validation and footer messaging. Pilot test must create → bind → rename → delete/undo.
+- **Combo studio** (`combos[]`).
+  - Acceptance criteria:
+    - CRUD APIs enforce unique names + trigger chords, key positions within `[0,79]`, and valid `LayerRef` targets; rename rewrites references.
+    - UI provides chord picker on KeyCanvas, layer scope chips, timeout field, and conflict badges when overlaps exist.
+    - Unit + pilot tests cover create/edit/delete, rename propagation, and reference blocking.
+- **Listener studio** (`inputListeners[]`).
+  - Acceptance criteria:
+    - Store supports listener CRUD with unique `code`, validated layer refs, and `find_listener_references` used to block delete while bindings refer to the listener.
+    - ListenerTab lists listeners with type badges, shows processors/nodes, and surfaces reference counts with navigation links.
+    - Modal editor + Textual pilot cover create/edit/delete including error messaging + footer integration.
+- **Command Palette & Search**.
+  - Acceptance criteria:
+    - Ctrl/Cmd+K opens palette backed by a command registry (add/rename/delete layer, jump to Macro/HoldTap/Combo/Listener, toggle bundles, run validation/regeneration, open Search/Jump, undo/redo).
+    - Palette honors `enabled()` predicates so commands disable when prerequisites missing; every execution posts `StoreUpdated` + `FooterMessage` (success/error).
+    - Search/Jump panel accepts key indices, layer names, macro/hold-tap/combo/listener identifiers and re-focuses the relevant widget. Autocomplete + pilot tests verify flows.
 - **Hold Tap studio** (`holdTaps[]`).
   - Acceptance criteria:
     - Provides key pickers for `holdTriggerKeyPositions[]` and ensures timing fields ≥ 0.
