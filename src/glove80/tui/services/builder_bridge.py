@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
+import logging
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Dict, Iterable, Literal, Mapping, Sequence, Tuple, cast
 
+from glove80.families.tailorkey.alpha_layouts import TAILORKEY_VARIANTS
 from glove80.families.tailorkey.layers.hrm import build_hrm_layers
 from glove80.layouts.components import LayoutFeatureComponents
 from glove80.layouts.merge import merge_components
 
 from ..state import LayoutStore
+
+
+_LOGGER = logging.getLogger(__name__)
+_TAILORKEY_VARIANTS = {name.lower() for name in TAILORKEY_VARIANTS}
 
 
 @dataclass(frozen=True)
@@ -52,6 +58,7 @@ class BuilderBridge:
     ) -> None:
         self.store = store
         self.variant = variant or "windows"
+        self._warned_variant_fallback = False
 
     # ------------------------------------------------------------------
     # Public API
@@ -113,7 +120,15 @@ class BuilderBridge:
         return (payload if dry_run else layout, diff)
 
     def _home_row_components(self) -> LayoutFeatureComponents:
-        layers = build_hrm_layers(self.variant)
+        normalized, fallback = _normalize_tailorkey_variant(self.variant)
+        if fallback and not self._warned_variant_fallback:
+            _LOGGER.warning(
+                "HRM preview variant '%s' is not a TailorKey variant; using '%s' instead",
+                self.variant,
+                normalized,
+            )
+            self._warned_variant_fallback = True
+        layers = build_hrm_layers(normalized)
         return LayoutFeatureComponents(layers=layers)
 
     @staticmethod
@@ -195,6 +210,18 @@ def _string_sequence(value: object | None) -> Tuple[str, ...]:
     if isinstance(value, Sequence):
         return tuple(entry for entry in value if isinstance(entry, str))
     return ()
+
+
+def _normalize_tailorkey_variant(candidate: str | None) -> tuple[str, bool]:
+    """Map arbitrary variant names to a TailorKey-safe value.
+
+    Returns (variant, fallback_used?).
+    """
+
+    name = (candidate or "windows").strip().lower()
+    if name in _TAILORKEY_VARIANTS:
+        return name, False
+    return "windows", True
 
 
 __all__ = ["BuilderBridge", "FeatureDiff"]
